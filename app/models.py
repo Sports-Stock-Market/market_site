@@ -1,9 +1,13 @@
 from werkzeug.security import generate_password_hash, check_password_hash
-from sqlalchemy.orm import Table, Column, Integer, String, Boolean, ForeignKey, DateTime
+from sqlalchemy import Table, Column, Integer, String, Boolean, Float, ForeignKey, DateTime
+from sqlalchemy.ext.declarative import declarative_base
 from datetime import datetime
 from json import dumps
 
-class User(Model):
+Base = declarative_base()
+
+class User(Base):
+    __tablename__ = 'user'
     id = Column(Integer, primary_key=True)
     username = Column(String(64), index=True, unique=True)
     email = Column(String(120), index=True, unique=True)
@@ -24,7 +28,8 @@ class User(Model):
                       'total_assets': self.total_assets,
                       'cash': cash, 'money': money})
 
-class Team(Model):
+class Team(Base):
+    __tablename__ = 'team'
     id = Column(Integer, primary_key=True)
     name = Column(String(140))
     price = Column(Float)
@@ -36,7 +41,8 @@ class Team(Model):
                       'price': self.price, 'num_team': self.num_team,
                       'buy_quant': self.buy_quant})
 
-class Purchase(Model):
+class Purchase(Base):
+    __tablename__ = 'purchase'
     id = Column(Integer, primary_key=True)
     team_id = Column(Integer, ForeignKey('team.id'))
     user_id = Column(Integer, ForeignKey('user.id'))
@@ -50,7 +56,8 @@ class Purchase(Model):
                       'purchased_at': self.purchased_at,
                       'purchased_for': self.purchased_for})
 
-class Short(Model):
+class Short(Base):
+    __tablename__ = 'short'
     id = Column(Integer, primary_key=True)
     team_id = Column(Integer, ForeignKey('team.id'))
     user_id = Column(Integer, ForeignKey('user.id'))
@@ -65,17 +72,19 @@ class Short(Model):
                       'shorted_for': self.shorted_for,
                       'expires_at': self.expires_at})
 
-class Teamprice(Model):
+class Teamprice(Base):
+    __tablename__ = 'teamprice'
     id = Column(Integer, primary_key=True)
     date = Column(DateTime, index=True)
-    team_id = Column(Integer, ForeignKey('team.id')
+    team_id = Column(Integer, ForeignKey('team.id'))
     price = Column(Float)
 
     def serialize(self):
         return dumps({'id': self.id, 'date': self.date,
                       'team_id': self.team_id, 'price': self.price})
 
-class Listing(Model):
+class Listing(Base):
+    __tablename__ = 'listing'
     id = Column(Integer, primary_key=True)
     team_id = Column(Integer, ForeignKey('team.id'))
     user_id = Column(Integer, ForeignKey('user.id'))
