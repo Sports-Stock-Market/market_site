@@ -52,3 +52,6 @@ docs/_build/
 
 # environment files
 .env
+
+# vim .swp files
+*.*.swp
