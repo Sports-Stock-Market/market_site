@@ -1,3 +1,3 @@
-from app import create_app
+from fanbasemarket import create_app
 
-create_app()
+srvr = create_app()

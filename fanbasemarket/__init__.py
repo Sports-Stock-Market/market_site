@@ -2,7 +2,7 @@ from sqlalchemy_utils import database_exists, create_database
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
 from dotenv import load_dotenv
-from .models import Base
+from fanbasemarket.models import Base
 from flask import Flask
 from os import getenv
 
@@ -22,7 +22,10 @@ Base.metadata.create_all(engine, checkfirst=True)
 Session = sessionmaker(bind=engine)
 session = Session()
 
+from fanbasemarket.routes.api_routes import api
+
 def create_app():
     app = Flask(__name__)
+    app.register_blueprint(api, url_prefix='/api/')
     return app
 

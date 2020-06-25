@@ -12,21 +12,24 @@ class User(Base):
     username = Column(String(64), index=True, unique=True)
     email = Column(String(120), index=True, unique=True)
     password_hash = Column(String(128))
-    total_assets = Column(Float)
     cash = Column(Integer, default=10000)
     money = Column(Integer, default=10000)
+    
+    @property
+    def password():
+        raise ValueError('Password is a write-only field')
 
-    def set_password(self, password):
-        self.password_hash = generate_password_hash(password)
+    @password.setter
+    def password(self, pword):
+        self.password_hash = generate_password_hash(pword)
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
     
     def serialize(self):
         return dumps({'id': self.id, 'username': self.username,
-                      'email': self.email,
-                      'total_assets': self.total_assets,
-                      'cash': cash, 'money': money})
+                      'email': self.email, 'cash': self.cash,
+                      'money': self.money})
 
 class Team(Base):
     __tablename__ = 'team'
