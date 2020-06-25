@@ -25,12 +25,12 @@
 
 * **Error response**
 
-    * Code: 400
+    * Code: 400 <br />
       JSON: `{message: "passwords do not match"}`
 
     OR
 
-    * Code: 400
+    * Code: 400 <br />
       JSON: `{message: "username/email is already in use"}`
 
 * **Sample call**
