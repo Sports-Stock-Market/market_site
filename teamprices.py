@@ -1,6 +1,6 @@
 teamprices = {'Milwaukee Bucks': 71.59,
 'Los Angeles Lakers': 68.33,
-'Toronto Raptors': 66.15,
+'Toronto Raptors': 66.16,
 'Los Angeles Clippers': 65.55,
 'Boston Celtics': 65.00,
 'Dallas Mavericks': 63.77,
