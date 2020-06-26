@@ -2,7 +2,6 @@ from flask import Flask, render_template, flash, redirect, url_for
 from app import app
 from flask import request, g
 from werkzeug.urls import url_parse
-from sqlalchemy.sql import exists, operators
 
 @app.before_request
 def global_user():
