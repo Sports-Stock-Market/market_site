@@ -7,5 +7,5 @@
 ## Setup Instructions
 * `pip install requirements.txt`
 * `python setup.py install`
-* `pip install -e fanbasemarket`
+* `pip install -e .`
 * `flask run`
