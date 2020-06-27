@@ -1,1 +1,6 @@
+flask
+werkzeug
+pyjwt
+setuptools
+sqlalchemy
 
