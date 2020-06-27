@@ -12,6 +12,7 @@ db_usr = getenv('DB_USR')
 db_pass = getenv('DB_PASS')
 db_host = getenv('DB_HOST')
 db_name = getenv('DB_NAME')
+secret = getenv('API_SECRET')
 
 mysql_url = f'mysql://{db_usr}:{db_pass}@{db_host}/{db_name}?ssl=false'
 

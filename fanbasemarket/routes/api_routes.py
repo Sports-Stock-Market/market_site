@@ -1,6 +1,6 @@
-from fanbasemarket.models import User
-from fanbasemarket import session
 from flask import Blueprint, Response, request
+from fanbasemarket.models import User
+from fanbasemarket import session, secret
 from json import dumps, loads
 
 api = Blueprint('api', __name__)
@@ -24,9 +24,9 @@ def create_user():
                  password=pwrd)
         session.add(u)
         session.commit()
-        r = Response(u.serialize())
-        r.status_code = 200
+        r = Response(dumps({'jwt', u.gen_auth_token()}))
+        r.status_code = 201
         return r
     except Exception as e:
-        print(e)
         return bad_request('username/email is already in use')
+
