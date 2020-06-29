@@ -61,3 +61,11 @@ def login_user():
         return ok(ret, cookies=to_set)
     return bad_request('invalid password')
 
+@api.route('/refresh', methods=['POST'])
+@jwt_refresh_token_required
+def refresh_jwt():
+    user = get_jwt_identity()
+    access_jwt = create_access_token(identity=user)
+    ret = {'access_token': access_jwt}
+    return ok(ret)
+
