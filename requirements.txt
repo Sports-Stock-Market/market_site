@@ -1,6 +1,5 @@
 flask
 werkzeug
-pyjwt
 setuptools
 sqlalchemy
-
+flask-jwt-extended
