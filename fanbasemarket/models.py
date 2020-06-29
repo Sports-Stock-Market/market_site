@@ -2,7 +2,6 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy import Table, Column, Integer, String, Boolean, Float, ForeignKey, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 from datetime import datetime, timedelta
-from fanbasemarket import secret
 from json import dumps
 from jwt import encode
 
@@ -30,25 +29,6 @@ class User(Base):
     def serialize(self):
         return dumps({'id': self.id, 'username': self.username,
                       'email': self.email, 'money': self.money})
-
-    # https://realpython.com/token-based-authentication-with-flask/
-    def gen_auth_token(self):
-        try:
-            now = datetime.utcnow()
-            end = now + timedelta(days=0, minutes=15)
-            data = {
-                'exp': end,
-                'iat': now,
-                'sub': self.id
-            }
-            return encode(data, secret, algorithm='HS256')
-        except Exception as e:
-            return e
-
-    @staticmethod
-    def decode_auth_token(auth_token):
-        data = jwt.decode(auth_token, secret)
-        return data['sub']
 
 class Team(Base):
     __tablename__ = 'team'
