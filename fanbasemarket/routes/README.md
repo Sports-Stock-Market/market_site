@@ -68,7 +68,7 @@
 
 * **Success response**
 
-    * Code: 201
+    * Code: 200
     * JSON: `{access_token: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE1OTM0NzI4NDksIm5iZiI6MTU5MzQ3Mjg0OSwianRpIjoiY2YxNzYyYmMtY2Q0YS00YjdmLWI3ZTctYjQ4MWZjMmVhYzJiIiwiZXhwIjoxNTkzNDczNzQ5LCJpZGVudGl0eSI6InZwYXRoYWsyIiwiZnJlc2giOmZhbHNlLCJ0eXBlIjoiYWNjZXNzIn0.dNW6qI9bdQcgH1GdbZfEzYwS9qVzVywC1peURip1h6E"}`
     * Cookies: `{name: "refresh_token", value: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE1OTM0NzI4NDksIm5iZiI6MTU5MzQ3Mjg0OSwianRpIjoiYzdkODg2NjMtMmJkNC00OTRlLTgxZGYtYTBiYTkzMTM5ZGNiIiwiZXhwIjoxNTk2MDY0ODQ5LCJpZGVudGl0eSI6InZwYXRoYWsyIiwidHlwZSI6InJlZnJlc2gifQ.HFmrl0dcJLe6fdRTdV7epD4OTOMUCRT3mQUZID4G4Wk"}`
 
