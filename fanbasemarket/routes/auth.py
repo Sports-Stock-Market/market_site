@@ -4,11 +4,10 @@ from flask_jwt_extended import (
     get_jwt_identity, get_raw_jwt
 )
 from fanbasemarket.models import User, BlacklistedToken
+from fanbasemarket.routes.utils import bad_request, ok
 from fanbasemarket import session, jwt
 from flask import Blueprint, request
 from json import loads
-
-from fanbasemarket.routes.utils import bad_request, ok
 
 auth = Blueprint('auth', __name__)
 
