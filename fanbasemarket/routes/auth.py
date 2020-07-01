@@ -32,7 +32,7 @@ def check_if_token_in_blacklist(tok):
     return matches != []
 
 
-@api.route('/register', methods=['POST'])
+@auth.route('/register', methods=['POST'])
 def create_user():
     req_data = loads(request.get_json())
     pwrd = req_data['password']
@@ -55,7 +55,7 @@ def create_user():
         return bad_request('username/email is already in use')
 
 
-@api.route('/login', methods=['POST'])
+@auth.route('/login', methods=['POST'])
 def login_user():
     req_data = loads(request.get_json())
     uname = req_data['username']
@@ -72,7 +72,7 @@ def login_user():
     return bad_request('invalid password')
 
 
-@api.route('/refresh', methods=['POST'])
+@auth.route('/refresh', methods=['POST'])
 @jwt_refresh_token_required
 def refresh_jwt():
     user = get_jwt_identity()
@@ -81,7 +81,7 @@ def refresh_jwt():
     return ok(ret)
 
 
-@api.route('/logout', methods=['DELETE'])
+@auth.route('/logout', methods=['DELETE'])
 @jwt_required
 def logout_user():
     jti = get_raw_jwt()['jti']
