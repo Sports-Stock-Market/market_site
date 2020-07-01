@@ -31,7 +31,7 @@ session = Session()
 
 from fanbasemarket.routes.auth import auth
 
+
 def create_app():
     app.register_blueprint(auth, url_prefix='/api/auth/')
     return app
-

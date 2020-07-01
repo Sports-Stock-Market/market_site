@@ -57,6 +57,7 @@ class Purchase(Base):
                       'purchased_at': self.purchased_at,
                       'purchased_for': self.purchased_for})
 
+
 class Short(Base):
     __tablename__ = 'short'
     id = Column(Integer, primary_key=True)
@@ -73,16 +74,31 @@ class Short(Base):
                       'shorted_for': self.shorted_for,
                       'expires_at': self.expires_at})
 
+
 class Teamprice(Base):
     __tablename__ = 'teamprice'
     id = Column(Integer, primary_key=True)
     date = Column(DateTime, index=True)
     team_id = Column(Integer, ForeignKey('team.id'))
     price = Column(Float)
+    elo = Column(Float)
 
     def serialize(self):
         return dumps({'id': self.id, 'date': self.date,
-                      'team_id': self.team_id, 'price': self.price})
+                      'team_id': self.team_id, 'price': self.price,
+                      'elo': self.elo})
+
+
+class Game(Base):
+    __tablename__ = 'game'
+    home = Column(Integer, ForeignKey('team.id'))
+    away = Column(Integer, ForeignKey('team.id'))
+    start = Column(DateTime)
+
+    def serialize(self):
+        return dumps({'id': self.id, 'home': self.home,
+                      'away': self.away, 'start': self.start})
+
 
 class Listing(Base):
     __tablename__ = 'listing'
@@ -96,6 +112,7 @@ class Listing(Base):
         return dumps({'id': self.id, 'team_id': self.team_id,
             'user_id': self.user_id, 'price': self.price,
             'posted_at': self.posted_at})
+
 
 class BlacklistedToken(Base):
     __tablename__ = 'blacklistedtoken'
