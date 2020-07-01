@@ -64,8 +64,8 @@ def login_user():
     if user is None:
         return bad_request('invalid username')
     if user.check_password(pwrd):
-        access_jwt = create_access_token(identity=username)
-        refresh_jwt = create_refresh_token(identity=username)
+        access_jwt = create_access_token(identity=uname)
+        refresh_jwt = create_refresh_token(identity=uname)
         ret = {'access_token': access_jwt}
         to_set = {'refresh_token': refresh_jwt}
         return ok(ret, cookies=to_set)
