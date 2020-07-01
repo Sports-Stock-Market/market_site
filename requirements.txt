@@ -3,3 +3,4 @@ werkzeug
 setuptools
 sqlalchemy
 flask-jwt-extended
+sqlalchemy-utils
