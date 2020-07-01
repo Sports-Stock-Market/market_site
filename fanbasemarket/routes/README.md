@@ -5,7 +5,7 @@
 ### Register User
 * **URL**
 
-    /api/register
+    /api/auth/register
 
 * **Method**
 
@@ -55,7 +55,7 @@
 ### Login User
 * **URL**
 
-    /api/login
+    /api/auth/login
 
 * **Method**
 

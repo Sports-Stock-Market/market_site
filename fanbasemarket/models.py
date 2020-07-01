@@ -1,9 +1,8 @@
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy import Table, Column, Integer, String, Boolean, Float, ForeignKey, DateTime
 from sqlalchemy.ext.declarative import declarative_base
-from datetime import datetime, timedelta
+from datetime import datetime
 from json import dumps
-from jwt import encode
 
 Base = declarative_base()
 
@@ -16,7 +15,7 @@ class User(Base):
     money = Column(Integer, default=10000)
     
     @property
-    def password():
+    def password(self):
         raise ValueError('Password is a write-only field')
 
     @password.setter
@@ -98,3 +97,7 @@ class Listing(Base):
             'user_id': self.user_id, 'price': self.price,
             'posted_at': self.posted_at})
 
+class BlacklistedToken(Base):
+    __tablename__ = 'blacklistedtoken'
+    id = Column(Integer, primary_key=True)
+    jwt = Column(String(100))

@@ -8,7 +8,6 @@ from flask import Flask
 from os import getenv
 
 load_dotenv()
-
 db_usr = getenv('DB_USR')
 db_pass = getenv('DB_PASS')
 db_host = getenv('DB_HOST')
@@ -23,7 +22,6 @@ app.config['JWT_BLACKLIST_TOKEN_CHECKS'] = ['access', 'refresh']
 jwt = JWTManager(app)
 
 mysql_url = f'mysql://{db_usr}:{db_pass}@{db_host}/{db_name}?ssl=false'
-
 engine = create_engine(mysql_url)
 if not database_exists(engine.url):
     create_database(engine.url)
@@ -31,9 +29,9 @@ Base.metadata.create_all(engine, checkfirst=True)
 Session = sessionmaker(bind=engine)
 session = Session()
 
-from fanbasemarket.routes.api_routes import api
+from fanbasemarket.routes.auth import auth
 
 def create_app():
-    app.register_blueprint(api, url_prefix='/api/')
+    app.register_blueprint(auth, url_prefix='/api/auth/')
     return app
 
