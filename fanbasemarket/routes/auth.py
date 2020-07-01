@@ -3,27 +3,14 @@ from flask_jwt_extended import (
     jwt_refresh_token_required, create_refresh_token,
     get_jwt_identity, get_raw_jwt
 )
-from flask import Blueprint, Response, request
-from fanbasemarket import session, jwt
 from fanbasemarket.models import User, BlacklistedToken
-from json import dumps, loads
+from fanbasemarket import session, jwt
+from flask import Blueprint, request
+from json import loads
+
+from fanbasemarket.routes.utils import bad_request, ok
 
 auth = Blueprint('auth', __name__)
-
-
-def bad_request(msg):
-    r = Response(dumps({'message': msg}))
-    r.status_code = 400
-    return r
-
-
-def ok(dict_payload, created=False, cookies={}):
-    payload = dumps(dict_payload)
-    r = Response(payload)
-    for k, v in cookies.items():
-        r.set_cookie(k, v, httponly=True)
-    r.status_code = 201 if created else 200
-    return r
 
 
 @jwt.token_in_blacklist_loader
