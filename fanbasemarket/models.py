@@ -1,10 +1,9 @@
+from sqlalchemy import Column, Integer, String, Boolean, Float, ForeignKey, DateTime
 from werkzeug.security import generate_password_hash, check_password_hash
-from sqlalchemy import Table, Column, Integer, String, Boolean, Float, ForeignKey, DateTime
-from sqlalchemy.ext.declarative import declarative_base
+from fanbasemarket import Base
 from datetime import datetime
 from json import dumps
 
-Base = declarative_base()
 
 class User(Base):
     __tablename__ = 'user'
@@ -29,18 +28,15 @@ class User(Base):
         return dumps({'id': self.id, 'username': self.username,
                       'email': self.email, 'money': self.money})
 
+
 class Team(Base):
     __tablename__ = 'team'
     id = Column(Integer, primary_key=True)
     name = Column(String(140))
-    price = Column(Float)
-    num_team = Column(Integer)
-    buy_quant = Column(Integer)
 
     def serialize(self):
-        return dumps({'id': self.id, 'name': self.name,
-                      'price': self.price, 'num_team': self.num_team,
-                      'buy_quant': self.buy_quant})
+        return dumps({'id': self.id, 'name': self.name})
+
 
 class Purchase(Base):
     __tablename__ = 'purchase'
@@ -80,19 +76,20 @@ class Teamprice(Base):
     id = Column(Integer, primary_key=True)
     date = Column(DateTime, index=True)
     team_id = Column(Integer, ForeignKey('team.id'))
-    price = Column(Float)
     elo = Column(Float)
 
     def serialize(self):
         return dumps({'id': self.id, 'date': self.date,
-                      'team_id': self.team_id, 'price': self.price,
-                      'elo': self.elo})
+                      'team_id': self.team_id, 'elo': self.elo})
 
 
 class Game(Base):
     __tablename__ = 'game'
+    id = Column(Integer, primary_key=True)
     home = Column(Integer, ForeignKey('team.id'))
     away = Column(Integer, ForeignKey('team.id'))
+    home_score = Column(Integer, default=0)
+    away_score = Column(Integer, default=0)
     start = Column(DateTime)
 
     def serialize(self):
@@ -110,8 +107,8 @@ class Listing(Base):
     
     def serialize(self):
         return dumps({'id': self.id, 'team_id': self.team_id,
-            'user_id': self.user_id, 'price': self.price,
-            'posted_at': self.posted_at})
+                      'user_id': self.user_id, 'price': self.price,
+                      'posted_at': self.posted_at})
 
 
 class BlacklistedToken(Base):
