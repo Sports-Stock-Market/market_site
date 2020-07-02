@@ -12,6 +12,7 @@ setup(
         'sqlalchemy-utils',
         'flask-jwt-extended',
         'python-dotenv',
-        'nba-api'
+        'nba-api',
+        'basketball_reference_web_scraper'
     ],
 )

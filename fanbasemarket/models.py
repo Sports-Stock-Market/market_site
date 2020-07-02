@@ -88,6 +88,8 @@ class Game(Base):
     id = Column(Integer, primary_key=True)
     home = Column(Integer, ForeignKey('team.id'))
     away = Column(Integer, ForeignKey('team.id'))
+    home_score = Column(Integer, default=0)
+    away_score = Column(Integer, default=0)
     start = Column(DateTime)
 
     def serialize(self):
@@ -105,8 +107,8 @@ class Listing(Base):
     
     def serialize(self):
         return dumps({'id': self.id, 'team_id': self.team_id,
-            'user_id': self.user_id, 'price': self.price,
-            'posted_at': self.posted_at})
+                      'user_id': self.user_id, 'price': self.price,
+                      'posted_at': self.posted_at})
 
 
 class BlacklistedToken(Base):
