@@ -10,6 +10,8 @@ setup(
         'setuptools',
         'sqlalchemy',
         'sqlalchemy-utils',
-        'flask-jwt-extended'
+        'flask-jwt-extended',
+        'python-dotenv',
+        'nba-api'
     ],
 )
