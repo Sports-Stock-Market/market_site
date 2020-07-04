@@ -59,7 +59,7 @@ for t_name in team_names:
 prices = Teamprice.query.all()
 if len(prices) == len(team_names):
     # Populate DB with historic results and prices
-    schedules = get_schedule_range(load_start.year, datetime.today().year - 1)
+    schedules = get_schedule_range(load_start.year, datetime.today().year)
     for schedule in schedules:
         for game in schedule:
             home_name = capwords(game['home_team'].value)
@@ -67,6 +67,10 @@ if len(prices) == len(team_names):
             start_time = game['start_time']
             home_score = game['home_team_score']
             away_score = game['away_team_score']
+            if home_score is None:
+                home_score = 0
+            if away_score is None:
+                away_score = 0
             home_team = Team.query.filter_by(name=home_name).first()
             away_team = Team.query.filter_by(name=away_name).first()
             game = Game(home=home_team.id, away=away_team.id, home_score=home_score,
