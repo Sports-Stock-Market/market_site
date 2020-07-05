@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useForm } from "react-hook-form";
 
 // Material-UI Components
 import { makeStyles } from '@material-ui/core/styles';
@@ -11,8 +12,6 @@ import Checkbox from '@material-ui/core/Checkbox';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import Container from '@material-ui/core/Container';
-
-
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -30,17 +29,23 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function Login() {
+const onSubmit = data => {
+  console.log(JSON.stringify(data));
+  // this is where you send data to API
+};
+
+const LoginForm = () => {
   const classes = useStyles();
+  const { register, handleSubmit } = useForm();
 
   return (
     <Container component="main" maxWidth="xs">
       <CssBaseline />
       <div className={classes.paper}>
-        <Typography component="h1" variant="h5">
+        <Typography variant="h5">
           Welcome to Fanbase
         </Typography>
-        <form className={classes.form} noValidate>
+        <form className={classes.form} noValidate onSubmit={handleSubmit(onSubmit)}>
           <TextField
             variant="outlined"
             margin="normal"
@@ -51,6 +56,7 @@ export default function Login() {
             name="email"
             autoComplete="email"
             autoFocus
+            inputRef={register}
           />
           <TextField
             variant="outlined"
@@ -62,9 +68,10 @@ export default function Login() {
             type="password"
             id="password"
             autoComplete="current-password"
+            inputRef={register}
           />
           <FormControlLabel
-            control={<Checkbox value="remember" color="primary" />}
+            control={<Checkbox inputRef={register} name="remember" color="primary" defaultValue={false}/>}
             label="Remember me"
           />
           <Button
@@ -74,7 +81,7 @@ export default function Login() {
             color="primary"
             className={classes.submit}
           >
-            Sign In
+            Login
           </Button>
           <Grid container>
             <Grid item xs>
@@ -93,3 +100,5 @@ export default function Login() {
     </Container>
   );
 }
+
+export default LoginForm;
