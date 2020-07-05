@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useForm } from "react-hook-form";
 
 // Material-UI Components
 import { makeStyles } from '@material-ui/core/styles';
@@ -26,17 +27,23 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function Register() {
+const onSubmit = data => {
+  console.log(JSON.stringify(data));
+  // this is where you send data to API
+};
+
+const SignUpForm = () => {
   const classes = useStyles();
+  const { register, handleSubmit } = useForm();
 
   return (
     <Container component="main" maxWidth="xs">
       <CssBaseline />
       <div className={classes.paper}>
-        <Typography component="h1" variant="h5">
+        <Typography variant="h5">
           Start Building Your Fanbase
         </Typography>
-        <form className={classes.form} noValidate>
+        <form className={classes.form} noValidate onSubmit={handleSubmit(onSubmit)}>
           <Grid container spacing={2}>
             <Grid item xs={12} sm={6}>
               <TextField
@@ -48,6 +55,7 @@ export default function Register() {
                 id="firstName"
                 label="First Name"
                 autoFocus
+                inputRef={register}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -59,6 +67,7 @@ export default function Register() {
                 label="Last Name"
                 name="lastName"
                 autoComplete="lname"
+                inputRef={register}
               />
             </Grid>
             <Grid item xs={12}>
@@ -70,6 +79,7 @@ export default function Register() {
                 label="Email Address"
                 name="email"
                 autoComplete="email"
+                inputRef={register}
               />
             </Grid>
             <Grid item xs={12}>
@@ -82,6 +92,7 @@ export default function Register() {
                 type="password"
                 id="password"
                 autoComplete="current-password"
+                inputRef={register}
               />
             </Grid>
             <Grid item xs={12}>
@@ -93,7 +104,8 @@ export default function Register() {
                 label="Confirm Password"
                 type="password"
                 id="confirm-password"
-                autoComplete="current-password"
+                autoComplete="confirm-password"
+                inputRef={register}
               />
             </Grid>
           </Grid>
@@ -118,3 +130,5 @@ export default function Register() {
     </Container>
   );
 }
+
+export default SignUpForm;

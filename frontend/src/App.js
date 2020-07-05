@@ -7,9 +7,9 @@ import {
 } from 'react-router-dom';
 
 import {
-  Login,
-  Register,
-  NavBar
+  LoginForm,
+  NavBar,
+  SignUpForm
 } from './components';
 
 import './App.css';
@@ -22,8 +22,8 @@ function App() {
           <Route path="/" exact>
             <h1> Fanbase Market </h1>
           </Route>
-          <Route path="/login" exact component={Login} />
-          <Route path="/register" exact component={Register} />
+          <Route path="/login" exact component={LoginForm} />
+          <Route path="/register" exact component={SignUpForm} />
         </Switch>
     </Router>
   );

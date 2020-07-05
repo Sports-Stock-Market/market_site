@@ -18,6 +18,7 @@ const useStyles = makeStyles((theme) => ({
     },
     title: {
       flexGrow: 1,
+      fontWeight: 700,
     },
 }));
 
@@ -26,14 +27,19 @@ export default function NavBar() {
   
     return (
       <div className={classes.root}>
-        <AppBar position="static">
+        <AppBar color="inherit" position="sticky">
           <Toolbar>
             <SportsBasketballIcon edge="start" className={classes.logo} color="inherit" />
-            <Typography variant="h6" className={classes.title}>
-                <Link to="/">Fanbase</Link>
-            </Typography>
+            <Typography variant="h6" className={classes.title}>Fanbase</Typography>
             <Button component={Link} to="/register" color="inherit">Sign Up</Button>
-            <Button component={Link} to="/login" color="inherit">Login</Button>
+            <Button 
+            component={Link} 
+            to="/login" 
+            color="primary" 
+            variant="outlined" 
+            >
+              Login
+            </Button>
           </Toolbar>
         </AppBar>
       </div>
