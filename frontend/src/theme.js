@@ -9,11 +9,14 @@ const theme = createMuiTheme({
             main: '#1043C1',
         },        
         red: {
-            main: '#EC1C24'
+            main: '#D8484D'
         },
         yellow: {
-           main: '#FFC010',
+            main: '#FFC010',
         },
+        green: {
+            main: '#009B43',
+        }
     },
     typography: {
         fontFamily: [
@@ -28,6 +31,9 @@ const theme = createMuiTheme({
           '"Segoe UI Emoji"',
           '"Segoe UI Symbol"',
         ].join(','),
+        h4: {
+            fontWeight: 700,
+        },
         h5: {
             fontWeight: 700,
         },

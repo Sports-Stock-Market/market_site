@@ -2,8 +2,7 @@ import React from 'react';
 import {
   BrowserRouter as Router,
   Switch,
-  Route,
-  Link
+  Route
 } from 'react-router-dom';
 
 import {
@@ -14,8 +13,10 @@ import {
 } from './components';
 
 import './App.css';
+import TeamCardContainer from './components/TeamCardContainer';
 
 function App() {
+
   return (
     <Router>
       <NavBar />
@@ -26,7 +27,7 @@ function App() {
           <Route path="/login" exact component={LoginForm} />
           <Route path="/register" exact component={SignUpForm} />
           <Route path="/portfolio/:username">
-            <TeamCard data={{abr: "TOR"}}/>
+            <TeamCardContainer />
           </Route>
         </Switch>
     </Router>
