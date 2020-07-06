@@ -9,7 +9,8 @@ import {
 import {
   LoginForm,
   NavBar,
-  SignUpForm
+  SignUpForm,
+  TeamCard
 } from './components';
 
 import './App.css';
@@ -24,6 +25,9 @@ function App() {
           </Route>
           <Route path="/login" exact component={LoginForm} />
           <Route path="/register" exact component={SignUpForm} />
+          <Route path="/portfolio/:username">
+            <TeamCard data={{abr: "TOR"}}/>
+          </Route>
         </Switch>
     </Router>
   );
