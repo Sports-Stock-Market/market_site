@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, Redirect } from 'react-router-dom';
 import { useForm } from "react-hook-form";
 
 // Material-UI Components
@@ -30,8 +30,25 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const onSubmit = data => {
-  console.log(JSON.stringify(data));
-  // this is where you send data to API
+  const requestOpts = {
+    method: 'POST',
+    headers: {'Content-type': 'application/JSON'},
+    body: JSON.stringify(data),
+    credentials: 'include'
+  };
+  fetch('http://127.0.0.1:5000/api/auth/login', requestOpts)
+    .then(response => {
+      if (response.status === 400) {
+        response.json().then(err => {
+          alert(err['message']);
+        });
+      } else if (response.status === 200) {
+        response.json().then(data => {
+          localStorage.setItem('access_token', data['access_token']);
+          return <Redirect to='/portfolio' />;
+        });
+      }
+    });
 };
 
 const LoginForm = () => {
@@ -52,9 +69,9 @@ const LoginForm = () => {
             required
             fullWidth
             id="email"
-            label="Email Address"
-            name="email"
-            autoComplete="email"
+            label="Username"
+            name="username"
+            autoComplete="username"
             autoFocus
             inputRef={register}
           />

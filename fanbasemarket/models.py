@@ -12,6 +12,7 @@ class User(Base):
     email = Column(String(120), index=True, unique=True)
     password_hash = Column(String(128))
     money = Column(Integer, default=10000)
+    confirmed = Column(Boolean, default=False)
     
     @property
     def password(self):
