@@ -9,11 +9,11 @@ import {
   LoginForm,
   NavBar,
   SignUpForm,
-  TeamCard
+  TeamCardContainer,
+  FormContainer
 } from './components';
 
 import './App.css';
-import TeamCardContainer from './components/TeamCardContainer';
 
 function App() {
 
@@ -24,8 +24,16 @@ function App() {
           <Route path="/" exact>
             <h1> Fanbase Market </h1>
           </Route>
-          <Route path="/login" exact component={LoginForm} />
-          <Route path="/register" exact component={SignUpForm} />
+          <Route path="/login" exact>
+            <FormContainer title="Welcome to Fanbase">
+              <LoginForm />
+            </FormContainer>
+          </Route>
+          <Route path="/signup" exact>
+            <FormContainer title="Build Your Fanbase">
+              <SignUpForm />
+            </FormContainer>
+          </Route>
           <Route path="/portfolio/:username">
             <TeamCardContainer />
           </Route>

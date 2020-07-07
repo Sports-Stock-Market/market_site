@@ -12,7 +12,7 @@ import {
 
 const useStyles = makeStyles((theme) => ({
     root: {
-        padding: theme.spacing(2),
+        padding: theme.spacing(1.5),
         boxShadow: "0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24)",
         transition: "all 0.3s cubic-bezier(.25,.8,.25,1)",
         '&:hover': {
@@ -49,23 +49,23 @@ const TeamCard = (props) => {
     return (
         <Link to={`/team/${props.data.abr.toLowerCase()}`} style={{ textDecoration: 'none' }}>
             <Card className={classes.root}>
-                <Grid container spacing={3}>
+                <Grid container spacing={2}>
                     <Grid item xs={9}>
                         <Typography variant="h5">
                             {props.data.name}
                         </Typography>
                         <Typography variant="subtitle2">
-                            {props.data.position.shares} shares ({props.data.position.diversity*100}% diversity) 
+                            {props.data.position.shares} Shares ({props.data.position.diversity*100}% Diversity) 
                         </Typography>
                     </Grid>
-                    <Grid item xs={3}>
-                        <Logo size={80} />
+                    <Grid style={{ marginTop: -8}} item xs={2}>
+                        <Logo size={60} />
                     </Grid>
                     <Grid item xs={12}>
                         Chart goes here
                     </Grid>
                     <Grid item xs={9}>
-                        <Typography className={textColor} variant="h4">
+                        <Typography className={textColor} variant="h5">
                             ${props.data.price}
                         </Typography>
                         <Typography className={textColor} variant="subtitle2">
