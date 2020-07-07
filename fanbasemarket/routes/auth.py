@@ -7,9 +7,17 @@ from fanbasemarket.models import User, BlacklistedToken
 from fanbasemarket.routes.utils import bad_request, ok
 from fanbasemarket import session, jwt
 from flask import Blueprint, request
+from flask_cors import cross_origin, CORS
 from json import loads
 
 auth = Blueprint('auth', __name__)
+CORS(auth)
+
+
+@auth.after_request
+def creds(response):
+    response.headers['Access-Control-Allow-Credentials'] = 'true'
+    return response
 
 
 @jwt.token_in_blacklist_loader
@@ -19,13 +27,14 @@ def check_if_token_in_blacklist(tok):
 
 
 @auth.route('/register', methods=['POST'])
+@cross_origin(origin='http://127.0.0.1:3000/')
 def create_user():
-    req_data = loads(request.get_json())
+    req_data = request.get_json()
     pwrd = req_data['password']
-    pwrd_c = req_data['confirm_password']
+    pwrd_c = req_data['confirm-password']
     if pwrd != pwrd_c:
         return bad_request('passwords do not match')
-    uname = req_data['username']
+    uname = req_data['userName']
     email = req_data['email']
     try:
         u = User(username=uname, email=email,
@@ -42,8 +51,9 @@ def create_user():
 
 
 @auth.route('/login', methods=['POST'])
+@cross_origin(origin='http://127.0.0.1:3000/')
 def login_user():
-    req_data = loads(request.get_json())
+    req_data = request.get_json()
     uname = req_data['username']
     pwrd = req_data['password']
     user = User.query.filter_by(username=uname).first()
@@ -59,6 +69,7 @@ def login_user():
 
 
 @auth.route('/refresh', methods=['POST'])
+@cross_origin(origin='http://127.0.0.1:3000/')
 @jwt_refresh_token_required
 def refresh_jwt():
     user = get_jwt_identity()
@@ -68,6 +79,7 @@ def refresh_jwt():
 
 
 @auth.route('/logout', methods=['DELETE'])
+@cross_origin(origin='http://127.0.0.1:3000/')
 @jwt_required
 def logout_user():
     jti = get_raw_jwt()['jti']

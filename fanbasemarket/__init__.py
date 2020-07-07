@@ -8,6 +8,7 @@ from nba_api.stats.static import teams
 from sqlalchemy import create_engine
 from dotenv import load_dotenv
 from datetime import datetime
+from flask_cors import CORS
 from string import capwords
 from flask import Flask
 from os import getenv
@@ -25,7 +26,8 @@ db_name = getenv('DB_NAME')
 load_start = datetime.strptime(getenv('LOAD_START'), STRPTIME_FORMAT)
 
 app = Flask(__name__)
-
+CORS(app)
+app.config['CORS_HEADERS'] = 'Content-Type'
 app.config['JWT_TOKEN_LOCATION'] = ['json', 'cookies']
 app.config['JWT_SECRET_KEY'] = getenv('API_SECRET')
 app.config['JWT_BLACKLIST_ENABLED'] = True

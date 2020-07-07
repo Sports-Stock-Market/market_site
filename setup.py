@@ -13,6 +13,7 @@ setup(
         'flask-jwt-extended',
         'python-dotenv',
         'nba-api',
-        'basketball_reference_web_scraper'
+        'basketball_reference_web_scraper',
+        'flask-cors'
     ],
 )

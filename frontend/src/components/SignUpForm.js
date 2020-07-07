@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, Redirect } from 'react-router-dom';
 import { useForm } from "react-hook-form";
 
 // Material-UI Components
@@ -10,6 +10,8 @@ import TextField from '@material-ui/core/TextField';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import Container from '@material-ui/core/Container';
+
+import { Alert } from 'react-alert';
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -28,8 +30,25 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const onSubmit = data => {
-  console.log(JSON.stringify(data));
-  // this is where you send data to API
+  const requestOpts = {
+    method: 'POST',
+    headers: {'Content-type': 'application/JSON'},
+    body: JSON.stringify(data),
+    credentials: 'include'
+  };
+  fetch('http://127.0.0.1:5000/api/auth/register', requestOpts)
+    .then(response => {
+      if (response.status === 400) {
+        response.json().then(err => {
+          alert(err['message']);
+        });
+      } else if (response.status === 201) {
+        response.json().then(data => {
+          localStorage.setItem('access_token', data['access_token']);
+          return <Redirect to='/portfolio' />;
+        });
+      }
+    });
 };
 
 const SignUpForm = () => {
@@ -45,28 +64,16 @@ const SignUpForm = () => {
         </Typography>
         <form className={classes.form} noValidate onSubmit={handleSubmit(onSubmit)}>
           <Grid container spacing={2}>
-            <Grid item xs={12} sm={6}>
+            <Grid item xs={12}>
               <TextField
-                autoComplete="fname"
-                name="firstName"
+                autoComplete="uname"
+                name="userName"
                 variant="outlined"
                 required
                 fullWidth
-                id="firstName"
-                label="First Name"
+                id="userName"
+                label="Username"
                 autoFocus
-                inputRef={register}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                variant="outlined"
-                required
-                fullWidth
-                id="lastName"
-                label="Last Name"
-                name="lastName"
-                autoComplete="lname"
                 inputRef={register}
               />
             </Grid>
@@ -78,6 +85,7 @@ const SignUpForm = () => {
                 id="email"
                 label="Email Address"
                 name="email"
+                type="email"
                 autoComplete="email"
                 inputRef={register}
               />
