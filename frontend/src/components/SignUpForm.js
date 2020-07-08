@@ -1,17 +1,18 @@
-import React from 'react';
-import { Link, Redirect } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link, useHistory } from 'react-router-dom';
 import { useForm } from "react-hook-form";
 
 // Material-UI Components
 import { makeStyles } from '@material-ui/core/styles';
-import Button from '@material-ui/core/Button';
-import CssBaseline from '@material-ui/core/CssBaseline';
-import TextField from '@material-ui/core/TextField';
-import Grid from '@material-ui/core/Grid';
-import Typography from '@material-ui/core/Typography';
-import Container from '@material-ui/core/Container';
-
-import { Alert } from 'react-alert';
+import { 
+  Button,
+  TextField,
+  Grid,
+  Collapse,
+  IconButton
+} from '@material-ui/core';
+import Alert from '@material-ui/lab/Alert';
+import CloseIcon from '@material-ui/icons/Close';
 
 const useStyles = makeStyles((theme) => ({
   form: {
@@ -31,57 +32,53 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-const onSubmit = data => {
-  const requestOpts = {
-    method: 'POST',
-    headers: {'Content-type': 'application/JSON'},
-    body: JSON.stringify(data),
-    credentials: 'include'
-  };
-  fetch('http://127.0.0.1:5000/api/auth/register', requestOpts)
-    .then(response => {
-      if (response.status === 400) {
-        response.json().then(err => {
-          alert(err['message']);
-        });
-      } else if (response.status === 201) {
-        response.json().then(data => {
-          localStorage.setItem('access_token', data['access_token']);
-          return <Redirect to='/portfolio' />;
-        });
-      }
-    });
-};
-
 const SignUpForm = () => {
   const classes = useStyles();
   const { register, handleSubmit } = useForm();
+  const [ formError, setFormError ] = useState(false);
+  const [ errorMessage, setErrorMessage ] = useState()
+  const history = useHistory();
+
+  const handleError = err => {
+    setFormError(true);
+    setErrorMessage(err['message']);
+  }
+
+  const onSubmit = data => {
+    const requestOpts = {
+      method: 'POST',
+      headers: {'Content-type': 'application/JSON'},
+      body: JSON.stringify(data),
+      credentials: 'include'
+    };
+    fetch('http://127.0.0.1:5000/api/auth/register', requestOpts)
+      .then(response => {
+        if (response.status === 400) {
+          response.json().then(err => {
+            handleError(err);
+          });
+        } else if (response.status === 201) {
+          response.json().then(data => {
+            localStorage.setItem('access_token', data['access_token']);
+            history.push("/portfolio/user");
+          });
+        }
+      });
+  };
 
   return (
     <form className={classes.form} noValidate onSubmit={handleSubmit(onSubmit)}>
       <Grid container spacing={2}>
-        <Grid item xs={12} sm={6}>
+        <Grid item xs={12}>
           <TextField
-            autoComplete="fname"
-            name="firstName"
+            autoComplete="uname"
+            name="userName"
             variant="outlined"
             required
             fullWidth
-            id="firstName"
-            label="First Name"
+            id="userName"
+            label="Username"
             autoFocus
-            inputRef={register}
-          />
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <TextField
-            variant="outlined"
-            required
-            fullWidth
-            id="lastName"
-            label="Last Name"
-            name="lastName"
-            autoComplete="lname"
             inputRef={register}
           />
         </Grid>
@@ -124,6 +121,9 @@ const SignUpForm = () => {
           />
         </Grid>
       </Grid>
+      <Link className={classes.link} to="/login" variant="body2">
+        Already have an account? Login
+      </Link>
       <Button
         type="submit"
         fullWidth
@@ -133,13 +133,23 @@ const SignUpForm = () => {
       >
         Sign Up
       </Button>
-      <Grid container justify="flex-end">
-        <Grid item>
-          <Link className={classes.link} to="/login" variant="body2">
-            Already have an account? Login
-          </Link>
-        </Grid>
-      </Grid>
+      <Collapse in={formError}>
+        <Alert 
+          action={
+            <IconButton
+              aria-label="close"
+              color="inherit"
+              size="small"
+              onClick={() => {
+                setFormError(false);
+              }}>
+              <CloseIcon fontSize="inherit" />
+            </IconButton>
+          } 
+          variant="outlined" severity="error">
+          {errorMessage}
+        </Alert>
+      </Collapse>
     </form>
   );
 }
