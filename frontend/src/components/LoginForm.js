@@ -1,17 +1,19 @@
-import React from 'react';
-import { Link, Redirect } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link, useHistory } from 'react-router-dom';
 import { useForm } from "react-hook-form";
 
 // Material-UI Components
 import { makeStyles } from '@material-ui/core/styles';
-import Button from '@material-ui/core/Button';
-import CssBaseline from '@material-ui/core/CssBaseline';
-import TextField from '@material-ui/core/TextField';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Checkbox from '@material-ui/core/Checkbox';
-import Grid from '@material-ui/core/Grid';
-import Typography from '@material-ui/core/Typography';
-import Container from '@material-ui/core/Container';
+import { 
+  Button,
+  TextField,
+  // FormControlLabel,
+  // Checkbox,
+  Collapse,
+  IconButton,
+} from '@material-ui/core';
+import Alert from '@material-ui/lab/Alert';
+import CloseIcon from '@material-ui/icons/Close';
 
 const useStyles = makeStyles((theme) => ({
   form: {
@@ -34,31 +36,39 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-const onSubmit = data => {
-  const requestOpts = {
-    method: 'POST',
-    headers: {'Content-type': 'application/JSON'},
-    body: JSON.stringify(data),
-    credentials: 'include'
-  };
-  fetch('http://127.0.0.1:5000/api/auth/login', requestOpts)
-    .then(response => {
-      if (response.status === 400) {
-        response.json().then(err => {
-          alert(err['message']);
-        });
-      } else if (response.status === 200) {
-        response.json().then(data => {
-          localStorage.setItem('access_token', data['access_token']);
-          return <Redirect to='/portfolio' />;
-        });
-      }
-    });
-};
-
 const LoginForm = () => {
   const classes = useStyles();
   const { register, handleSubmit } = useForm();
+  const [ formError, setFormError ] = useState(false);
+  const [ errorMessage, setErrorMessage ] = useState();
+  const history = useHistory();
+
+  const handleError = err => {
+    setFormError(true);
+    setErrorMessage(err['message']);
+  }
+
+  const onSubmit = data => {
+    const requestOpts = {
+      method: 'POST',
+      headers: {'Content-type': 'application/JSON'},
+      body: JSON.stringify(data),
+      credentials: 'include'
+    };
+    fetch('http://127.0.0.1:5000/api/auth/login', requestOpts)
+      .then(response => {
+        if (response.status === 400) {
+          response.json().then(err => {
+            handleError(err);
+          });
+        } else if (response.status === 200) {
+          response.json().then(data => {
+            localStorage.setItem('access_token', data['access_token']);
+            history.push("/portfolio/user");
+          });
+        }
+      });
+  };
 
   return (
     <form className={classes.form} noValidate onSubmit={handleSubmit(onSubmit)}>
@@ -69,9 +79,9 @@ const LoginForm = () => {
         required
         fullWidth
         id="email"
-        label="Email Address"
-        name="email"
-        autoComplete="email"
+        label="Username"
+        name="username"
+        autoComplete="username"
         autoFocus
         inputRef={register}
       />
@@ -92,6 +102,9 @@ const LoginForm = () => {
         control={<Checkbox inputRef={register} name="remember" color="primary" defaultValue={false}/>}
         label="Remember me"
       /> */}
+      <Link className={classes.link} to="/signup">
+        Don't have an account? Register
+      </Link>
       <Button
         type="submit"
         fullWidth
@@ -101,18 +114,23 @@ const LoginForm = () => {
       >
         Login
       </Button>
-      <Grid container>
-        <Grid item xs>
-          <Link className={classes.link} to="#" variant="body2">
-            Forgot password?
-          </Link>
-        </Grid>
-        <Grid item>
-          <Link className={classes.link} to="/signup" variant="body2">
-            Don't have an account? Register
-          </Link>
-        </Grid>
-      </Grid>
+      <Collapse in={formError}>
+        <Alert 
+          action={
+            <IconButton
+              aria-label="close"
+              color="inherit"
+              size="small"
+              onClick={() => {
+                setFormError(false);
+              }}>
+              <CloseIcon fontSize="inherit" />
+            </IconButton>
+          }  
+        variant="outlined" severity="error">
+          {errorMessage}
+        </Alert>
+      </Collapse>
     </form>
   );
 }
