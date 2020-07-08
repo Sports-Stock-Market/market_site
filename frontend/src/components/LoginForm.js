@@ -14,19 +14,24 @@ import Typography from '@material-ui/core/Typography';
 import Container from '@material-ui/core/Container';
 
 const useStyles = makeStyles((theme) => ({
-  paper: {
-    marginTop: theme.spacing(8),
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-  },
   form: {
     width: '100%', // Fix IE 11 issue.
     marginTop: theme.spacing(1),
   },
-  submit: {
-    margin: theme.spacing(3, 0, 2),
+  field: {
+    margin: theme.spacing(2, 0, 0),
   },
+  submit: {
+    height: 40,
+    margin: theme.spacing(2, 0, 1.5),
+  },
+  link: {
+    color: 'black',
+    textDecoration: 'none',
+    '&:hover': {
+      textDecoration: 'underline',
+    },
+  }
 }));
 
 const onSubmit = data => {
@@ -56,65 +61,59 @@ const LoginForm = () => {
   const { register, handleSubmit } = useForm();
 
   return (
-    <Container component="main" maxWidth="xs">
-      <CssBaseline />
-      <div className={classes.paper}>
-        <Typography variant="h5">
-          Welcome to Fanbase
-        </Typography>
-        <form className={classes.form} noValidate onSubmit={handleSubmit(onSubmit)}>
-          <TextField
-            variant="outlined"
-            margin="normal"
-            required
-            fullWidth
-            id="email"
-            label="Username"
-            name="username"
-            autoComplete="username"
-            autoFocus
-            inputRef={register}
-          />
-          <TextField
-            variant="outlined"
-            margin="normal"
-            required
-            fullWidth
-            name="password"
-            label="Password"
-            type="password"
-            id="password"
-            autoComplete="current-password"
-            inputRef={register}
-          />
-          <FormControlLabel
-            control={<Checkbox inputRef={register} name="remember" color="primary" defaultValue={false}/>}
-            label="Remember me"
-          />
-          <Button
-            type="submit"
-            fullWidth
-            variant="contained"
-            color="primary"
-            className={classes.submit}
-          >
-            Login
-          </Button>
-          <Grid container>
-            <Grid item xs>
-              <Link to="#" variant="body2">
-                Forgot password?
-              </Link>
-            </Grid>
-            <Grid item>
-              <Link to="/register" variant="body2">
-                Don't have an account? Register
-              </Link>
-            </Grid>
-          </Grid>
-        </form>
-      </div>
-    </Container>
+    <form className={classes.form} noValidate onSubmit={handleSubmit(onSubmit)}>
+      <TextField
+        className={classes.field}
+        variant="outlined"
+        margin="normal"
+        required
+        fullWidth
+        id="email"
+        label="Email Address"
+        name="email"
+        autoComplete="email"
+        autoFocus
+        inputRef={register}
+      />
+      <TextField
+        className={classes.field}
+        variant="outlined"
+        margin="normal"
+        required
+        fullWidth
+        name="password"
+        label="Password"
+        type="password"
+        id="password"
+        autoComplete="current-password"
+        inputRef={register}
+      />
+      {/* <FormControlLabel
+        control={<Checkbox inputRef={register} name="remember" color="primary" defaultValue={false}/>}
+        label="Remember me"
+      /> */}
+      <Button
+        type="submit"
+        fullWidth
+        variant="contained"
+        color="primary"
+        className={classes.submit}
+      >
+        Login
+      </Button>
+      <Grid container>
+        <Grid item xs>
+          <Link className={classes.link} to="#" variant="body2">
+            Forgot password?
+          </Link>
+        </Grid>
+        <Grid item>
+          <Link className={classes.link} to="/signup" variant="body2">
+            Don't have an account? Register
+          </Link>
+        </Grid>
+      </Grid>
+    </form>
   );
 }
 
