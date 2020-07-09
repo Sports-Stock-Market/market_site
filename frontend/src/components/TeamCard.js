@@ -1,14 +1,13 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import * as NBAIcons from 'react-nba-logos';
+import StockChart from './StockChart.js';
 
 // Material-UI Components
 import { makeStyles } from '@material-ui/core/styles';
 import { 
-    Card,
-    Typography,
-    Grid,
-} from '@material-ui/core'
+    Card, Typography, Grid,
+} from '@material-ui/core';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -16,6 +15,7 @@ const useStyles = makeStyles((theme) => ({
         boxShadow: "0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24)",
         transition: "all 0.3s cubic-bezier(.25,.8,.25,1)",
         '&:hover': {
+            cursor: "pointer",
             boxShadow: "0 3px 6px rgba(0,0,0,0.25), 0 3px 6px rgba(0,0,0,0.22)",
         },
     },
@@ -29,6 +29,13 @@ const useStyles = makeStyles((theme) => ({
         color: theme.palette.red.main,
     }
 }));
+
+const data = Array.from({length: 40}, (v, i) => {
+    return {
+        "date": v,
+        "price": Math.round(Math.random() * 8000 + 10)/100,
+    }
+});
 
 const TeamCard = (props) => {
     const classes = useStyles();
@@ -62,7 +69,7 @@ const TeamCard = (props) => {
                         <Logo size={60} />
                     </Grid>
                     <Grid item xs={12}>
-                        Chart goes here
+                        <StockChart data={data} width={"90%"} height={100} strokeWidth={2}/>
                     </Grid>
                     <Grid item xs={9}>
                         <Typography className={textColor} variant="h5">

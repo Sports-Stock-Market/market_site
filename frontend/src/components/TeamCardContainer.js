@@ -1,20 +1,19 @@
 import React from 'react';
 import TeamCard from './TeamCard.js';
+import StockChart from './StockChart.js';
 
 // Material-UI Components
 import { makeStyles } from '@material-ui/core/styles';
 import { 
-    Grid,
-    Typography,
-    Container,
+    Grid, Typography, Container,
 } from '@material-ui/core';
 
 const useStyles = makeStyles((theme) => ({
-    root: {
+    container: {
         margin: theme.spacing(2),
     },
     title: {
-        marginBottom: theme.spacing(2),
+        margin: theme.spacing(2, 0),
     }
 }));
 
@@ -52,6 +51,13 @@ const holdings = [
     },
 ]
 
+const data = Array.from({length: 80}, (v, i) => {
+    return {
+        "date": v,
+        "price": Math.round(Math.random() * 8000 + 10)/100,
+    }
+});
+
 const TeamCardContainer = () => {
     const classes = useStyles();
 
@@ -62,7 +68,11 @@ const TeamCardContainer = () => {
     );
 
     return (
-        <Container component="main" maxWidth="md">
+        <Container className={classes.container} component="main" maxWidth="md">
+            <Typography className={classes.title} variant="h4">
+                Will's Portfolio
+            </Typography>
+            <StockChart data={data} height={250} strokeWidth={3} />
             <Typography className={classes.title} variant="h4">
                 My Teams
             </Typography>
