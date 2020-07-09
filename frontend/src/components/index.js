@@ -3,3 +3,4 @@ export { default as SignUpForm } from './SignUpForm.js';
 export { default as NavBar } from './NavBar.js';
 export { default as TeamCardContainer } from './TeamCardContainer.js';
 export { default as FormContainer } from './FormContainer.js';
+export { default as Leaderboard } from './Leaderboard.js';

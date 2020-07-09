@@ -16,7 +16,7 @@ import Paper from "@material-ui/core/Paper";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Switch from "@material-ui/core/Switch";
 
-import "bootstrap/dist/css/bootstrap.css";
+// import "bootstrap/dist/css/bootstrap.css";
 
 function createData(name, fans) {
   const growth = (((fans - 10000) / 10000) * 100).toFixed(2);
