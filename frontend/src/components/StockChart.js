@@ -2,8 +2,6 @@ import React from 'react';
 import {
     AreaChart, Area, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine,
 } from 'recharts';
-import { requirePropFactory } from '@material-ui/core';
-
   
 const StockChart = (props) => {
     return (

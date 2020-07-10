@@ -7,11 +7,9 @@ import { makeStyles } from '@material-ui/core/styles';
 import { 
     Grid, Typography, Container,
 } from '@material-ui/core';
+import MainStockChart from './MainStockChart.js';
 
 const useStyles = makeStyles((theme) => ({
-    container: {
-        margin: theme.spacing(2),
-    },
     title: {
         margin: theme.spacing(2, 0),
     }
@@ -51,33 +49,24 @@ const holdings = [
     },
 ]
 
-const data = Array.from({length: 80}, (v, i) => {
-    return {
-        "date": v,
-        "price": Math.round(Math.random() * 8000 + 10)/100,
-    }
-});
-
 const TeamCardContainer = () => {
     const classes = useStyles();
-
-    const teamCards = holdings.map((holding) => 
-        <Grid item xs={6} sm={4}>
-            <TeamCard data={holding} />
-        </Grid>
-    );
 
     return (
         <Container className={classes.container} component="main" maxWidth="md">
             <Typography className={classes.title} variant="h4">
                 Will's Portfolio
             </Typography>
-            <StockChart data={data} height={250} strokeWidth={3} />
+            <MainStockChart />
             <Typography className={classes.title} variant="h4">
                 My Teams
             </Typography>
             <Grid container spacing={3}>
-                {teamCards}
+                {holdings.map((holding) => 
+                    <Grid item xs={6} sm={4}>
+                        <TeamCard data={holding} />
+                    </Grid>
+                )}
             </Grid>
         </Container>
     );

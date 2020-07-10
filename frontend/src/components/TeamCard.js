@@ -8,6 +8,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import { 
     Card, Typography, Grid,
 } from '@material-ui/core';
+import StockPrice from './StockPrice.js';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -19,15 +20,6 @@ const useStyles = makeStyles((theme) => ({
             boxShadow: "0 3px 6px rgba(0,0,0,0.25), 0 3px 6px rgba(0,0,0,0.22)",
         },
     },
-    default: {
-        color: theme.palette.default,
-    },
-    positive: {
-        color: theme.palette.green.main,
-    },
-    negative: {
-        color: theme.palette.red.main,
-    }
 }));
 
 const data = Array.from({length: 40}, (v, i) => {
@@ -43,15 +35,6 @@ const TeamCard = (props) => {
     const Logo = NBAIcons[props.data.abr];
     const change = Math.round((props.data.price-props.data.position.bought) * 100) / 100;
     const pct_change = Math.round((change / props.data.position.bought) * 100) / 100;
-
-    let textColor = classes.default;
-    let sign = "+";
-    if (change < 0) {
-        textColor = classes.negative;
-        sign = "-";
-    } else if (change > 0) {
-        textColor = classes.positive;
-    }
 
     return (
         <Link to={`/team/${props.data.abr.toLowerCase()}`} style={{ textDecoration: 'none' }}>
@@ -69,15 +52,16 @@ const TeamCard = (props) => {
                         <Logo size={60} />
                     </Grid>
                     <Grid item xs={12}>
+                    </Grid>
+                    <Grid item xs={12}>
                         <StockChart data={data} width={"90%"} height={100} strokeWidth={2}/>
                     </Grid>
                     <Grid item xs={9}>
-                        <Typography className={textColor} variant="h5">
-                            ${props.data.price}
-                        </Typography>
-                        <Typography className={textColor} variant="subtitle2">
-                            {sign}${Math.abs(change)} ({sign}{Math.abs(pct_change)}%) 
-                        </Typography>
+                        <StockPrice 
+                            price={props.data.price}
+                            change={change}
+                            pct_change={pct_change}
+                        />
                     </Grid>
                 </Grid>
             </Card>
