@@ -8,7 +8,7 @@ const StockChart = (props) => {
     <ResponsiveContainer width={props.width} height={props.height}>
         <AreaChart data={props.data} margin={{top: 0, right: 0, left: 0, bottom: 20,}}>
             <Tooltip />
-            <ReferenceLine y={50} stroke="#000" strokeDasharray="3 3" />
+            {props.referenceLine && <ReferenceLine y={50} stroke="#000" strokeDasharray="3 3" />}
             <Area 
                 type="linear" 
                 dataKey="price" 

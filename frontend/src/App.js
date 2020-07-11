@@ -4,7 +4,7 @@ import {
 } from 'react-router-dom';
 
 import {
-  LoginForm, NavBar,SignUpForm, TeamCardContainer, FormContainer,
+  LoginForm, NavBar, SignUpForm, TeamCardContainer, FormContainer,
 } from './components';
 
 import './App.css';

@@ -2,13 +2,13 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import * as NBAIcons from 'react-nba-logos';
 import StockChart from './StockChart.js';
+import StockPrice from './StockPrice.js';
 
 // Material-UI Components
 import { makeStyles } from '@material-ui/core/styles';
 import { 
     Card, Typography, Grid,
 } from '@material-ui/core';
-import StockPrice from './StockPrice.js';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -39,24 +39,29 @@ const TeamCard = (props) => {
     return (
         <Link to={`/team/${props.data.abr.toLowerCase()}`} style={{ textDecoration: 'none' }}>
             <Card className={classes.root}>
-                <Grid container spacing={2}>
-                    <Grid item xs={9}>
+                <Grid container spacing={1}>
+                    <Grid item md={9} xs={10}>
                         <Typography variant="h5">
                             {props.data.name}
                         </Typography>
                         <Typography variant="subtitle2">
-                            {props.data.position.shares} Shares ({props.data.position.diversity*100}% Diversity) 
+                            {props.data.position.shares} Shares ({props.data.position.diversity*100}% Portfolio) 
                         </Typography>
                     </Grid>
-                    <Grid style={{ marginTop: -8}} item xs={2}>
-                        <Logo size={60} />
+                    <Grid style={{ marginTop: -9}} item xs={2}>
+                        <Logo size={50} />
                     </Grid>
                     <Grid item xs={12}>
                     </Grid>
                     <Grid item xs={12}>
-                        <StockChart data={data} width={"90%"} height={100} strokeWidth={2}/>
+                        <StockChart 
+                            data={data} 
+                            width={"90%"} 
+                            height={80} 
+                            strokeWidth={1.5}
+                        />
                     </Grid>
-                    <Grid item xs={9}>
+                    <Grid item xs={12}>
                         <StockPrice 
                             price={props.data.price}
                             change={change}

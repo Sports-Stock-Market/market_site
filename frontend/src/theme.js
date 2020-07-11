@@ -35,7 +35,7 @@ const theme = createMuiTheme({
             fontWeight: 800,
         },
         h5: {
-            fontSize: "1.25rem",
+            fontSize: "0.9rem",
             fontWeight: 700,
             lineHeight: 1.15,
         },
@@ -43,7 +43,7 @@ const theme = createMuiTheme({
             fontWeight: 700,
         },
         subtitle2: {
-            fontSize: "0.7rem",
+            fontSize: "0.5rem",
             fontWeight: 600,
         },
         button: {

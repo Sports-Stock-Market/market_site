@@ -33,7 +33,7 @@ export default function NavBar() {
           <Toolbar>
             <SportsBasketballIcon edge="start" className={classes.logo} color="inherit" />
             <Typography variant="h6" className={classes.title}>Fanbase</Typography>
-            <Button component={Link} to="/signup" color="inherit">Sign Up</Button>
+            <Button disableRipple component={Link} to="/signup" color="inherit">Sign Up</Button>
             <Button 
             component={Link} 
             to="/login" 

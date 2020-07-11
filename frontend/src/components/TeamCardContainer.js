@@ -47,6 +47,16 @@ const holdings = [
             diversity: 0.45,
         }
     },
+    {
+        name: "Los Angeles Lakers",
+        abr: "LAL",
+        price: 1646.35,
+        position: {
+            bought: 1646.35,
+            shares: 30,
+            diversity: 0.45,
+        }
+    },
 ]
 
 const TeamCardContainer = () => {
@@ -63,7 +73,7 @@ const TeamCardContainer = () => {
             </Typography>
             <Grid container spacing={3}>
                 {holdings.map((holding) => 
-                    <Grid item xs={6} sm={4}>
+                    <Grid item sm={6} md={3}>
                         <TeamCard data={holding} />
                     </Grid>
                 )}
