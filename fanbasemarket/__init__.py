@@ -28,7 +28,7 @@ load_start = datetime.strptime(getenv('LOAD_START'), STRPTIME_FORMAT)
 app = Flask(__name__)
 CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
-app.config['JWT_TOKEN_LOCATION'] = ['json', 'cookies']
+app.config['JWT_TOKEN_LOCATION'] = ['cookies']
 app.config['JWT_SECRET_KEY'] = getenv('API_SECRET')
 app.config['JWT_BLACKLIST_ENABLED'] = True
 app.config['JWT_BLACKLIST_TOKEN_CHECKS'] = ['access', 'refresh']

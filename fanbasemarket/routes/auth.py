@@ -43,9 +43,9 @@ def create_user():
         session.commit()
         access_jwt = create_access_token(identity=uname)
         refresh_jwt = create_refresh_token(identity=uname)
-        ret = {'access_token': access_jwt}
-        to_set = {'refresh_token': refresh_jwt}
-        return ok(ret, created=True, cookies=to_set)
+        to_set = {'access_token': access_jwt,
+                  'refresh_token': refresh_jwt}
+        return ok({}, created=True, cookies=to_set)
     except:
         return bad_request('username/email is already in use')
 
@@ -62,9 +62,9 @@ def login_user():
     if user.check_password(pwrd):
         access_jwt = create_access_token(identity=uname)
         refresh_jwt = create_refresh_token(identity=uname)
-        ret = {'access_token': access_jwt}
-        to_set = {'refresh_token': refresh_jwt}
-        return ok(ret, cookies=to_set)
+        to_set = {'access_token': access_jwt,
+                  'refresh_token': refresh_jwt}
+        return ok({}, cookies=to_set)
     return bad_request('invalid password')
 
 

@@ -4,7 +4,7 @@ import {
 } from 'react-router-dom';
 
 import {
-  LoginForm, NavBar, SignUpForm, TeamCardContainer, FormContainer,
+  LoginForm, NavBar, SignUpForm, TeamCardContainer, FormContainer, Leaderboard,
 } from './components';
 
 import './App.css';
@@ -30,6 +30,9 @@ function App() {
           </Route>
           <Route path="/portfolio/:username">
             <TeamCardContainer />
+          </Route>
+          <Route path="/leaderboard" exact>
+            <Leaderboard />
           </Route>
         </Switch>
     </Router>
