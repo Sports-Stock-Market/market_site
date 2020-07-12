@@ -3,10 +3,9 @@ import { Link } from 'react-router-dom';
 
 // Material-UI Components
 import { makeStyles } from '@material-ui/core/styles';
-import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
-import Typography from '@material-ui/core/Typography';
-import Button from '@material-ui/core/Button';
+import {
+  AppBar, Toolbar, Typography, Button,
+} from '@material-ui/core';
 import SportsBasketballIcon from '@material-ui/icons/SportsBasketball';
 
 const useStyles = makeStyles((theme) => ({
@@ -34,7 +33,7 @@ export default function NavBar() {
           <Toolbar>
             <SportsBasketballIcon edge="start" className={classes.logo} color="inherit" />
             <Typography variant="h6" className={classes.title}>Fanbase</Typography>
-            <Button component={Link} to="/signup" color="inherit">Sign Up</Button>
+            <Button disableRipple component={Link} to="/signup" color="inherit">Sign Up</Button>
             <Button 
             component={Link} 
             to="/login" 
