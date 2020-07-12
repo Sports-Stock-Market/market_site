@@ -63,7 +63,6 @@ const LoginForm = () => {
           });
         } else if (response.status === 200) {
           response.json().then(data => {
-            localStorage.setItem('access_token', data['access_token']);
             history.push("/portfolio/user");
           });
         }
