@@ -24,7 +24,7 @@ const useStyles = makeStyles((theme) => ({
 
 const data = Array.from({length: 40}, (v, i) => {
     return {
-        "date": v,
+        "date": `7/${i}/20`,
         "price": Math.round(Math.random() * 8000 + 10)/100,
     }
 });
@@ -52,13 +52,11 @@ const TeamCard = (props) => {
                         <Logo size={50} />
                     </Grid>
                     <Grid item xs={12}>
-                    </Grid>
-                    <Grid item xs={12}>
                         <StockChart 
                             data={data} 
                             width={"90%"} 
                             height={80} 
-                            strokeWidth={1.5}
+                            strokeWidth={1}
                         />
                     </Grid>
                     <Grid item xs={12}>

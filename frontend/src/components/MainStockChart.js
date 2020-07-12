@@ -10,14 +10,14 @@ import {
 
 const data = Array.from({length: 80}, (v, i) => {
     return {
-        "date": v,
+        "date": `7/${i}/20`,
         "price": Math.round(Math.random() * 8000 + 10)/100,
     }
 });
 
 const MainStockChart = () => {
     return (
-        <Grid container spacing={2}>
+        <Grid container spacing={4}>
             <Grid item xs={12}>
                 <StockPrice 
                     big
@@ -28,13 +28,14 @@ const MainStockChart = () => {
             </Grid>
             <Grid item xs={12}>
                 <StockChart
+                    big
                     referenceLine 
                     data={data}
                     height={250}
-                    strokeWidth={2}
+                    strokeWidth={1.5}
                 />
             </Grid>
-            <Grid style={{ marginTop: -20}}item xs={12}>
+            <Grid item xs={12}>
                 <ChartRangePicker />
             </Grid>
         </Grid>

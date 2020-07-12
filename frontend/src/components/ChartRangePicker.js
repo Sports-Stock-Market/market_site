@@ -8,7 +8,7 @@ import {
 
 const StockTabs = withStyles((theme) => ({
     root: {
-      borderBottom: '1px solid #d6d6d6',
+      borderBottom: "1px solid #AAA",
     },
     indicator: {
       backgroundColor: theme.palette.primary,
@@ -19,7 +19,7 @@ const StockTabs = withStyles((theme) => ({
 
 const StockTab = withStyles((theme) => ({
     root: {
-      color: "#d6d6d6",
+      color: theme.palette.secondary.main,
       textTransform: 'none',
       marginRight: theme.spacing(1),
       minWidth: 30,

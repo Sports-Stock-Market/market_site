@@ -23,7 +23,7 @@ const StockPrice = (props) => {
     return (
         <>
         <Typography className={props.big ? classes.bigHeader : null} variant="h5">
-            {props.price}
+            ${props.price}
         </Typography>
         <Typography className={props.big ? classes.bigSubtitle : null} variant="subtitle2">
             {sign}${Math.abs(props.change)} ({sign}{Math.abs(props.pct_change)}%) 

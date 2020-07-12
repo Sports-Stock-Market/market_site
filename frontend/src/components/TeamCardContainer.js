@@ -1,6 +1,5 @@
 import React from 'react';
 import TeamCard from './TeamCard.js';
-import StockChart from './StockChart.js';
 
 // Material-UI Components
 import { makeStyles } from '@material-ui/core/styles';
