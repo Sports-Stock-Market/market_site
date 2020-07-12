@@ -45,6 +45,7 @@ const StockChart = (props) => {
                 type="linear" 
                 dataKey="price"
                 label={(entry) => entry.date}
+                isAnimationActive={true}
                 animationDuration={800} 
                 unit="$"
                 stroke="#000"

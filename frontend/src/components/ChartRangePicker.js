@@ -8,7 +8,7 @@ import {
 
 const StockTabs = withStyles((theme) => ({
     root: {
-      borderBottom: "1px solid #AAA",
+      borderBottom: "1px solid #BBB",
     },
     indicator: {
       backgroundColor: theme.palette.primary,
