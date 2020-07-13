@@ -1,5 +1,8 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import TeamCard from './TeamCard.js';
+import Cookies from 'universal-cookie';
+import { refreshToken } from '../actions/authActions';
+import { connect } from 'react-redux';
 
 // Material-UI Components
 import { makeStyles } from '@material-ui/core/styles';
@@ -54,6 +57,9 @@ const holdings = [
 
 const TeamCardContainer = () => {
     const classes = useStyles();
+    const cookies = new Cookies();
+
+    useEffect(refreshToken(cookies.get('csrf_refresh_token')), []);fa
 
     const teamCards = holdings.map((holding) => 
         <Grid item xs={6} sm={4}>
@@ -73,4 +79,10 @@ const TeamCardContainer = () => {
     );
 }
 
-export default TeamCardContainer;
+const mapStateToProps = (state) => {
+  return {
+    auth: state.auth
+  };
+}
+
+export default connect(mapStateToProps, { refreshToken })(TeamCardContainer);

@@ -5,12 +5,24 @@ import './index.css';
 import theme from './theme.js'
 import { ThemeProvider } from '@material-ui/core/styles';
 import * as serviceWorker from './serviceWorker';
+import { createStore, applyMiddleware } from 'redux';
+import { Provider } from 'react-redux';
+import thunk from 'redux-thunk';
+import { composeWithDevTools } from 'redux-devtools-extension';
+import rootReducer from './rootReducer';
+
+const store = createStore(
+  rootReducer,
+  composeWithDevTools(applyMiddleware(thunk))
+);
 
 ReactDOM.render(
   <React.StrictMode>
-    <ThemeProvider theme={theme}>
-      <App />
-    </ThemeProvider>
+    <Provider store={store}>
+      <ThemeProvider theme={theme}>
+        <App />
+      </ThemeProvider>
+    </Provider>
   </React.StrictMode>,
   document.getElementById('root')
 );

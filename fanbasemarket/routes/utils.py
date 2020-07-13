@@ -7,10 +7,8 @@ def bad_request(msg):
     return r
 
 
-def ok(dict_payload, created=False, cookies={}):
+def ok(dict_payload, created=False):
     payload = dumps(dict_payload)
     r = Response(payload)
-    for k, v in cookies.items():
-        r.set_cookie(k, v, httponly=True)
     r.status_code = 201 if created else 200
     return r

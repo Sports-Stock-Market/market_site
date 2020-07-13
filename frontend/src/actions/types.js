@@ -1,0 +1,1 @@
+export const SET_USR = 'SET_USR';

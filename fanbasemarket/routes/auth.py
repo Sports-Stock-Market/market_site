@@ -1,14 +1,13 @@
 from flask_jwt_extended import (
     jwt_required, create_access_token,
     jwt_refresh_token_required, create_refresh_token,
-    get_jwt_identity, get_raw_jwt
+    get_jwt_identity, get_raw_jwt, jwt_optional, unset_jwt_cookies, set_refresh_cookies
 )
 from fanbasemarket.models import User, BlacklistedToken
 from fanbasemarket.routes.utils import bad_request, ok
 from fanbasemarket import session, jwt
 from flask import Blueprint, request
 from flask_cors import cross_origin, CORS
-from json import loads
 
 auth = Blueprint('auth', __name__)
 CORS(auth)
@@ -22,12 +21,12 @@ def creds(response):
 
 @jwt.token_in_blacklist_loader
 def check_if_token_in_blacklist(tok):
-    matches = BlacklistedToken.query.filter(jwt=tok['jti']).all()
+    matches = BlacklistedToken.query.filter_by(jwt=tok['jti']).all()
     return matches != []
 
 
 @auth.route('/register', methods=['POST'])
-@cross_origin(origin='http://127.0.0.1:3000/')
+@cross_origin(origin='http://localhost:3000/')
 def create_user():
     req_data = request.get_json()
     pwrd = req_data['password']
@@ -43,15 +42,15 @@ def create_user():
         session.commit()
         access_jwt = create_access_token(identity=uname)
         refresh_jwt = create_refresh_token(identity=uname)
-        to_set = {'access_token': access_jwt,
-                  'refresh_token': refresh_jwt}
-        return ok({}, created=True, cookies=to_set)
+        resp = ok({'access_token': access_jwt, 'username': uname})
+        set_refresh_cookies(resp, refresh_jwt)
+        return resp
     except:
         return bad_request('username/email is already in use')
 
 
 @auth.route('/login', methods=['POST'])
-@cross_origin(origin='http://127.0.0.1:3000/')
+@cross_origin(origin='http://localhost:3000/')
 def login_user():
     req_data = request.get_json()
     uname = req_data['username']
@@ -62,31 +61,36 @@ def login_user():
     if user.check_password(pwrd):
         access_jwt = create_access_token(identity=uname)
         refresh_jwt = create_refresh_token(identity=uname)
-        to_set = {'access_token': access_jwt,
-                  'refresh_token': refresh_jwt}
-        return ok({}, cookies=to_set)
+        resp = ok({'access_token': access_jwt, 'username': uname})
+        set_refresh_cookies(resp, refresh_jwt)
+        return resp
     return bad_request('invalid password')
 
 
 @auth.route('/refresh', methods=['POST'])
-@cross_origin(origin='http://127.0.0.1:3000/')
+@cross_origin(origin='http://localhost:3000/')
 @jwt_refresh_token_required
 def refresh_jwt():
     user = get_jwt_identity()
     access_jwt = create_access_token(identity=user)
-    ret = {'access_token': access_jwt}
-    return ok(ret)
+    resp = ok({'access_token': access_jwt, 'username': user})
+    return resp
 
 
 @auth.route('/logout', methods=['DELETE'])
-@cross_origin(origin='http://127.0.0.1:3000/')
+@cross_origin(origin='http://localhost:3000/')
 @jwt_required
 def logout_user():
-    jti = get_raw_jwt()['jti']
-    to_add = BlacklistedToken(jwt=jti)
-    try:
-        session.add(to_add)
-        session.commit()
-        return ok({})
-    except:
-        return bad_request('could not log user out')
+    tok = get_raw_jwt()['jti']
+    blTok = BlacklistedToken(jwt=tok)
+    session.add(blTok)
+    session.commit()
+    resp = ok({})
+    unset_jwt_cookies(resp)
+    return resp
+
+
+@auth.route('/healthcheck', methods=['GET'])
+@cross_origin(origin='http://localhost:3000/')
+def check_health():
+    return ok({})
