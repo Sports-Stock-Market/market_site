@@ -7,17 +7,13 @@ import { connect } from 'react-redux';
 // Material-UI Components
 import { makeStyles } from '@material-ui/core/styles';
 import { 
-    Grid,
-    Typography,
-    Container,
+    Grid, Typography, Container,
 } from '@material-ui/core';
+import MainStockChart from './MainStockChart.js';
 
 const useStyles = makeStyles((theme) => ({
-    root: {
-        margin: theme.spacing(2),
-    },
     title: {
-        marginBottom: theme.spacing(2),
+        margin: theme.spacing(2, 0),
     }
 }));
 
@@ -53,6 +49,16 @@ const holdings = [
             diversity: 0.45,
         }
     },
+    {
+        name: "Los Angeles Lakers",
+        abr: "LAL",
+        price: 1646.35,
+        position: {
+            bought: 1646.35,
+            shares: 30,
+            diversity: 0.45,
+        }
+    },
 ]
 
 const TeamCardContainer = (props) => {
@@ -65,19 +71,21 @@ const TeamCardContainer = (props) => {
       );
     }, []);
 
-    const teamCards = holdings.map((holding) => 
-        <Grid item xs={6} sm={4}>
-            <TeamCard data={holding} />
-        </Grid>
-    );
-
     return (
-        <Container component="main" maxWidth="md">
+        <Container className={classes.container} component="main" maxWidth="md">
+            <Typography className={classes.title} variant="h4">
+                Will's Portfolio
+            </Typography>
+            <MainStockChart />
             <Typography className={classes.title} variant="h4">
                 My Teams
             </Typography>
             <Grid container spacing={3}>
-                {teamCards}
+                {holdings.map((holding) => 
+                    <Grid item sm={6} md={3}>
+                        <TeamCard data={holding} />
+                    </Grid>
+                )}
             </Grid>
         </Container>
     );

@@ -5,6 +5,9 @@ const theme = createMuiTheme({
         primary: {
             main: '#000000',
         },
+        secondary: {
+            main: '#AAA',
+        },
         blue: {
             main: '#1043C1',
         },        
@@ -35,7 +38,7 @@ const theme = createMuiTheme({
             fontWeight: 800,
         },
         h5: {
-            fontSize: "1.25rem",
+            fontSize: "0.9rem",
             fontWeight: 700,
             lineHeight: 1.15,
         },
@@ -43,8 +46,14 @@ const theme = createMuiTheme({
             fontWeight: 700,
         },
         subtitle2: {
-            fontSize: "0.7rem",
+            fontSize: "0.5rem",
             fontWeight: 600,
+        },
+        body1: {
+            fontSize: "0.9rem",
+        },
+        body2: {
+            fontSize: "0.7rem",
         },
         button: {
             textTransform: "none",

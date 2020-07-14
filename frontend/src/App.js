@@ -1,16 +1,9 @@
 import React from 'react';
 import {
-  BrowserRouter as Router,
-  Switch,
-  Route
+  BrowserRouter as Router, Switch, Route,
 } from 'react-router-dom';
 import {
-  LoginForm,
-  NavBar,
-  SignUpForm,
-  TeamCardContainer,
-  FormContainer,
-  Leaderboard
+  LoginForm, NavBar, SignUpForm, TeamCardContainer, FormContainer, Leaderboard,
 } from './components';
 
 import './App.css';
