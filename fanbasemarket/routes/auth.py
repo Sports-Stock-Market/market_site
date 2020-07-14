@@ -1,11 +1,9 @@
-from datetime import datetime
-
 from flask_jwt_extended import (
     jwt_required, create_access_token,
     jwt_refresh_token_required, create_refresh_token,
-    get_jwt_identity, get_raw_jwt, jwt_optional, unset_jwt_cookies, set_refresh_cookies
+    get_jwt_identity, get_raw_jwt, unset_jwt_cookies, set_refresh_cookies
 )
-from fanbasemarket.models import User, BlacklistedToken, UninvestedAmount
+from fanbasemarket.models import User, BlacklistedToken
 from fanbasemarket.routes.utils import bad_request, ok
 from fanbasemarket import session, jwt
 from flask import Blueprint, request
@@ -41,10 +39,6 @@ def create_user():
         u = User(username=uname, email=email,
                  password=pwrd)
         session.add(u)
-        session.commit()
-        uninvested = UninvestedAmount(amount=15000, user_id=u.id,
-                                      date=datetime.utcnow())
-        session.add(uninvested)
         session.commit()
         access_jwt = create_access_token(identity=uname)
         refresh_jwt = create_refresh_token(identity=uname)
