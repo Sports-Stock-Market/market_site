@@ -7,12 +7,15 @@ export function setUsr(user) {
 }
 
 export function authReq(name, opts) {
-  return dispatch => {
-    return fetch('http://localhost:5000/api/auth/' + name, opts).then(res => {
-      res.json().then(user => {
-        dispatch(setUsr(user));
-      });
-    });
+  return async function(dispatch) {
+    const res = await fetch('http://localhost:5000/api/auth/' + name, opts);
+    const user = res.json();
+    if (user.hasOwnProperty('message')) {
+      dispatch(setUsr({}));
+    } else {
+      dispatch(setUsr(user));
+    }
+    return user;
   }
 }
 
@@ -39,9 +42,14 @@ export function refreshToken(csrfToken) {
       credentials: 'include'
     }
     return fetch('http://localhost:5000/api/auth/refresh', requestOpts).then(res => {
-      res.json().then(data =>
-        dispatch(setUsr(data))
-      );
+      res.json().then(data => {
+        console.log(data);
+        if (data.hasOwnProperty('msg')) {
+          dispatch(setUsr({}));
+        } else {
+          dispatch(setUsr(data));
+        }
+      });
     });
   }
 }

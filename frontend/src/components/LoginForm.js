@@ -57,10 +57,21 @@ const LoginForm = (props) => {
       body: JSON.stringify(data),
       credentials: 'include'
     };
-    props.authReq('login', requestOpts).then(
-      (res) => history.push('/portfolio/user'),
-      (err) => handleError(err)
-    );
+    try {
+      props.authReq('login', requestOpts).then(
+        (res) => {
+          if (res.hasOwnProperty('message')) {
+            handleError(res);
+          } else {
+            const uname = res['username'];
+            history.push('/portfolio/' + uname);
+          }
+        }
+      );
+    }
+    catch(error) {
+      console.log(error);
+    }
   };
 
   return (

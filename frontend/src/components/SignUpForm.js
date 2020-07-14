@@ -53,10 +53,21 @@ const SignUpForm = (props) => {
       body: JSON.stringify(data),
       credentials: 'include'
     };
-    props.authReq('register', requestOpts).then(
-      (res) => history.push('/portfolio'),
-      (err) => handleError(err)
-    );
+    try {
+      props.authReq('register', requestOpts).then(
+        (res) => {
+          if (res.hasOwnProperty('message')) {
+            handleError(res);
+          } else {
+            const uname = res['username'];
+            history.push('/portfolio/' + uname);
+          }
+        }
+      );
+    }
+    catch(error) {
+      console.log(error);
+    }
   };
 
   return (

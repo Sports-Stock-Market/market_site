@@ -56,7 +56,6 @@ const NavBar = (props) => {
     const guestLinks = (
       <React.Fragment>
       <Button component={Link} to="/signup" color="inherit">Sign Up</Button>
-      <Button onClick={checkHealth} color="inherit">Check health</Button>
       <Button component={Link} to="/login" color="primary" variant="outlined">Login</Button>
       </React.Fragment>
     );
@@ -67,6 +66,7 @@ const NavBar = (props) => {
           <Toolbar>
             <SportsBasketballIcon edge="start" className={classes.logo} color="inherit" />
             <Typography variant="h6" className={classes.title}>Fanbase</Typography>
+            <Button component={Link} to="/leaderboard" color="inherit">Leaderboard</Button>
             { isAuthenticated ? userLinks : guestLinks }
           </Toolbar>
         </AppBar>
