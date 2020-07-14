@@ -30,10 +30,19 @@ class User(Base):
                       'email': self.email, 'money': self.money})
 
 
+class UninvestedAmount(Base):
+    __tablename__ = 'uninvestedamount'
+    id = Column(Integer, primary_key=True)
+    amount = Column(Float)
+    user_id = Column(Integer, ForeignKey('user.id'))
+    date = Column(DateTime)
+
+
 class Team(Base):
     __tablename__ = 'team'
     id = Column(Integer, primary_key=True)
     name = Column(String(140))
+    abr = Column(String(10))
 
     def serialize(self):
         return dumps({'id': self.id, 'name': self.name})
@@ -47,6 +56,7 @@ class Purchase(Base):
     exists = Column(Boolean, default=True)
     purchased_at = Column(DateTime)
     purchased_for = Column(Float)
+    amt_shares = Column(Integer)
 
     def serialize(self):
         return dumps({'id': self.id, 'team_id': self.team_id,

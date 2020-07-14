@@ -49,11 +49,11 @@ Base.metadata.create_all(engine, checkfirst=True)
 
 # Populate DB with NBA Teams
 teams_all = teams.get_teams()
-team_names = [team['full_name'] for team in teams_all]
-for t_name in team_names:
+team_names = [(team['full_name'], team['abbreviation']) for team in teams_all]
+for t_name, t_abr in team_names:
     q = Team.query.filter_by(name=t_name).all()
     if len(q) == 0:
-        t_obj = Team(name=t_name)
+        t_obj = Team(name=t_name, abr=t_abr)
         session.add(t_obj)
         session.commit()
         t_price = Teamprice(date=load_start, team_id=t_obj.id, elo=1500.00)
@@ -96,8 +96,10 @@ if len(prices) == len(team_names):
             session.commit()
 
 from fanbasemarket.routes.auth import auth
+from fanbasemarket.routes.users import users
 
 
 def create_app():
     app.register_blueprint(auth, url_prefix='/api/auth/')
+    app.register_blueprint(users, url_prefix='/api/users/')
     return app
