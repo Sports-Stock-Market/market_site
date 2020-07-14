@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useLayoutEffect } from 'react';
 import TeamCard from './TeamCard.js';
 import Cookies from 'universal-cookie';
 import { refreshToken } from '../actions/authActions';
@@ -55,11 +55,15 @@ const holdings = [
     },
 ]
 
-const TeamCardContainer = () => {
+const TeamCardContainer = (props) => {
     const classes = useStyles();
     const cookies = new Cookies();
-
-    useEffect(refreshToken(cookies.get('csrf_refresh_token')), []);fa
+    useLayoutEffect(() => {
+      props.refreshToken(cookies.get('csrf_refresh_token')).then(
+        (res) => console.log(res),
+        (err) => console.log(err)
+      );
+    }, []);
 
     const teamCards = holdings.map((holding) => 
         <Grid item xs={6} sm={4}>

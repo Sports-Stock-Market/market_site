@@ -34,14 +34,14 @@ export function logout(token) {
 export function refreshToken(csrfToken) {
   return dispatch => {
     const requestOpts = {
-      method: 'GET',
-      headers: {'Content-type': 'application/JSON', 'X-XSRFHeader': csrfToken},
+      method: 'POST',
+      headers: {'Content-type': 'application/JSON', 'X-CSRF-Token': csrfToken},
       credentials: 'include'
     }
     return fetch('http://localhost:5000/api/auth/refresh', requestOpts).then(res => {
-      res.json().then(data => {
+      res.json().then(data =>
         dispatch(setUsr(data))
-      });
+      );
     });
   }
 }
