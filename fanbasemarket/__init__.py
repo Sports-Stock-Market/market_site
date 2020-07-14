@@ -28,10 +28,12 @@ load_start = datetime.strptime(getenv('LOAD_START'), STRPTIME_FORMAT)
 app = Flask(__name__)
 CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
-app.config['JWT_TOKEN_LOCATION'] = ['cookies']
+app.config['JWT_TOKEN_LOCATION'] = ['cookies', 'headers']
 app.config['JWT_SECRET_KEY'] = getenv('API_SECRET')
 app.config['JWT_BLACKLIST_ENABLED'] = True
 app.config['JWT_BLACKLIST_TOKEN_CHECKS'] = ['access', 'refresh']
+app.config['JWT_COOKIE_CSRF_PROTECT'] = True
+app.config['JWT_SESSION_COOKIE'] = False
 jwt = JWTManager(app)
 
 mysql_url = f'mysql://{db_usr}:{db_pass}@{db_host}/{db_name}?ssl=false'

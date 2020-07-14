@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Link, useHistory } from 'react-router-dom';
 import { useForm } from "react-hook-form";
+import { connect } from 'react-redux';
+import { authReq } from '../actions/authActions';
 
 // Material-UI Components
 import { makeStyles } from '@material-ui/core/styles';
@@ -28,9 +30,9 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-const SignUpForm = () => {
+const SignUpForm = (props) => {
   const classes = useStyles();
-  const { register, handleSubmit } = useForm();
+  const { register, handleSubmit, setValue } = useForm();
   const [ formError, setFormError ] = useState(false);
   const [ errorMessage, setErrorMessage ] = useState()
   const history = useHistory();
@@ -47,18 +49,21 @@ const SignUpForm = () => {
       body: JSON.stringify(data),
       credentials: 'include'
     };
-    fetch('http://127.0.0.1:5000/api/auth/register', requestOpts)
-      .then(response => {
-        if (response.status === 400) {
-          response.json().then(err => {
-            handleError(err);
-          });
-        } else if (response.status === 201) {
-          response.json().then(data => {
-            history.push("/portfolio/user");
-          });
+    try {
+      props.authReq('register', requestOpts).then(
+        (res) => {
+          if (res.hasOwnProperty('message')) {
+            handleError(res);
+          } else {
+            const uname = res['username'];
+            history.push('/portfolio/' + uname);
+          }
         }
-      });
+      );
+    }
+    catch(error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -75,6 +80,7 @@ const SignUpForm = () => {
             label="Username"
             autoFocus
             inputRef={register}
+            onChange={e => setValue('userName', e.target.value)}
           />
         </Grid>
         <Grid item xs={12}>
@@ -87,6 +93,7 @@ const SignUpForm = () => {
             name="email"
             autoComplete="email"
             inputRef={register}
+            onChange={e => setValue('email', e.target.value)}
           />
         </Grid>
         <Grid item xs={12}>
@@ -100,6 +107,7 @@ const SignUpForm = () => {
             id="password"
             autoComplete="current-password"
             inputRef={register}
+            onChange={e => setValue('password', e.target.value)}
           />
         </Grid>
         <Grid item xs={12}>
@@ -113,6 +121,7 @@ const SignUpForm = () => {
             id="confirm-password"
             autoComplete="confirm-password"
             inputRef={register}
+            onChange={e => setValue('confirm-password', e.target.value)}
           />
         </Grid>
       </Grid>
@@ -149,4 +158,4 @@ const SignUpForm = () => {
   );
 }
 
-export default SignUpForm;
+export default connect(null, { authReq })(SignUpForm);

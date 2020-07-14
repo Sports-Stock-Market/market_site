@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useLayoutEffect } from "react";
 import PropTypes from "prop-types";
 import clsx from "clsx";
 import { lighten, makeStyles } from "@material-ui/core/styles";
@@ -15,6 +15,9 @@ import Typography from "@material-ui/core/Typography";
 import Paper from "@material-ui/core/Paper";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Switch from "@material-ui/core/Switch";
+import { refreshToken } from '../actions/authActions';
+import { connect } from 'react-redux';
+import Cookies from 'universal-cookie';
 
 // import "bootstrap/dist/css/bootstrap.css";
 
@@ -225,7 +228,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function Leaderboard() {
+function Leaderboard(props) {
   const classes = useStyles();
   const [order, setOrder] = React.useState("desc");
   const [orderBy, setOrderBy] = React.useState("fans");
@@ -233,6 +236,14 @@ export default function Leaderboard() {
   const [page, setPage] = React.useState(0);
   const [dense, setDense] = React.useState(false);
   const [rowsPerPage, setRowsPerPage] = React.useState(100);
+
+  const cookies = new Cookies();
+  useLayoutEffect(() => {
+    props.refreshToken(cookies.get('csrf_refresh_token')).then(
+      (res) => console.log(res),
+      (err) => console.log(err)
+    );
+  }, []);
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === "asc";
@@ -349,3 +360,11 @@ export default function Leaderboard() {
     </div>
   );
 }
+
+const mapStateToProps = (state) => {
+  return {
+    auth: state.auth
+  };
+}
+
+export default connect(mapStateToProps, { refreshToken })(Leaderboard);

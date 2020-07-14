@@ -1,5 +1,8 @@
-import React from 'react';
+import React, { useLayoutEffect } from 'react';
 import TeamCard from './TeamCard.js';
+import Cookies from 'universal-cookie';
+import { refreshToken } from '../actions/authActions';
+import { connect } from 'react-redux';
 
 // Material-UI Components
 import { makeStyles } from '@material-ui/core/styles';
@@ -58,8 +61,15 @@ const holdings = [
     },
 ]
 
-const TeamCardContainer = () => {
+const TeamCardContainer = (props) => {
     const classes = useStyles();
+    const cookies = new Cookies();
+    useLayoutEffect(() => {
+      props.refreshToken(cookies.get('csrf_refresh_token')).then(
+        (res) => console.log(res),
+        (err) => console.log(err)
+      );
+    }, []);
 
     return (
         <Container className={classes.container} component="main" maxWidth="md">
@@ -81,4 +91,10 @@ const TeamCardContainer = () => {
     );
 }
 
-export default TeamCardContainer;
+const mapStateToProps = (state) => {
+  return {
+    auth: state.auth
+  };
+}
+
+export default connect(mapStateToProps, { refreshToken })(TeamCardContainer);
