@@ -35,17 +35,14 @@ export function logout(token) {
 }
 
 export function refreshToken(csrfToken) {
-  console.log('hello...?');
   return dispatch => {
     const requestOpts = {
       method: 'POST',
       headers: {'Content-type': 'application/JSON', 'X-CSRF-Token': csrfToken},
       credentials: 'include'
     }
-    console.log('I\'m here...');
     return fetch('http://localhost:5000/api/auth/refresh', requestOpts).then(res => {
       res.json().then(data => {
-        console.log(data);
         if (data.hasOwnProperty('msg')) {
           dispatch(setUsr({}));
         } else {

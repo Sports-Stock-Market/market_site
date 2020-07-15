@@ -21,9 +21,9 @@ const MainStockChart = (props) => {
             <Grid item xs={12}>
                 <StockPrice 
                     big
-                    price={props.funds}
-                    change={4650.35}
-                    pct_change={0.3832}
+                    price={props.last}
+                    change={props.delta}
+                    pct_change={props.pctInc}
                 />
             </Grid>
             <Grid item xs={12}>

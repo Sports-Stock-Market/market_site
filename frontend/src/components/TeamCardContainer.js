@@ -51,13 +51,23 @@ const TeamCardContainer = (props) => {
         getUsrData();
     }, []);
 
-    console.log(data);
+    var last = 0;
+    var sndLast = 0;
+    var delta = 0;
+    var pctInc = 0;
+    if (data.length !== 0) {
+        last = data[data.length - 1]['price'];
+        sndLast = data[data.length - 2]['price'];
+        delta = last - sndLast;
+        pctInc = (last / sndLast) - 1;
+    }
+
     return (
         <Container className={classes.container} component="main" maxWidth="md">
             <Typography className={classes.title} variant="h4">
                 {username}'s Portfolio
             </Typography>
-            <MainStockChart funds={avFunds} chartData={data} />
+            <MainStockChart chartData={data} delta={delta} pctInc={pctInc} last={last} />
             <Typography className={classes.title} variant="h4">
                 My Teams
             </Typography>
