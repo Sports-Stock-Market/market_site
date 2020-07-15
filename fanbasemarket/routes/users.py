@@ -23,13 +23,16 @@ def creds(response):
 @users.route('/totalAssets', methods=['GET'])
 @cross_origin('http://localhost:3000/')
 def get_total_assets():
-    body = request.get_json()
-    date = body['date']
-    uname = body['username']
+    heads = request.headers
+    if 'date' not in heads:
+        date = str(datetime.utcnow())
+    else:
+        date = heads['date']
+    uname = heads['username']
     matches = User.query.filter_by(username=uname).all()
-    user_obj = matches[0]
     if not matches:
         return bad_request('no such user')
+    user_obj = matches[0]
     uid = user_obj.id
     all_purchases = get_active_holdings(uid, date)
     payload = {'available_funds': user_obj.available_funds, 'holdings': []}
@@ -49,12 +52,34 @@ def get_total_assets():
     return ok(payload)
 
 
-@users.route('/graphPts', methods=['GET'])
+@users.route('/usrPg', methods=['GET'])
 @cross_origin('http://localhost:3000/')
-def make_purchase():
-    body = request.get_json()
-    uname = body['username']
-    user = session.query(User).filter(User.username == uname).first()
-    if user is None:
+def gen_usrPg():
+    heads = request.headers
+    if 'date' not in heads:
+        date = str(datetime.utcnow())
+    else:
+        date = heads['date']
+    uname = heads['username']
+    matches = User.query.filter_by(username=uname).all()
+    if not matches:
         return bad_request('no such user')
-    return ok(get_user_graph_points(user.id))
+    user_obj = matches[0]
+    uid = user_obj.id
+    all_purchases = get_active_holdings(uid, date)
+    payload = {'available_funds': user_obj.available_funds, 'holdings': []}
+    for purchase in all_purchases:
+        holding = {}
+        tid = purchase.team_id
+        team = session.query(Team).filter(Team.id == tid)
+        holding['name'] = team.name
+        holding['abr'] = team.abr
+        price = get_price(tid, date)
+        holding['price'] = price
+        holding['position'] = {
+            'bought': purchase.purchased_for,
+            'shares': purchase.amt_shares
+        }
+        payload['holdings'].append(holding)
+    payload['graphData'] = get_user_graph_points(uid)
+    return ok(payload)

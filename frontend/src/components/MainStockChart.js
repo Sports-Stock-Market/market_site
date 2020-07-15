@@ -15,13 +15,13 @@ const data = Array.from({length: 80}, (v, i) => {
     }
 });
 
-const MainStockChart = () => {
+const MainStockChart = (props) => {
     return (
         <Grid container spacing={4}>
             <Grid item xs={12}>
                 <StockPrice 
                     big
-                    price={16785.22}
+                    price={props.funds}
                     change={4650.35}
                     pct_change={0.3832}
                 />
@@ -30,7 +30,7 @@ const MainStockChart = () => {
                 <StockChart
                     big
                     referenceLine 
-                    data={data}
+                    data={props.chartData}
                     height={250}
                     strokeWidth={1.5}
                 />

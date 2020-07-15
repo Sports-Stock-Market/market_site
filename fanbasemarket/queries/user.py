@@ -4,6 +4,7 @@ from json import dumps
 from sqlalchemy import and_, not_
 
 from fanbasemarket import session
+from fanbasemarket.queries.utils import get_graph_x_values
 from fanbasemarket.models import Purchase
 
 
@@ -50,25 +51,7 @@ def get_assets_in_date_range(uid, previous_balance, end, start=None):
 
 
 def get_user_graph_points(uid):
-    now = datetime.utcnow()
-    beginning_of_day = datetime(now.year, now.month, now.day)
-    week_ago = beginning_of_day - timedelta(weeks=1)
-    month_ago = beginning_of_day - timedelta(weeks=4)
-    beginning_of_year = datetime(now.year, 1, 1)
-    x_values = []
-    while beginning_of_year <= beginning_of_day:
-        x_values.append(beginning_of_year)
-        beginning_of_year += timedelta(weeks=1)
-    while month_ago <= beginning_of_day:
-        x_values.append(month_ago)
-        month_ago += timedelta(days=1)
-    while week_ago <= beginning_of_day:
-        x_values.append(week_ago)
-        week_ago += timedelta(days=1)
-    while beginning_of_day <= now:
-        x_values.append(beginning_of_day)
-        beginning_of_day += timedelta(hours=0.5)
-    x_values = sorted(x_values)
+    x_values = get_graph_x_values()
     data_points = []
     initial_date, val = get_assets_in_date_range(uid, 15000, x_values[0])
     data_points.append({'date': str(initial_date), 'price': val})

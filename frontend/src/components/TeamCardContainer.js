@@ -1,4 +1,4 @@
-import React, { useLayoutEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import TeamCard from './TeamCard.js';
 import Cookies from 'universal-cookie';
 import { refreshToken } from '../actions/authActions';
@@ -17,66 +17,47 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-// Sample Data
-const holdings = [
-    {
-        name: "Atlanta Hawks",
-        abr: "ATL",
-        price: 1500.21,
-        position: {
-            bought: 1646.35,
-            shares: 8,
-            diversity: 0.09,
-        }
-    },
-    {
-        name: "New York Knicks",
-        abr: "NYK",
-        price: 1760.21,
-        position: {
-            bought: 1646.35,
-            shares: 20,
-            diversity: 0.15,
-        }
-    },
-    {
-        name: "Los Angeles Lakers",
-        abr: "LAL",
-        price: 1646.35,
-        position: {
-            bought: 1646.35,
-            shares: 30,
-            diversity: 0.45,
-        }
-    },
-    {
-        name: "Los Angeles Lakers",
-        abr: "LAL",
-        price: 1646.35,
-        position: {
-            bought: 1646.35,
-            shares: 30,
-            diversity: 0.45,
-        }
-    },
-]
-
 const TeamCardContainer = (props) => {
+
+    const [avFunds, setAvFunds] = useState(0.0);
+    const [holdings, setHoldings] = useState([]);
+    const [data, setData] = useState([]);
+
     const classes = useStyles();
     const cookies = new Cookies();
-    useLayoutEffect(() => {
-      props.refreshToken(cookies.get('csrf_refresh_token')).then(
-        (res) => console.log(res),
-        (err) => console.log(err)
-      );
+    const username = window.location.pathname.slice(11);
+    const requestOpts = {
+        method: 'GET',
+        headers: {'Content-type': 'application/JSON',
+                  'username': username},
+        credentials: 'include'
+    };
+    
+    const getUsrData = () => {
+        fetch('http://localhost:5000/api/users/usrPg', requestOpts).then(
+            res => res.json().then(data_ => {
+              setAvFunds(data_['available_funds']);
+              setHoldings(data_['holdings']);
+              setData(data_['graphData']);
+            })
+        );
+    }
+
+    useEffect(() => {
+        props.refreshToken(cookies.get('csrf_refresh_token'));
     }, []);
 
+    useEffect(() => {
+        getUsrData();
+    }, []);
+
+    console.log(data);
     return (
         <Container className={classes.container} component="main" maxWidth="md">
             <Typography className={classes.title} variant="h4">
-                Will's Portfolio
+                {username}'s Portfolio
             </Typography>
-            <MainStockChart />
+            <MainStockChart funds={avFunds} chartData={data} />
             <Typography className={classes.title} variant="h4">
                 My Teams
             </Typography>
