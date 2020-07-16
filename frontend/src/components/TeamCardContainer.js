@@ -7,9 +7,8 @@ import { connect } from 'react-redux';
 // Material-UI Components
 import { makeStyles } from '@material-ui/core/styles';
 import { 
-    Grid, Typography, Container,
+    Grid, Typography,
 } from '@material-ui/core';
-import MainStockChart from './MainStockChart.js';
 
 const useStyles = makeStyles((theme) => ({
     title: {
@@ -63,22 +62,22 @@ const TeamCardContainer = (props) => {
     }
 
     return (
-        <Container className={classes.container} component="main" maxWidth="md">
-            <Typography className={classes.title} variant="h4">
-                {username}'s Portfolio
-            </Typography>
-            <MainStockChart chartData={data} delta={delta} pctInc={pctInc} last={last} />
-            <Typography className={classes.title} variant="h4">
-                My Teams
-            </Typography>
-            <Grid container spacing={3}>
-                {holdings.map((holding) => 
-                    <Grid item sm={6} md={3}>
-                        <TeamCard data={holding} />
-                    </Grid>
-                )}
+        <Grid container spacing={1}>
+            <Grid item xs={12}>
+                <Typography className={classes.title} variant="h4">
+                    My Teams
+                </Typography>
             </Grid>
-        </Container>
+            <Grid item xs={12}>
+                <Grid container spacing={3}>
+                    {holdings.map((holding) => 
+                        <Grid item sm={6} md={3}>
+                            <TeamCard key={holding.abr} data={holding} />
+                        </Grid>
+                    )}
+                </Grid>
+            </Grid>
+        </Grid>
     );
 }
 

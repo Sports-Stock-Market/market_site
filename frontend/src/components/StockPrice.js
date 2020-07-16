@@ -8,10 +8,10 @@ import {
 
 const useStyles = makeStyles((theme) => ({
     bigHeader: {
-        fontSize: "2rem",
+        fontSize: "2.2rem",
     },
     bigSubtitle: {
-        fontSize: "0.9rem",
+        fontSize: "1rem",
     },
 }));
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-    AreaChart, Area, Tooltip, ResponsiveContainer, ReferenceLine, XAxis, Legend, 
+    LineChart, Line, Tooltip, ResponsiveContainer, ReferenceLine, XAxis, Legend, 
 } from 'recharts';
 
 // Material-UI Components
@@ -22,17 +22,7 @@ const StockTooltip = (props) => {
 const StockChart = (props) => {
     return (
     <ResponsiveContainer width={props.width} height={props.height}>
-        <AreaChart data={props.data}>
-        <defs>
-            <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor="#00893B" stopOpacity={0.8}/>
-            <stop offset="95%" stopColor="#00893B" stopOpacity={0}/>
-            </linearGradient>
-            <linearGradient id="colorPv" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor="#EC1C24" stopOpacity={0.8}/>
-            <stop offset="95%" stopColor="#EC1C24" stopOpacity={0}/>
-            </linearGradient>
-        </defs>
+        <LineChart data={props.data}>
             <XAxis dataKey="date" hide />
             <Tooltip 
                 position={props.big ? { y: -20 } : { y: -15 }}
@@ -41,20 +31,19 @@ const StockChart = (props) => {
                 content={<StockTooltip big={props.big} />}
             />
             {props.referenceLine && <ReferenceLine y={50} stroke="#000" strokeDasharray="3 3" />}
-            <Area 
-                type="linear" 
+            <Line
+                
                 dataKey="price"
                 label={(entry) => entry.date}
                 isAnimationActive={true}
                 animationDuration={800} 
                 unit="$"
-                stroke="#000"
+                stroke={props.color}
                 strokeWidth={props.strokeWidth}
-                fill="url(#colorPv)" 
-                fillOpacity={0.5}
+                dot={false}
                 activeDot={props.big ? { r: 6 } : { r: 4 }}
                 />
-        </AreaChart>
+        </LineChart>
     </ResponsiveContainer>
     );
 }

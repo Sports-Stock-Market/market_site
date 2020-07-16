@@ -22,7 +22,7 @@ const useStyles = makeStyles((theme) => ({
         <Container component="main" maxWidth="xs">
             <CssBaseline />
             <div className={classes.paper}>
-                <Typography variant="h5">
+                <Typography variant="h4">
                     {props.title}
                 </Typography>
                 {props.children}
