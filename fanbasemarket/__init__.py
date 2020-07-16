@@ -5,13 +5,14 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import scoped_session, sessionmaker
 from flask_jwt_extended import JWTManager
 from nba_api.stats.static import teams
+from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import create_engine
 from flask_executor import Executor
 from dotenv import load_dotenv
 from datetime import datetime
 from flask_cors import CORS
 from string import capwords
-from flask import Flask
+from flask import Flask, g
 from os import getenv
 
 
@@ -28,6 +29,8 @@ load_start = datetime.strptime(getenv('LOAD_START'), STRPTIME_FORMAT)
 
 app = Flask(__name__)
 CORS(app)
+
+app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql://{db_usr}:{db_pass}@{db_host}/{db_name}?ssl=false'
 app.config['CORS_HEADERS'] = 'Content-Type'
 app.config['JWT_TOKEN_LOCATION'] = ['cookies', 'headers']
 app.config['JWT_SECRET_KEY'] = getenv('API_SECRET')
@@ -35,18 +38,17 @@ app.config['JWT_BLACKLIST_ENABLED'] = True
 app.config['JWT_BLACKLIST_TOKEN_CHECKS'] = ['access', 'refresh']
 app.config['JWT_COOKIE_CSRF_PROTECT'] = True
 app.config['JWT_SESSION_COOKIE'] = False
+
+db = SQLAlchemy(app)
 jwt = JWTManager(app)
 
-mysql_url = f'mysql://{db_usr}:{db_pass}@{db_host}/{db_name}?ssl=false'
-engine = create_engine(mysql_url)
-Session = scoped_session(sessionmaker(bind=engine))
-session = Session()
-Base = declarative_base()
-Base.query = Session.query_property()
 from fanbasemarket.models import *
-if not database_exists(engine.url):
-    create_database(engine.url)
-Base.metadata.create_all(engine, checkfirst=True)
+
+try:
+    db.create_all()
+except:
+    pass
+
 
 # Populate DB with NBA Teams
 teams_all = teams.get_teams()
@@ -55,11 +57,11 @@ for t_name, t_abr in team_names:
     q = Team.query.filter_by(name=t_name).all()
     if len(q) == 0:
         t_obj = Team(name=t_name, abr=t_abr)
-        session.add(t_obj)
-        session.commit()
+        db.session.add(t_obj)
+        db.session.commit()
         t_price = Teamprice(date=load_start, team_id=t_obj.id, elo=1500.00)
-        session.add(t_price)
-        session.commit()
+        db.session.add(t_price)
+        db.session.commit()
 
 prices = Teamprice.query.all()
 if len(prices) == len(team_names):
@@ -80,8 +82,8 @@ if len(prices) == len(team_names):
             away_team = Team.query.filter_by(name=away_name).first()
             game = Game(home=home_team.id, away=away_team.id, home_score=home_score,
                         away_score=away_score, start=start_time)
-            session.add(game)
-            session.commit()
+            db.session.add(game)
+            db.session.commit()
             home_elo = Teamprice.query.filter_by(team_id=home_team.id).all()[-1].elo
             away_elo = Teamprice.query.filter_by(team_id=away_team.id).all()[-1].elo
             mov = home_score - away_score
@@ -89,23 +91,34 @@ if len(prices) == len(team_names):
                                            use_mov=True)
             new_home_price = Teamprice(date=start_time, team_id=home_team.id,
                                        elo=home_elo + elo_delta)
-            session.add(new_home_price)
-            session.commit()
+            db.session.add(new_home_price)
+            db.session.commit()
             new_away_price = Teamprice(date=start_time, team_id=away_team.id,
                                        elo=away_elo - elo_delta)
-            session.add(new_away_price)
-            session.commit()
-session.close()
+            db.session.add(new_away_price)
+            db.session.commit()
+db.session.remove()
 
 executor = Executor(app)
 
+def get_db():
+    if 'db' not in g:
+        g.db = SQLAlchemy(app)
+    return g.db
+
+@app.teardown_appcontext
+def teardown_db(exc):
+    db = g.pop('db', None)
+    if db is not None:
+        db.session.remove()
+
 from fanbasemarket.routes.auth import auth
 from fanbasemarket.routes.users import users
-from fanbasemarket.routes.teams import teams
+# from fanbasemarket.routes.teams import teams
 
 
 def create_app():
     app.register_blueprint(auth, url_prefix='/api/auth/')
     app.register_blueprint(users, url_prefix='/api/users/')
-    app.register_blueprint(teams, url_prefix='/api/teams/')
+    # app.register_blueprint(teams, url_prefix='/api/teams/')
     return app

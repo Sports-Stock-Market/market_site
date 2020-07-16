@@ -2,16 +2,14 @@ from datetime import datetime
 
 from sqlalchemy import desc
 
-from fanbasemarket import session
 from fanbasemarket.models import Teamprice
 from fanbasemarket.queries.utils import get_graph_x_values
-from fanbasemarket import session
 
 
-def get_price(tid, date=None):
+def get_price(tid, db, date=None):
     if not date:
         date = datetime.utcnow().strftime('%Y-%m-%d')
-    prices = session.query(Teamprice). \
+    prices = db.session.query(Teamprice). \
         filter(Teamprice.team_id == tid). \
         filter(Teamprice.date <= date). \
         order_by(desc(Teamprice.date)). \

@@ -5,7 +5,7 @@ from flask_jwt_extended import (
 )
 from fanbasemarket.models import User, BlacklistedToken
 from fanbasemarket.routes.utils import bad_request, ok
-from fanbasemarket import Session, jwt
+from fanbasemarket import app, jwt, get_db
 from flask import Blueprint, request
 from flask_cors import cross_origin, CORS
 
@@ -28,51 +28,47 @@ def check_if_token_in_blacklist(tok):
 @auth.route('/register', methods=['POST'])
 @cross_origin(origin='http://localhost:3000/')
 def create_user():
-    session = Session()
-    req_data = request.get_json()
-    pwrd = req_data['password']
-    pwrd_c = req_data['confirm-password']
-    if pwrd != pwrd_c:
-        session.close()
-        return bad_request('passwords do not match')
-    uname = req_data['userName']
-    email = req_data['email']
-    try:
-        u = User(username=uname, email=email,
-                 password=pwrd)
-        session.add(u)
-        session.commit()
-        access_jwt = create_access_token(identity=uname)
-        refresh_jwt = create_refresh_token(identity=uname)
-        resp = ok({'access_token': access_jwt, 'username': uname})
-        set_refresh_cookies(resp, refresh_jwt)
-        session.close()
-        return resp
-    except:
-        session.close()
-        return bad_request('username/email is already in use')
+    with app.app_context():
+        db = get_db()
+        req_data = request.get_json()
+        pwrd = req_data['password']
+        pwrd_c = req_data['confirm-password']
+        if pwrd != pwrd_c:
+            return bad_request('passwords do not match')
+        uname = req_data['userName']
+        email = req_data['email']
+        try:
+            u = User(username=uname, email=email,
+                    password=pwrd)
+            db.session.add(u)
+            db.session.commit()
+            access_jwt = create_access_token(identity=uname)
+            refresh_jwt = create_refresh_token(identity=uname)
+            resp = ok({'access_token': access_jwt, 'username': uname})
+            set_refresh_cookies(resp, refresh_jwt)
+            return resp
+        except:
+            return bad_request('username/email is already in use')
 
 
 @auth.route('/login', methods=['POST'])
 @cross_origin(origin='http://localhost:3000/')
 def login_user():
-    session = Session()
-    req_data = request.get_json()
-    uname = req_data['username']
-    pwrd = req_data['password']
-    user = User.query.filter_by(username=uname).first()
-    if user is None:
-        session.close()
-        return bad_request('invalid username')
-    if user.check_password(pwrd):
-        access_jwt = create_access_token(identity=uname)
-        refresh_jwt = create_refresh_token(identity=uname)
-        resp = ok({'access_token': access_jwt, 'username': uname})
-        set_refresh_cookies(resp, refresh_jwt)
-        session.close()
-        return resp
-    session.close()
-    return bad_request('invalid password')
+    with app.app_context():
+        db = get_db()
+        req_data = request.get_json()
+        uname = req_data['username']
+        pwrd = req_data['password']
+        user = User.query.filter_by(username=uname).first()
+        if user is None:
+            return bad_request('invalid username')
+        if user.check_password(pwrd):
+            access_jwt = create_access_token(identity=uname)
+            refresh_jwt = create_refresh_token(identity=uname)
+            resp = ok({'access_token': access_jwt, 'username': uname})
+            set_refresh_cookies(resp, refresh_jwt)
+            return resp
+        return bad_request('invalid password')
 
 
 @auth.route('/refresh', methods=['POST'])
@@ -89,12 +85,12 @@ def refresh_jwt():
 @cross_origin(origin='http://localhost:3000/')
 @jwt_required
 def logout_user():
-    session = Session()
-    tok = get_raw_jwt()['jti']
-    blTok = BlacklistedToken(jwt=tok)
-    session.add(blTok)
-    session.commit()
-    session.close()
-    resp = ok({})
-    unset_jwt_cookies(resp)
-    return resp
+    with app.app_context():
+        db = get_db()
+        tok = get_raw_jwt()['jti']
+        blTok = BlacklistedToken(jwt=tok)
+        db.session.add(blTok)
+        db.session.commit()
+        resp = ok({})
+        unset_jwt_cookies(resp)
+        return resp
