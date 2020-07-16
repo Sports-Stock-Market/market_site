@@ -85,9 +85,9 @@ def refresh_jwt():
 @cross_origin(origin='http://localhost:3000/')
 @jwt_required
 def logout_user():
+    tok = get_raw_jwt()['jti']
     with app.app_context():
         db = get_db()
-        tok = get_raw_jwt()['jti']
         blTok = BlacklistedToken(jwt=tok)
         db.session.add(blTok)
         db.session.commit()
