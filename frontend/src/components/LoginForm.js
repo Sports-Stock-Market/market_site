@@ -7,7 +7,7 @@ import { authReq } from '../actions/authActions';
 // Material-UI Components
 import { makeStyles } from '@material-ui/core/styles';
 import { 
-  Button, TextField,
+  Button, TextField, Grid,
   // FormControlLabel,
   // Checkbox,
   Collapse, IconButton,
@@ -18,16 +18,14 @@ import CloseIcon from '@material-ui/icons/Close';
 const useStyles = makeStyles((theme) => ({
   form: {
     width: '100%', // Fix IE 11 issue.
-    marginTop: theme.spacing(1),
-  },
-  field: {
-    margin: theme.spacing(2, 0, 0),
+    marginTop: theme.spacing(3),
   },
   submit: {
     height: 40,
     margin: theme.spacing(2, 0, 1.5),
   },
   link: {
+    marginTop: -20,
     color: 'black',
     textDecoration: 'none',
     '&:hover': {
@@ -74,39 +72,43 @@ const LoginForm = (props) => {
 
   return (
     <form className={classes.form} noValidate onSubmit={handleSubmit(onSubmit)}>
-      <TextField
-        className={classes.field}
-        variant="outlined"
-        margin="normal"
-        required
-        fullWidth
-        id="email"
-        label="Username"
-        name="username"
-        autoComplete="username"
-        autoFocus
-        inputRef={register}
-      />
-      <TextField
-        className={classes.field}
-        variant="outlined"
-        margin="normal"
-        required
-        fullWidth
-        name="password"
-        label="Password"
-        type="password"
-        id="password"
-        autoComplete="current-password"
-        inputRef={register}
-      />
-      {/* <FormControlLabel
-        control={<Checkbox inputRef={register} name="remember" color="primary" defaultValue={false}/>}
-        label="Remember me"
-      /> */}
-      <Link className={classes.link} to="/signup">
-        Don't have an account? Register
-      </Link>
+      <Grid container spacing={2}>
+        <Grid item xs={12}>
+          <TextField
+            variant="outlined"
+            required
+            fullWidth
+            id="email"
+            label="Username"
+            name="username"
+            autoComplete="username"
+            autoFocus
+            inputRef={register}
+          />
+        </Grid>
+        <Grid item xs={12}>
+          <TextField
+            variant="outlined"
+            required
+            fullWidth
+            name="password"
+            label="Password"
+            type="password"
+            id="password"
+            autoComplete="current-password"
+            inputRef={register}
+          />
+        </Grid>
+        {/* <FormControlLabel
+          control={<Checkbox inputRef={register} name="remember" color="primary" defaultValue={false}/>}
+          label="Remember me"
+        /> */}
+        <Grid style={{marginTop: -10}} item xs={12}>
+          <Link className={classes.link} to="/signup">
+            Don't have an account? Register
+          </Link>
+        </Grid>
+      </Grid>
       <Button
         type="submit"
         fullWidth
