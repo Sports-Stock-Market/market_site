@@ -8,13 +8,6 @@ import {
     Grid,
 } from '@material-ui/core';
 
-const data = Array.from({length: 80}, (v, i) => {
-    return {
-        "date": `7/${i}/20`,
-        "price": Math.round(Math.random() * 8000 + 10)/100,
-    }
-});
-
 const MainStockChart = (props) => {
     return (
         <Grid container spacing={4}>

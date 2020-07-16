@@ -14,6 +14,7 @@ setup(
         'python-dotenv',
         'nba-api',
         'basketball_reference_web_scraper',
-        'flask-cors'
+        'flask-cors',
+        'flask-executor'
     ],
 )

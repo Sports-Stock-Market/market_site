@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-    LineChart, Line, Tooltip, ResponsiveContainer, ReferenceLine, XAxis, Legend, 
+    LineChart, Line, Tooltip, ResponsiveContainer, ReferenceLine, XAxis 
 } from 'recharts';
 
 // Material-UI Components

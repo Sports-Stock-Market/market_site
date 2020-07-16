@@ -6,6 +6,7 @@ from sqlalchemy.orm import scoped_session, sessionmaker
 from flask_jwt_extended import JWTManager
 from nba_api.stats.static import teams
 from sqlalchemy import create_engine
+from flask_executor import Executor
 from dotenv import load_dotenv
 from datetime import datetime
 from flask_cors import CORS
@@ -94,6 +95,9 @@ if len(prices) == len(team_names):
                                        elo=away_elo - elo_delta)
             session.add(new_away_price)
             session.commit()
+session.close()
+
+executor = Executor(app)
 
 from fanbasemarket.routes.auth import auth
 from fanbasemarket.routes.users import users

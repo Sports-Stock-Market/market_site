@@ -3,22 +3,23 @@ from json import dumps
 
 from sqlalchemy import and_, not_
 
-from fanbasemarket import session
 from fanbasemarket.queries.utils import get_graph_x_values
 from fanbasemarket.models import Purchase
 
 
-def get_active_holdings(uid, date=None):
+def get_active_holdings(uid, session, date=None):
     if not date:
         date = datetime.utcnow().strftime('%Y-%m-%d')
-    return session.query(Purchase).\
+    results = session.query(Purchase).\
         filter(Purchase.user_id == uid).\
         filter(Purchase.exists).\
         filter(Purchase.purchased_at <= date).\
         all()
+    session.close()
+    return results
 
 
-def get_assets_in_date_range(uid, previous_balance, end, start=None):
+def get_assets_in_date_range(uid, previous_balance, end, session, start=None):
     if start is None:
         previous_purchases = session.query(Purchase).\
             filter(Purchase.user_id == uid).\
@@ -50,13 +51,13 @@ def get_assets_in_date_range(uid, previous_balance, end, start=None):
     return last_date, total
 
 
-def get_user_graph_points(uid):
+def get_user_graph_points(uid, session):
     x_values = get_graph_x_values()
     data_points = []
-    initial_date, val = get_assets_in_date_range(uid, 15000, x_values[0])
+    initial_date, val = get_assets_in_date_range(uid, 15000, x_values[0], session)
     data_points.append({'date': str(initial_date), 'price': val})
     for i, x_val in enumerate(x_values[:-1]):
-        date, val = get_assets_in_date_range(uid, val, x_values[i + 1], start=x_val)
+        date, val = get_assets_in_date_range(uid, val, x_values[i + 1], session, start=x_val)
         date_s = str(date)
         data_points.append({'date': date_s, 'price': val})
     return data_points
