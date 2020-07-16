@@ -39,15 +39,6 @@ const NavBar = (props) => {
       );
     };
 
-    const checkHealth = () => {
-      const requestOpts = {
-        method: 'Get',
-        headers: {'Content-type': 'application/JSON'},
-        credentials: 'include'
-      }
-      fetch('http://localhost:5000/api/auth/healthcheck', requestOpts);
-    }
-
     const userLinks = (
       <Button color="primary" variant="outlined" onClick={onClick}>Logout</Button>
     );

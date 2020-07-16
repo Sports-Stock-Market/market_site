@@ -11,7 +11,7 @@ class User(Base):
     username = Column(String(64), index=True, unique=True)
     email = Column(String(120), index=True, unique=True)
     password_hash = Column(String(128))
-    money = Column(Integer, default=10000)
+    available_funds = Column(Float, default=15000)
     confirmed = Column(Boolean, default=False)
     
     @property
@@ -34,6 +34,7 @@ class Team(Base):
     __tablename__ = 'team'
     id = Column(Integer, primary_key=True)
     name = Column(String(140))
+    abr = Column(String(10))
 
     def serialize(self):
         return dumps({'id': self.id, 'name': self.name})
@@ -46,7 +47,10 @@ class Purchase(Base):
     user_id = Column(Integer, ForeignKey('user.id'))
     exists = Column(Boolean, default=True)
     purchased_at = Column(DateTime)
+    sold_at = Column(DateTime, nullable=True)
+    sold_for = Column(Float, nullable=True)
     purchased_for = Column(Float)
+    amt_shares = Column(Integer)
 
     def serialize(self):
         return dumps({'id': self.id, 'team_id': self.team_id,

@@ -8,3 +8,4 @@ nba-api
 python-dotenv
 basketball_reference_web_scraper
 flask-cors
+flask-executor

@@ -43,7 +43,6 @@ export function refreshToken(csrfToken) {
     }
     return fetch('http://localhost:5000/api/auth/refresh', requestOpts).then(res => {
       res.json().then(data => {
-        console.log(data);
         if (data.hasOwnProperty('msg')) {
           dispatch(setUsr({}));
         } else {
