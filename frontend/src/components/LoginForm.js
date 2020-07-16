@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Link, useHistory } from 'react-router-dom';
 import { useForm } from "react-hook-form";
+import { connect } from 'react-redux';
+import { authReq } from '../actions/authActions';
 
 // Material-UI Components
 import { makeStyles } from '@material-ui/core/styles';
@@ -32,7 +34,7 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-const LoginForm = () => {
+const LoginForm = (props) => {
   const classes = useStyles();
   const { register, handleSubmit } = useForm();
   const [ formError, setFormError ] = useState(false);
@@ -51,18 +53,21 @@ const LoginForm = () => {
       body: JSON.stringify(data),
       credentials: 'include'
     };
-    fetch('http://127.0.0.1:5000/api/auth/login', requestOpts)
-      .then(response => {
-        if (response.status === 400) {
-          response.json().then(err => {
-            handleError(err);
-          });
-        } else if (response.status === 200) {
-          response.json().then(data => {
-            history.push("/portfolio/user");
-          });
+    try {
+      props.authReq('login', requestOpts).then(
+        (res) => {
+          if (res.hasOwnProperty('message')) {
+            handleError(res);
+          } else {
+            const uname = res['username'];
+            history.push('/portfolio/' + uname);
+          }
         }
-      });
+      );
+    }
+    catch(error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -134,4 +139,4 @@ const LoginForm = () => {
   );
 }
 
-export default LoginForm;
+export default connect(null, { authReq })(LoginForm);

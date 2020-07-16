@@ -6,6 +6,16 @@ import theme from './theme.js'
 import CssBaseline from "@material-ui/core/CssBaseline";
 import { ThemeProvider } from '@material-ui/core/styles';
 import * as serviceWorker from './serviceWorker';
+import { createStore, applyMiddleware } from 'redux';
+import { Provider } from 'react-redux';
+import thunk from 'redux-thunk';
+import { composeWithDevTools } from 'redux-devtools-extension';
+import rootReducer from './rootReducer';
+
+const store = createStore(
+  rootReducer,
+  composeWithDevTools(applyMiddleware(thunk))
+);
 
 ReactDOM.render(
   <React.StrictMode>
