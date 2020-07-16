@@ -1,18 +1,18 @@
 from sqlalchemy import Column, Integer, String, Boolean, Float, ForeignKey, DateTime
 from werkzeug.security import generate_password_hash, check_password_hash
-from fanbasemarket import Base
+from fanbasemarket import db
 from datetime import datetime
 from json import dumps
 
 
-class User(Base):
+class User(db.Model):
     __tablename__ = 'user'
-    id = Column(Integer, primary_key=True)
-    username = Column(String(64), index=True, unique=True)
-    email = Column(String(120), index=True, unique=True)
-    password_hash = Column(String(128))
-    available_funds = Column(Float, default=15000)
-    confirmed = Column(Boolean, default=False)
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(64), index=True, unique=True)
+    email = db.Column(db.String(120), index=True, unique=True)
+    password_hash = db.Column(db.String(128))
+    available_funds = db.Column(db.Float, default=15000)
+    confirmed = db.Column(db.Boolean, default=False)
     
     @property
     def password(self):
@@ -30,27 +30,27 @@ class User(Base):
                       'email': self.email, 'money': self.money})
 
 
-class Team(Base):
+class Team(db.Model):
     __tablename__ = 'team'
-    id = Column(Integer, primary_key=True)
-    name = Column(String(140))
-    abr = Column(String(10))
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(String(140))
+    abr = db.Column(String(10))
 
     def serialize(self):
         return dumps({'id': self.id, 'name': self.name})
 
 
-class Purchase(Base):
+class Purchase(db.Model):
     __tablename__ = 'purchase'
-    id = Column(Integer, primary_key=True)
-    team_id = Column(Integer, ForeignKey('team.id'))
-    user_id = Column(Integer, ForeignKey('user.id'))
-    exists = Column(Boolean, default=True)
-    purchased_at = Column(DateTime)
-    sold_at = Column(DateTime, nullable=True)
-    sold_for = Column(Float, nullable=True)
-    purchased_for = Column(Float)
-    amt_shares = Column(Integer)
+    id = db.Column(db.Integer, primary_key=True)
+    team_id = db.Column(db.Integer, db.ForeignKey('team.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    exists = db.Column(db.Boolean, default=True)
+    purchased_at = db.Column(db.DateTime)
+    sold_at = db.Column(db.DateTime, nullable=True)
+    sold_for = db.Column(db.Float, nullable=True)
+    purchased_for = db.Column(Float)
+    amt_shares = db.Column(Integer)
 
     def serialize(self):
         return dumps({'id': self.id, 'team_id': self.team_id,
@@ -59,14 +59,14 @@ class Purchase(Base):
                       'purchased_for': self.purchased_for})
 
 
-class Short(Base):
+class Short(db.Model):
     __tablename__ = 'short'
-    id = Column(Integer, primary_key=True)
-    team_id = Column(Integer, ForeignKey('team.id'))
-    user_id = Column(Integer, ForeignKey('user.id'))
-    shorted_at = Column(DateTime)
-    shorted_for = Column(Float)
-    expires_at = Column(DateTime)
+    id = db.Column(db.Integer, primary_key=True)
+    team_id = db.Column(db.Integer, db.ForeignKey('team.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    shorted_at = db.Column(db.DateTime)
+    shorted_for = db.Column(db.Float)
+    expires_at = db.Column(db.DateTime)
 
     def serialize(self):
         return dumps({'id': self.id, 'team_id': self.team_id,
@@ -76,39 +76,39 @@ class Short(Base):
                       'expires_at': self.expires_at})
 
 
-class Teamprice(Base):
+class Teamprice(db.Model):
     __tablename__ = 'teamprice'
-    id = Column(Integer, primary_key=True)
-    date = Column(DateTime, index=True)
-    team_id = Column(Integer, ForeignKey('team.id'))
-    elo = Column(Float)
+    id = db.Column(db.Integer, primary_key=True)
+    date = db.Column(db.DateTime, index=True)
+    team_id = db.Column(db.Integer, db.ForeignKey('team.id'))
+    elo = db.Column(db.Float)
 
     def serialize(self):
         return dumps({'id': self.id, 'date': self.date,
                       'team_id': self.team_id, 'elo': self.elo})
 
 
-class Game(Base):
+class Game(db.Model):
     __tablename__ = 'game'
-    id = Column(Integer, primary_key=True)
-    home = Column(Integer, ForeignKey('team.id'))
-    away = Column(Integer, ForeignKey('team.id'))
-    home_score = Column(Integer, default=0)
-    away_score = Column(Integer, default=0)
-    start = Column(DateTime)
+    id = db.Column(db.Integer, primary_key=True)
+    home = db.Column(db.Integer, db.ForeignKey('team.id'))
+    away = db.Column(db.Integer, db.ForeignKey('team.id'))
+    home_score = db.Column(db.Integer, default=0)
+    away_score = db.Column(db.Integer, default=0)
+    start = db.Column(db.DateTime)
 
     def serialize(self):
         return dumps({'id': self.id, 'home': self.home,
                       'away': self.away, 'start': self.start})
 
 
-class Listing(Base):
+class Listing(db.Model):
     __tablename__ = 'listing'
-    id = Column(Integer, primary_key=True)
-    team_id = Column(Integer, ForeignKey('team.id'))
-    user_id = Column(Integer, ForeignKey('user.id'))
-    price = Column(Float)
-    posted_at = Column(DateTime, index=True, default=datetime.utcnow)
+    id = db.Column(db.Integer, primary_key=True)
+    team_id = db.Column(db.Integer, db.ForeignKey('team.id'))
+    user_id = db.Column(db.Integer, ForeignKey('user.id'))
+    price = db.Column(db.Float)
+    posted_at = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     
     def serialize(self):
         return dumps({'id': self.id, 'team_id': self.team_id,
@@ -116,7 +116,7 @@ class Listing(Base):
                       'posted_at': self.posted_at})
 
 
-class BlacklistedToken(Base):
+class BlacklistedToken(db.Model):
     __tablename__ = 'blacklistedtoken'
-    id = Column(Integer, primary_key=True)
-    jwt = Column(String(100))
+    id = db.Column(db.Integer, primary_key=True)
+    jwt = db.Column(db.String(100))
