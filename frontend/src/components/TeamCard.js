@@ -12,12 +12,19 @@ import {
 
 const useStyles = makeStyles((theme) => ({
     root: {
+        borderRadius: "8px",
+        backgroundColor: "#FFF",
+        width: "100%",
+        border: "1px solid #EDF2F5",
         padding: theme.spacing(1.5),
-        boxShadow: "0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24)",
-        transition: "all 0.3s cubic-bezier(.25,.8,.25,1)",
+        // boxShadow: "0 1px 1px 1px rgba(0,0,0,0.1)",
+        transition: "all 0.5s cubic-bezier(.25,.8,.25,1)",
+        // transition: "all 0.3s cubic-bezier(.25,.8,.25,1)",
         '&:hover': {
             cursor: "pointer",
-            boxShadow: "0 3px 6px rgba(0,0,0,0.25), 0 3px 6px rgba(0,0,0,0.22)",
+            // boxShadow: "0 2px 6px 1px rgba(0,0,0,0.15)",
+            // boxShadow: "0 1px 3px 1px rgba(0,0,0,0.1)",
+            backgroundColor: theme.palette.secondary.light
         },
     },
 }));
@@ -38,8 +45,8 @@ const TeamCard = (props) => {
 
     return (
         <Link to={`/team/${props.data.abr.toLowerCase()}`} style={{ textDecoration: 'none' }}>
-            <Card className={classes.root}>
-                <Grid container spacing={1}>
+            <Card variant="outlined" className={classes.root}>
+                <Grid container spacing={2}>
                     <Grid item md={9} xs={10}>
                         <Typography variant="h5">
                             {props.data.name}
@@ -56,7 +63,8 @@ const TeamCard = (props) => {
                             data={data} 
                             width={"90%"} 
                             height={80} 
-                            strokeWidth={1}
+                            strokeWidth={2}
+                            color={"#000"}
                         />
                     </Grid>
                     <Grid item xs={12}>

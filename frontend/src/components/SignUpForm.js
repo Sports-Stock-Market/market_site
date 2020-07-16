@@ -115,10 +115,12 @@ const SignUpForm = () => {
             inputRef={register}
           />
         </Grid>
+        <Grid style={{marginTop: -10}} item xs={12}>
+          <Link className={classes.link} to="/login" variant="body2">
+            Already have an account? Login
+          </Link>
+        </Grid>
       </Grid>
-      <Link className={classes.link} to="/login" variant="body2">
-        Already have an account? Login
-      </Link>
       <Button
         type="submit"
         fullWidth

@@ -4,9 +4,8 @@ import TeamCard from './TeamCard.js';
 // Material-UI Components
 import { makeStyles } from '@material-ui/core/styles';
 import { 
-    Grid, Typography, Container,
+    Grid, Typography,
 } from '@material-ui/core';
-import MainStockChart from './MainStockChart.js';
 
 const useStyles = makeStyles((theme) => ({
     title: {
@@ -47,9 +46,9 @@ const holdings = [
         }
     },
     {
-        name: "Los Angeles Lakers",
-        abr: "LAL",
-        price: 1646.35,
+        name: "Houston Rockets",
+        abr: "HOU",
+        price: 1851.96,
         position: {
             bought: 1646.35,
             shares: 30,
@@ -62,22 +61,22 @@ const TeamCardContainer = () => {
     const classes = useStyles();
 
     return (
-        <Container className={classes.container} component="main" maxWidth="md">
-            <Typography className={classes.title} variant="h4">
-                Will's Portfolio
-            </Typography>
-            <MainStockChart />
-            <Typography className={classes.title} variant="h4">
-                My Teams
-            </Typography>
-            <Grid container spacing={3}>
-                {holdings.map((holding) => 
-                    <Grid item sm={6} md={3}>
-                        <TeamCard data={holding} />
-                    </Grid>
-                )}
+        <Grid container spacing={1}>
+            <Grid item xs={12}>
+                <Typography className={classes.title} variant="h4">
+                    My Teams
+                </Typography>
             </Grid>
-        </Container>
+            <Grid item xs={12}>
+                <Grid container spacing={3}>
+                    {holdings.map((holding) => 
+                        <Grid item sm={6} md={3}>
+                            <TeamCard key={holding.abr} data={holding} />
+                        </Grid>
+                    )}
+                </Grid>
+            </Grid>
+        </Grid>
     );
 }
 

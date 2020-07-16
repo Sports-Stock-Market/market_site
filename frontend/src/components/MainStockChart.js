@@ -32,10 +32,11 @@ const MainStockChart = () => {
                     referenceLine 
                     data={data}
                     height={250}
-                    strokeWidth={1.5}
+                    strokeWidth={3}
+                    color={"#000"}
                 />
             </Grid>
-            <Grid item xs={12}>
+            <Grid  item xs={12}>
                 <ChartRangePicker />
             </Grid>
         </Grid>
