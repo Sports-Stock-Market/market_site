@@ -3,7 +3,7 @@ import {
   BrowserRouter as Router, Switch, Route
 } from 'react-router-dom';
 import {
-  LoginForm, NavBar, SignUpForm, Portfolio, FormContainer, Leaderboard,
+  LoginForm, NavBar, SignUpForm, Portfolio, FormContainer, Leaderboard, TeamPage,
 } from './components';
 
 import './App.css';
@@ -29,6 +29,9 @@ function App() {
           </Route>
           <Route path="/portfolio/:username">
             <Portfolio />
+          </Route>
+          <Route path="/team/:abr">
+            <TeamPage />
           </Route>
           <Route path="/leaderboard" exact>
             <Leaderboard />

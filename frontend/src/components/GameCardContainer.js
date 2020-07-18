@@ -96,7 +96,7 @@ const GameCardContainer = () => {
         <Grid container spacing={1}>
             <Grid item xs={12}>
                 <Typography className={classes.title} variant="h4">
-                    My Games
+                    Schedule
                 </Typography>
             </Grid>
             <Grid item xs={12}>

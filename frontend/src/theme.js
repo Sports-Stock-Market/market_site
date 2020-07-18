@@ -61,12 +61,12 @@ const theme = createMuiTheme({
             lineHeight: 1.15,
         },
         h6: {
-            fontSize: "1.5rem",
+            fontSize: "1.4rem",
             fontWeight: 700,
         },
         subtitle1: {
             fontSize: "1rem",
-            fontWeight: 600,
+            fontWeight: 500,
         },
         subtitle2: {
             fontSize: "0.1rem",

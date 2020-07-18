@@ -4,3 +4,4 @@ export { default as NavBar } from './NavBar.js';
 export { default as Portfolio } from './Portfolio.js';
 export { default as FormContainer } from './FormContainer.js';
 export { default as Leaderboard } from './Leaderboard.js';
+export { default as TeamPage } from './TeamPage.js'

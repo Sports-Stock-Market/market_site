@@ -32,14 +32,20 @@ const useStyles = makeStyles((theme) => ({
 
 const SignUpForm = (props) => {
   const classes = useStyles();
-  const { register, handleSubmit, setValue } = useForm();
+  const { register, handleSubmit, setValue, getValues } = useForm();
   const [ formError, setFormError ] = useState(false);
   const [ errorMessage, setErrorMessage ] = useState()
   const history = useHistory();
 
+  const values = getValues(["userName", "email", "password", "confirm-password"])
+
   const handleError = err => {
     setFormError(true);
     setErrorMessage(err['message']);
+  }
+
+  const isFieldError = (field) => {
+    return formError && values[field] !== ""
   }
 
   const onSubmit = data => {
@@ -71,6 +77,8 @@ const SignUpForm = (props) => {
       <Grid container spacing={2}>
         <Grid item xs={12}>
           <TextField
+            error={isFieldError("userName") ? true : false}
+            helperText={isFieldError("userName") ? errorMessage : ""}
             autoComplete="uname"
             name="userName"
             variant="outlined"
@@ -85,6 +93,8 @@ const SignUpForm = (props) => {
         </Grid>
         <Grid item xs={12}>
           <TextField
+            error={isFieldError("email") ? true : false}
+            helperText={isFieldError("email") ? errorMessage : ""}          
             variant="outlined"
             required
             fullWidth
@@ -98,6 +108,8 @@ const SignUpForm = (props) => {
         </Grid>
         <Grid item xs={12}>
           <TextField
+            error={isFieldError("password") ? true : false}
+            helperText={isFieldError("password") ? errorMessage : ""}
             variant="outlined"
             required
             fullWidth
@@ -112,6 +124,8 @@ const SignUpForm = (props) => {
         </Grid>
         <Grid item xs={12}>
           <TextField
+            error={isFieldError("confirm-password") ? true : false}
+            helperText={isFieldError("confirm-password") ? errorMessage : ""}
             variant="outlined"
             required
             fullWidth
@@ -124,11 +138,6 @@ const SignUpForm = (props) => {
             onChange={e => setValue('confirm-password', e.target.value)}
           />
         </Grid>
-        <Grid style={{marginTop: -10}} item xs={12}>
-          <Link className={classes.link} to="/login" variant="body2">
-            Already have an account? Login
-          </Link>
-        </Grid>
       </Grid>
       <Button
         type="submit"
@@ -139,23 +148,9 @@ const SignUpForm = (props) => {
       >
         Sign Up
       </Button>
-      <Collapse in={formError}>
-        <Alert 
-          action={
-            <IconButton
-              aria-label="close"
-              color="inherit"
-              size="small"
-              onClick={() => {
-                setFormError(false);
-              }}>
-              <CloseIcon fontSize="inherit" />
-            </IconButton>
-          } 
-          variant="outlined" severity="error">
-          {errorMessage}
-        </Alert>
-      </Collapse>
+      <Link className={classes.link} to="/login" variant="body2">
+        Already have an account? Login
+      </Link>
     </form>
   );
 }

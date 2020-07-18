@@ -55,3 +55,6 @@ docs/_build/
 
 # vim .swp files
 *.*.swp
+
+# zsh profile
+.zshrc

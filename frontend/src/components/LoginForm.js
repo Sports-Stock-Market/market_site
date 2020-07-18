@@ -75,6 +75,8 @@ const LoginForm = (props) => {
       <Grid container spacing={2}>
         <Grid item xs={12}>
           <TextField
+            error={formError ? true : false}
+            helperText={formError ? errorMessage : ""}
             variant="outlined"
             required
             fullWidth
@@ -88,6 +90,8 @@ const LoginForm = (props) => {
         </Grid>
         <Grid item xs={12}>
           <TextField
+            error={formError ? true : false}
+            helperText={formError ? errorMessage : ""}
             variant="outlined"
             required
             fullWidth
@@ -103,11 +107,6 @@ const LoginForm = (props) => {
           control={<Checkbox inputRef={register} name="remember" color="primary" defaultValue={false}/>}
           label="Remember me"
         /> */}
-        <Grid style={{marginTop: -10}} item xs={12}>
-          <Link className={classes.link} to="/signup">
-            Don't have an account? Register
-          </Link>
-        </Grid>
       </Grid>
       <Button
         type="submit"
@@ -118,23 +117,9 @@ const LoginForm = (props) => {
       >
         Login
       </Button>
-      <Collapse in={formError}>
-        <Alert 
-          action={
-            <IconButton
-              aria-label="close"
-              color="inherit"
-              size="small"
-              onClick={() => {
-                setFormError(false);
-              }}>
-              <CloseIcon fontSize="inherit" />
-            </IconButton>
-          }  
-        variant="outlined" severity="error">
-          {errorMessage}
-        </Alert>
-      </Collapse>
+      <Link className={classes.link} to="/signup">
+        Don't have an account? Register
+      </Link>
     </form>
   );
 }
