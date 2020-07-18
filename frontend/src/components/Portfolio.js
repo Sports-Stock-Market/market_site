@@ -30,12 +30,12 @@ const Portfolio = (props) => {
 
     const username = window.location.pathname.slice(11);
     const cookies = new Cookies();
-        const requestOpts = {
-            method: 'GET',
-            headers: {'Content-type': 'application/JSON',
-                    'username': username},
-            credentials: 'include'
-        };
+    const requestOpts = {
+        method: 'GET',
+        headers: {'Content-type': 'application/JSON',
+                'username': username},
+        credentials: 'include'
+    };
     const getUsrData = () => {
         fetch('http://localhost:5000/api/users/usrPg', requestOpts).then(
             res => res.json().then(data_ => {
@@ -50,8 +50,8 @@ const Portfolio = (props) => {
     var delta = 0;
     var pctInc = 0;
     if (data.length !== 0) {
-        last = data[data.length - 1]['price'];
-        sndLast = data[data.length - 2]['price'];
+        last = data['1D'][data['1D'].length - 1]['price'];
+        sndLast = data['1D'][data['1D'].length - 2]['price'];
         delta = last - sndLast;
         pctInc = (last / sndLast) - 1;
     }

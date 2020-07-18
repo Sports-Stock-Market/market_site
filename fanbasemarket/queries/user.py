@@ -4,7 +4,7 @@ from json import dumps
 from sqlalchemy import and_, not_
 
 from fanbasemarket.queries.utils import get_graph_x_values
-from fanbasemarket.models import Purchase
+from fanbasemarket.models import Purchase, User
 
 
 def get_active_holdings(uid, db, date=None):
@@ -49,14 +49,26 @@ def get_assets_in_date_range(uid, previous_balance, end, db, start=None):
             total += sale.sold_for
     return last_date, total
 
+def get_current_usr_value(uid, db):
+    now = str(datetime.utcnow())
+    _, t = get_assets_in_date_range(uid, 1500, now, db)
+    return t
+
+def get_leaderboard(db):
+    usrs_all = User.query.all()
+    vals = [(u.username, get_current_usr_value(u.id, db)) for u in usrs_all]
+    return [{'username': x, 'value': y} for x, y in vals]   
 
 def get_user_graph_points(uid, db):
-    x_values = get_graph_x_values()
+    x_values_dict = get_graph_x_values()
     data_points = []
-    initial_date, val = get_assets_in_date_range(uid, 15000, x_values[0], db)
-    data_points.append({'date': str(initial_date), 'price': val})
-    for i, x_val in enumerate(x_values[:-1]):
-        date, val = get_assets_in_date_range(uid, val, x_values[i + 1], db, start=x_val)
-        date_s = str(date)
-        data_points.append({'date': date_s, 'price': val})
+    data_points = {}
+    for k, x_values in x_values_dict.items():
+        data_points[k] = []
+        initial_date, val = get_assets_in_date_range(uid, 15000, x_values[0], db)
+        data_points[k].append({'date': str(initial_date), 'price': val})
+        for i, x_val in enumerate(x_values[:-1]):
+            date, val = get_assets_in_date_range(uid, val, x_values[i + 1], db, start=x_val)
+            date_s = str(date)
+            data_points[k].append({'date': date_s, 'price': val})
     return data_points

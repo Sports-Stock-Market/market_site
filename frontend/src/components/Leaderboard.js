@@ -1,4 +1,4 @@
-import React, { useLayoutEffect } from "react";
+import React, { useLayoutEffect, useEffect } from "react";
 import PropTypes from "prop-types";
 import clsx from "clsx";
 import { lighten, makeStyles } from "@material-ui/core/styles";
@@ -22,22 +22,9 @@ import Cookies from 'universal-cookie';
 // import "bootstrap/dist/css/bootstrap.css";
 
 function createData(name, fans) {
-  const growth = (((fans - 10000) / 10000) * 100).toFixed(2);
+  const growth = (((fans - 1500) / 1500) * 100).toFixed(2);
   return { name, fans, growth };
 }
-
-const rows = [
-  createData("Ben", 999999),
-  createData("Zaid", 13912.32123),
-  createData("Will", 10000),
-  createData("Vedant", 100000.05),
-  createData("Yoon", 10000),
-  createData("Ben", 10000),
-  createData("Zaid", 120),
-  createData("Will", 10000),
-  createData("Vedant", 1225),
-  createData("Yoon", 998.42314),
-];
 
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -230,6 +217,7 @@ const useStyles = makeStyles((theme) => ({
 
 function Leaderboard(props) {
   const classes = useStyles();
+  const [rows, setRows] = React.useState([]);
   const [order, setOrder] = React.useState("desc");
   const [orderBy, setOrderBy] = React.useState("fans");
   const [selected, setSelected] = React.useState([]);
@@ -243,6 +231,22 @@ function Leaderboard(props) {
       (res) => console.log(res),
       (err) => console.log(err)
     );
+  }, []);
+  const requestOpts = {
+    method: 'GET',
+    headers: {'Content-type': 'application/JSON'},
+    credentials: 'include'
+  };
+  const getLeaderboard = () => {
+    fetch('http://localhost:5000/api/users/leaderboard', requestOpts).then(
+      res => res.json().then(data => {
+        data = data.map(o => createData(o['username'], o['value']));
+        setRows(data);
+      })
+    );
+  }
+  useEffect(() => {
+    getLeaderboard();
   }, []);
 
   const handleRequestSort = (event, property) => {

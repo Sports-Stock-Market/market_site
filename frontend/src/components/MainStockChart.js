@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import StockPrice from './StockPrice';
 import StockChart from './StockChart';
 import ChartRangePicker from './ChartRangePicker';
@@ -9,6 +9,10 @@ import {
 } from '@material-ui/core';
 
 const MainStockChart = (props) => {
+
+    const [range, setRange] = useState('1D');
+    const labels = ["1D", "1W", "1M", "YTD"];
+
     return (
         <Grid container spacing={3}>
             <Grid item xs={12}>
@@ -23,14 +27,14 @@ const MainStockChart = (props) => {
                 <StockChart
                     big
                     referenceLine 
-                    data={props.chartData}
+                    data={props.chartData[range]}
                     height={250}
                     strokeWidth={3}
                     color={"#000"}
                 />
             </Grid>
             <Grid  item xs={12}>
-                <ChartRangePicker />
+                <ChartRangePicker pickRange={range => setRange(labels[range])} />
             </Grid>
         </Grid>
     );
