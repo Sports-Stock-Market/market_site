@@ -312,8 +312,6 @@ function Leaderboard(props) {
                       : row.growth < 0.0000001
                       ? "table-active"
                       : "bg-success";
-                  console.log(row.growth);
-                  console.log("heyy");
 
                   return (
                     <TableRow className={rowColor}>

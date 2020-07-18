@@ -15,9 +15,15 @@ const useStyles = makeStyles((theme) => ({
         border: "1px solid #EDF2F5",
         padding: theme.spacing(1.5),
     },
+    infoContainer: {
+        margin: theme.spacing(1, 0, 1.5, 0),
+    },
+    teamContainer: {
+        marginBottom: theme.spacing(0.8),
+    },
     team: {
         display: "inline",
-        margin: theme.spacing(-5, 1),
+        marginRight: theme.spacing(1),
     },
 }));
 
@@ -45,26 +51,26 @@ const GameCard = (props) => {
 
     return (
         <div style={{ width: "100%" }}>
-            <Box display="flex">
+            <Box className={classes.infoContainer} display="flex">
                 <Box flexGrow={1}>
-                    <Typography variant="subtitle1">
-                        {time}
-                    </Typography>
-                </Box>
-                <Box p={0}>
                     <Typography variant="subtitle1">
                         {props.data.location}
                     </Typography>
                 </Box>
+                <Box p={0}>
+                    <Typography variant="subtitle1">
+                        {time}
+                    </Typography>
+                </Box>
             </Box>
-            <Box display="flex">
+            <Box className={classes.teamContainer} display="flex">
                 <Box flexGrow={1}>
-                    <HomeLogo size={50}/>
+                    {/* <HomeLogo size={50}/> */}
                     <Typography className={classes.team} variant="h6">
                         {props.data.home_team.name}
                     </Typography>
                     <Typography display="inline" variant="subtitle1">
-                        {props.data.home_team.record}
+                        ({props.data.home_team.record})
                     </Typography>
                 </Box>
                 <Box >
@@ -73,14 +79,14 @@ const GameCard = (props) => {
                     </Typography>
                 </Box>
             </Box>
-            <Box display="flex">
+            <Box className={classes.teamContainer} display="flex">
                 <Box flexGrow={1}>
-                    <AwayLogo size={50}/>
+                    {/* <AwayLogo size={50}/> */}
                     <Typography className={classes.team} variant="h6">
                         {props.data.away_team.name}
                     </Typography>
                     <Typography display="inline" variant="subtitle1">
-                        {props.data.away_team.record}
+                        ({props.data.away_team.record})
                     </Typography>
                 </Box>
                 <Box >

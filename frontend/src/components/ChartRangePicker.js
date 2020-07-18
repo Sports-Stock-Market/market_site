@@ -8,32 +8,28 @@ import {
 
 const StockTabs = withStyles((theme) => ({
     root: {
-      
+      borderBottom: '1px solid #9FAFBA',
     },
     indicator: {
-      display: 'none',
-      justifyContent: 'center',
+      backgroundColor: theme.palette.primary.main,
+
     },
   }))(Tabs);
 
 const StockTab = withStyles((theme) => ({
     root: {
-      color: theme.palette.primary.main,
+      color: theme.palette.secondary.main,
       textTransform: 'none',
-      marginRight: theme.spacing(1),
-      minWidth: 30,
-      minHeight: 42,
+      marginRight: theme.spacing(0.5),
+      minWidth: 20,
       fontWeight: 500,
-      borderRadius: "20px",
-      transition: "all 0.3s cubic-bezier(.25,.8,.25,1)",
+      transition: "all 0.6s cubic-bezier(.25,.8,.25,1)",
       '&:hover': {
-        backgroundColor: theme.palette.secondary.light,
+        color: theme.palette.primary.main,
         opacity: 1,
       },
       '&$selected': {
-        color: theme.palette.common.white,
         fontWeight: theme.typography.fontWeightMedium,
-        backgroundColor: theme.palette.primary.main
       },
       '&:focus': {
         color: theme.palette.primary,
