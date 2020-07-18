@@ -38,13 +38,14 @@ const StockTab = withStyles((theme) => ({
     selected: {},
   }))((props) => <Tab disableRipple {...props} />);  
 
-const ChartRangePicker = () => {
+const ChartRangePicker = (props) => {
     const [value, setValue] = useState(0);
 
     const labels = ["1D", "1W", "1M", "YTD"];
 
     const handleChange = (e, newValue) => {
         setValue(newValue);
+        props.pickRange(newValue);
     };
 
     return (
