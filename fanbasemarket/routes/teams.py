@@ -1,6 +1,6 @@
 from flask import Blueprint, request
 from flask_cors import CORS, cross_origin
-from fanbasemarket import session
+from fanbasemarket import app
 from fanbasemarket.models import Team
 from fanbasemarket.routes.utils import ok, bad_request
 from fanbasemarket.queries.team import get_team_graph_points
@@ -19,7 +19,9 @@ def creds(response):
 def gen_team_graph_pts():
     body = request.get_json()
     tname = body['team_name']
-    team = session.query(Team).filter(Team.name == tname).first()
-    if team is None:
-        return bad_request('no such team')
-    return ok(get_team_graph_points(team.id))
+    with app.app_context():
+        db = get_db()
+        team = db.session.query(Team).filter(Team.name == tname).first()
+        if team is None:
+            return bad_request('no such team')
+        return ok(get_team_graph_points(team.id, db))

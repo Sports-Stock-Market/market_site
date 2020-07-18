@@ -16,10 +16,10 @@ def get_price(tid, db, date=None):
         all()
     return prices[-1].elo
 
-def get_team_graph_points(tid):
+def get_team_graph_points(tid, db):
     x_values = get_graph_x_values()
     data_points = []
     for x_val in x_values:
-        price = get_price(tid, x_val)
+        price = get_price(tid, db, date=x_val)
         data_points.append({'date': str(x_val), 'price': price})
     return data_points
