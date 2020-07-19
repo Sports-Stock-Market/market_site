@@ -1,14 +1,20 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   BrowserRouter as Router, Switch, Route
 } from 'react-router-dom';
 import {
   BaseNavBar, AuthNavBar, LoginForm, SignUpForm, Portfolio, FormContainer, Leaderboard, TeamPage,
 } from './components';
+import { connect } from 'react-redux';
+import { initAllTeams } from './actions/teamActions'; 
 
 import './App.css';
 
-function App() {
+function App(props) {
+
+  useEffect(() => {
+    props.initAllTeams();
+  }, []);
 
   return (
     <Router>
@@ -39,4 +45,4 @@ function App() {
   );
 }
 
-export default App;
+export default connect(null, { initAllTeams })(App);

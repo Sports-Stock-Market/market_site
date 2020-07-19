@@ -1,6 +1,6 @@
 from flask import Blueprint, request
 from flask_cors import CORS, cross_origin
-from fanbasemarket import app
+from fanbasemarket import app, get_db
 from fanbasemarket.models import Team
 from fanbasemarket.routes.utils import ok, bad_request
 from fanbasemarket.queries.team import get_team_graph_points
@@ -14,14 +14,17 @@ def creds(response):
     response.headers['Access-Control-Allow-Credentials'] = 'true'
     return response
 
-@teams.route('/graphPts')
+@teams.route('allTeamData', methods=['GET'])
 @cross_origin('http://localhost:3000/')
-def gen_team_graph_pts():
-    body = request.get_json()
-    tname = body['team_name']
+def all_team_data():
     with app.app_context():
         db = get_db()
-        team = db.session.query(Team).filter(Team.name == tname).first()
-        if team is None:
-            return bad_request('no such team')
-        return ok(get_team_graph_points(team.id, db))
+        teams_all = Team.query.all()
+        payload = {}
+        for team in teams_all:
+            d = {}
+            d['graph'] = get_team_graph_points(team.id, db)
+            d['price'] = d['graph']['1D'][-1]
+            d['name'] = team.name
+            payload[team.abr] = d
+        return ok(payload)
