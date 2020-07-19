@@ -3,7 +3,7 @@ import {
   BrowserRouter as Router, Switch, Route
 } from 'react-router-dom';
 import {
-  LoginForm, NavBar, SignUpForm, Portfolio, FormContainer, Leaderboard, TeamPage,
+  BaseNavBar, AuthNavBar, LoginForm, SignUpForm, Portfolio, FormContainer, Leaderboard, TeamPage,
 } from './components';
 
 import './App.css';
@@ -12,7 +12,7 @@ function App() {
 
   return (
     <Router>
-      <NavBar />
+      <AuthNavBar />
         <Switch>
           <Route path="/" exact>
             <h1> Fanbase Market </h1>
@@ -30,9 +30,7 @@ function App() {
           <Route path="/portfolio/:username">
             <Portfolio />
           </Route>
-          <Route path="/team/:abr">
-            <TeamPage />
-          </Route>
+          <Route path="/team/:abr" render={props => <TeamPage {...props} />} />
           <Route path="/leaderboard" exact>
             <Leaderboard />
           </Route>

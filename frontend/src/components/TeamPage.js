@@ -28,6 +28,11 @@ const sample = Array.from({length: 80}, (v, i) => {
 const TeamPage = (props) => {
     const classes = useStyles();
     const [data, setData] = useState(sample);
+    const [abr, setAbr] = useState("");
+
+    useEffect(() => {
+        setAbr(props.match.params.abr.toUpperCase());
+    }, [props.match])
 
     return (
         <Container component="main" maxWidth="md">
@@ -40,7 +45,7 @@ const TeamPage = (props) => {
                 </Grid>
                 <Divider />
                 <Grid item xs={12}>
-                    <TeamBuySell />
+                    <TeamBuySell abr={abr}/>
                 </Grid>
                 <Grid item xs={12}>
                     <GameCardContainer />
