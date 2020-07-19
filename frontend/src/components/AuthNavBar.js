@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useHistory } from 'react-router-dom';
-
+import { connect } from 'react-redux';
 import { fade, makeStyles } from '@material-ui/core/styles';
 import {
     AppBar, Toolbar, IconButton, Typography, InputBase, MenuItem, Menu, Button
@@ -86,6 +86,14 @@ const teams = [
   ]
 
 const AuthNavBar = (props) => {
+
+  const teams = Object.entries(props.names).map(p => {
+    const obj = {};
+    obj['name'] = p[1];
+    obj['abr'] = p[0];
+    return obj;
+  });
+
   const classes = useStyles();
   const history = useHistory();
   const [anchorEl, setAnchorEl] = useState(null);
@@ -179,7 +187,7 @@ const AuthNavBar = (props) => {
                   <SearchIcon />
                   </div>
                   <InputBase
-                  placeholder="Search"
+                  placeholder="Search Team"
                   classes={{
                     root: classes.inputRoot,
                     input: classes.inputInput,
@@ -197,7 +205,6 @@ const AuthNavBar = (props) => {
           />
           <div className={classes.grow} />
           <div className={classes.sectionDesktop}>
-            <Button component={Link} to="/portfolio/user" color="inherit">Portfolio</Button>
             <Button component={Link} to="/team/nyk" color="inherit">Teams</Button>
             <Button component={Link} to="/leaderboard" color="inherit">Leaderboard</Button>
             <IconButton
@@ -231,4 +238,11 @@ const AuthNavBar = (props) => {
   );
 }
 
-export default AuthNavBar;
+const mapStateToProps = (state) => {
+  return {
+    auth: state.auth,
+    names: state.teams.names
+  };
+}
+
+export default connect(mapStateToProps, {})(AuthNavBar);

@@ -7,12 +7,17 @@ import {
 } from './components';
 import { connect } from 'react-redux';
 import { initAllTeams, setAllNames } from './actions/teamActions'; 
+import { refreshToken } from './actions/authActions';
+import Cookies from 'universal-cookie';
 
 import './App.css';
 
 function App(props) {
 
+  const cookies = new Cookies();
+
   useEffect(() => {
+    props.refreshToken(cookies.get('csrf_refresh_token'));
     props.setAllNames();
     props.initAllTeams();
   }, []);
@@ -46,4 +51,4 @@ function App(props) {
   );
 }
 
-export default connect(null, { initAllTeams, setAllNames })(App);
+export default connect(null, { initAllTeams, setAllNames, refreshToken })(App);

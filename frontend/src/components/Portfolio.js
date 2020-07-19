@@ -29,7 +29,6 @@ const Portfolio = (props) => {
     const [data, setData] = useState([]);
 
     const username = window.location.pathname.slice(11);
-    const cookies = new Cookies();
     const requestOpts = {
         method: 'GET',
         headers: {'Content-type': 'application/JSON',
@@ -45,6 +44,7 @@ const Portfolio = (props) => {
             })
         );
     }
+
     var last = 0;
     var sndLast = 0;
     var delta = 0;
@@ -55,10 +55,6 @@ const Portfolio = (props) => {
         delta = last - sndLast;
         pctInc = (last / sndLast) - 1;
     }
-
-    useEffect(() => {
-        props.refreshToken(cookies.get('csrf_refresh_token'));
-    }, []);
 
     useEffect(() => {
         getUsrData();
@@ -92,4 +88,4 @@ const mapStateToProps = (state) => {
     };
 }
 
-export default connect(mapStateToProps, { refreshToken })(Portfolio);
+export default connect(mapStateToProps, {})(Portfolio);

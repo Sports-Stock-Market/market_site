@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import MainStockChart from './MainStockChart.js';
 import GameCardContainer from './GameCardContainer.js';
 import TeamBuySell from './TeamBuySell.js';
+import { connect } from 'react-redux';
 
 // Material-UI Components
 import { makeStyles } from '@material-ui/core/styles';
@@ -34,10 +35,12 @@ const TeamPage = (props) => {
         setAbr(props.match.params.abr.toUpperCase());
     }, [props.match])
 
+    const name = props.teams.names[abr];
+
     return (
         <Container component="main" maxWidth="md">
             <Typography className={classes.title} variant="h3">
-                Atlanta Hawks
+                {name}
             </Typography>
             <Grid className={classes.main} container spacing={4}>
                 <Grid item xs={12}>
@@ -55,4 +58,11 @@ const TeamPage = (props) => {
     );
 }
 
-export default TeamPage;
+const mapStateToProps = (state) => {
+    return {
+      auth: state.auth,
+      teams: state.teams
+    };
+}
+
+export default connect(mapStateToProps, {})(TeamPage);
