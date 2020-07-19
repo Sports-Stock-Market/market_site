@@ -1,9 +1,16 @@
-import { INIT_TEAMS } from './types';
+import { INIT_TEAMS, SET_NAMES } from './types';
 
 export function initTeamData(data) {
     return {
         type: INIT_TEAMS,
         teams: data
+    }
+}
+
+export function setNames(data) {
+    return {
+        type: SET_NAMES,
+        names: data
     }
 }
 
@@ -17,5 +24,18 @@ export function initAllTeams() {
         const res = await fetch('http://localhost:3000/api/teams/allTeamData', opts);
         const data = await res.json()
         dispatch(initTeamData(data));
+    }
+}
+
+export function setAllNames() {
+    return async function(dispatch) {
+        const opts = {
+            method: 'GET',
+            headers: {'Content-Type': 'application/JSON'},
+            credentials: 'include'
+        }
+        const res = await fetch('http://localhost:3000/api/teams/teamNames');
+        const data = await res.json();
+        dispatch(setNames(data));
     }
 }

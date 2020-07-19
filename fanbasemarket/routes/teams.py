@@ -28,3 +28,14 @@ def all_team_data():
             d['name'] = team.name
             payload[team.abr] = d
         return ok(payload)
+
+@teams.route('teamNames', methods=['GET'])
+@cross_origin('http://localhost:3000/')
+def names():
+    with app.app_context():
+        db = get_db()
+        teams_all = Team.query.all()
+        payload = {}
+        for team in teams_all:
+            payload[team.abr] = team.name
+        return ok(payload)

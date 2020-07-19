@@ -6,13 +6,14 @@ import {
   BaseNavBar, AuthNavBar, LoginForm, SignUpForm, Portfolio, FormContainer, Leaderboard, TeamPage,
 } from './components';
 import { connect } from 'react-redux';
-import { initAllTeams } from './actions/teamActions'; 
+import { initAllTeams, setAllNames } from './actions/teamActions'; 
 
 import './App.css';
 
 function App(props) {
 
   useEffect(() => {
+    props.setAllNames();
     props.initAllTeams();
   }, []);
 
@@ -45,4 +46,4 @@ function App(props) {
   );
 }
 
-export default connect(null, { initAllTeams })(App);
+export default connect(null, { initAllTeams, setAllNames })(App);
