@@ -1,12 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useHistory } from 'react-router-dom';
 
 // Material-UI Components
 import { makeStyles } from '@material-ui/core/styles';
 import {
-  AppBar, Toolbar, Typography, Button,
+  AppBar, Toolbar, Typography, Button, TextField, Box, 
 } from '@material-ui/core';
 import SportsBasketballIcon from '@material-ui/icons/SportsBasketball';
+import Autocomplete from '@material-ui/lab/Autocomplete';
 import { connect } from 'react-redux';
 import { logout } from '../actions/authActions';
 import Cookies from 'universal-cookie'
@@ -19,7 +20,7 @@ const useStyles = makeStyles((theme) => ({
       boxShadow: "0 1px 3px 1px rgba(0,0,0,0.1)",
     },
     logo: {
-      marginRight: theme.spacing(2),
+      marginRight: theme.spacing(1.5),
     },
     title: {
       flexGrow: 1,
@@ -27,7 +28,13 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const NavBar = (props) => {
+const teams = [
+  { name: "New York Knicks", abr: "NYK"},
+  { name: "Chicago Bulls", abr: "CHI"},
+  { name: "Los Angeles Lakers", abr: "LAL"},
+]
+
+const BaseNavBar = (props) => {
     const classes = useStyles();
     const { isAuthenticated, user } = props.auth;
     const history = useHistory();
@@ -37,6 +44,10 @@ const NavBar = (props) => {
         (res) => history.push('/'),
         (err) => console.log(err)
       );
+    };
+
+    const onSearch = (value) => {
+      history.push(`/team/${value}`)
     };
 
     const userLinks = (
@@ -52,14 +63,14 @@ const NavBar = (props) => {
 
     return (
       <div className={classes.root}>
-        <AppBar className={classes.bar} color="inherit" position="sticky">
+        <AppBar className={classes.bar} color="inherit" position="fixed">
           <Toolbar>
             <SportsBasketballIcon edge="start" className={classes.logo} color="inherit" />
             <Typography variant="h6" className={classes.title}>Fanbase</Typography>
-            <Button component={Link} to="/leaderboard" color="inherit">Leaderboard</Button>
             { isAuthenticated ? userLinks : guestLinks }
           </Toolbar>
         </AppBar>
+        <Toolbar />
       </div>
     );
 }
@@ -70,4 +81,4 @@ const mapStateToProps = (state) => {
   };
 }
 
-export default connect(mapStateToProps, { logout })(NavBar);
+export default connect(mapStateToProps, { logout })(BaseNavBar);

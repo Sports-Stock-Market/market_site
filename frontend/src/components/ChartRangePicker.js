@@ -58,7 +58,7 @@ const ChartRangePicker = (props) => {
                 aria-label="disabled tabs example"
             >
                 {labels.map((label) => 
-                    <StockTab label={label} />
+                    <StockTab key={label} label={label} />
                 )}
             </StockTabs>
         </div>

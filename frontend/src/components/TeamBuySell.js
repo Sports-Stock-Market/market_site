@@ -20,7 +20,8 @@ const useStyles = makeStyles((theme) => ({
     },
     submit: {
         height: 40,
-        margin: theme.spacing(2, 0, 1.5),
+        width: "40%",
+        margin: theme.spacing(4, 1, 1, 1),
     },
 }));
 
@@ -90,8 +91,7 @@ const TeamBuySell = (props) => {
     const [value, setValue] = useState(0);
     const [data, setData] = useState(sample);
 
-    const abr = window.location.pathname.slice(6).toUpperCase();
-    const Logo = NBAIcons[abr];
+    const Logo = NBAIcons[props.abr];
 
     const handleChange = (event, newValue) => {
       setValue(newValue);
@@ -103,7 +103,7 @@ const TeamBuySell = (props) => {
                 <Grid item xs={12}>
                     {/* <Logo size={40} /> */}
                     <Typography display="inline" variant="h4">
-                        {abr}
+                        {props.abr}
                     </Typography>
                 </Grid>
                 <Grid item xs={12}>
@@ -136,7 +136,6 @@ const TeamBuySell = (props) => {
                 </Grid>
                 <Button
                     type="submit"
-                    fullWidth
                     variant="contained"
                     color="primary"
                     className={classes.submit}
