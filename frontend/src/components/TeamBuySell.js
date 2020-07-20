@@ -9,14 +9,15 @@ const useStyles = makeStyles((theme) => ({
     root: {
         border: "1px solid #EDF2F5",
         padding: theme.spacing(1.5),
-        width: 450,
+        width: "100%",
     },
     field: {
         color: theme.palette.primary,
         backgroundColor: theme.palette.secondary.light,
     },
-    right: {
+    value: {
         fontWeight: 700,
+        marginLeft: theme.spacing(1.5),
     },
     submit: {
         height: 40,
@@ -57,33 +58,19 @@ const TradeTab = withStyles((theme) => ({
     selected: {},
   }))((props) => <Tab disableRipple {...props} />);
 
-const RightLeftAlign = ({ left, right }) => {
-    const classes = useStyles();
-
-    return (
-        <Grid item xs={6}>
-            <Box display="flex">
-                <Box flexGrow={1}>
-                    <Typography variant="subtitle1">
-                        {left}
-                    </Typography>
-                </Box>
-                <Box p={0}>
-                    <Typography className={classes.right} variant="subtitle1">
-                        {right}
-                    </Typography>
-                </Box>
-            </Box>
-        </Grid>
-    )
-}
-
 // sample data
 const sample = {
     price: 1600,
-    totalPrice: 1600,
-    avFunds: 1600,
-    remFunds: 1600,
+    avFunds: 16000,
+    totalPrice: 3200,
+    remFunds: 16000,
+}
+
+const labels = {
+    price: "Share Price",
+    totalPrice: "Total Price",
+    avFunds: "Available Funds",
+    remFunds: "Remaining Funds"
 }
 
 const TeamBuySell = (props) => {
@@ -97,15 +84,22 @@ const TeamBuySell = (props) => {
       setValue(newValue);
     };
 
+    const InfoItem = ({ label, info }) => {
+        return (
+            <Grid item xs={6}>
+                <Typography display="inline" variant="subtitle1">
+                    {label}
+                </Typography>
+                <Typography display="inline" className={classes.value} variant="subtitle1">
+                    {info}
+                </Typography>
+            </Grid>
+        )
+    };
+
     return (
         <Card variant="outlined" className={classes.root}>
             <Grid container spacing={2}>
-                <Grid item xs={12}>
-                    {/* <Logo size={40} /> */}
-                    <Typography display="inline" variant="h4">
-                        {props.abr}
-                    </Typography>
-                </Grid>
                 <Grid item xs={12}>
                 <TradeTabs 
                  value={value}
@@ -128,11 +122,10 @@ const TeamBuySell = (props) => {
                         className={classes.field}
                     />
                 </Grid>
-                <Grid container item xs={12} spacing={1}>
-                    <RightLeftAlign left="Share Price" right={data.price} />
-                    <RightLeftAlign left="Available Funds" right={data.avFunds} />
-                    <RightLeftAlign left="Total Price" right={data.totalPrice} />
-                    <RightLeftAlign left="Remaining Funds" right={data.remFunds} />
+                <Grid container item xs={12} spacing={0}>
+                    {Object.entries(data).map(([ label, info ]) => 
+                        <InfoItem key={label} label={labels[label]} info={info} />
+                    )}
                 </Grid>
                 <Button
                     type="submit"
