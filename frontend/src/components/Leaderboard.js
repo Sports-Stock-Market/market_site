@@ -2,6 +2,7 @@ import React, { useLayoutEffect, useEffect } from "react";
 import PropTypes from "prop-types";
 import clsx from "clsx";
 import { lighten, makeStyles } from "@material-ui/core/styles";
+import Container from "@material-ui/core/Container";
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
 import TableCell from "@material-ui/core/TableCell";
@@ -150,7 +151,7 @@ const useToolbarStyles = makeStyles((theme) => ({
           backgroundColor: theme.palette.secondary.dark,
         },
   title: {
-    flex: "1 1 100%",
+    margin: theme.spacing(2, 0)
   },
 }));
 
@@ -176,11 +177,11 @@ const EnhancedTableToolbar = (props) => {
       ) : (
         <Typography
           className={classes.title}
-          variant="h6"
+          variant="h3"
           id="tableTitle"
           component="div"
         >
-          <h1 align="center">Leaderboard</h1>
+          Leaderboard
         </Typography>
       )}
     </Toolbar>
@@ -215,7 +216,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function Leaderboard(props) {
+const Leaderboard = (props) => {
   const classes = useStyles();
   const [rows, setRows] = React.useState([]);
   const [order, setOrder] = React.useState("desc");
@@ -283,8 +284,8 @@ function Leaderboard(props) {
     rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage);
 
   return (
-    <div className={classes.root}>
-      <Paper className={classes.paper}>
+    <Container component="main" maxWidth="md">
+      <div className={classes.root}>
         <EnhancedTableToolbar numSelected={selected.length} />
         <TableContainer>
           <Table
@@ -354,12 +355,12 @@ function Leaderboard(props) {
           onChangePage={handleChangePage}
           onChangeRowsPerPage={handleChangeRowsPerPage}
         />
-      </Paper>
-      <FormControlLabel
-        control={<Switch checked={dense} onChange={handleChangeDense} />}
-        label="Dense padding"
-      />
-    </div>
+        <FormControlLabel
+          control={<Switch checked={dense} onChange={handleChangeDense} />}
+          label="Dense padding"
+        />
+      </div>
+    </Container>
   );
 }
 

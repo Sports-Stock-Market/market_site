@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import MainStockChart from './MainStockChart.js';
 import GameCardContainer from './GameCardContainer.js';
 import TeamBuySell from './TeamBuySell.js';
+import PositionCard from './PositionCard.js';
 
 // Material-UI Components
 import { makeStyles } from '@material-ui/core/styles';
@@ -44,8 +45,19 @@ const TeamPage = (props) => {
                     <MainStockChart last={1600.06} delta={200.02} pctInc={20.34} chartData={data} />
                 </Grid>
                 <Divider />
-                <Grid item xs={12}>
-                    <TeamBuySell abr={abr}/>
+                <Grid container item xs={12} spacing={3}>
+                    <Grid item md={6} xs={12}>
+                        <Typography className={classes.title} variant="h4">
+                            Position
+                        </Typography>
+                        <PositionCard />
+                    </Grid>
+                    <Grid item md={6} xs={12}>
+                        <Typography className={classes.title} variant="h4">
+                            Trade {abr}
+                        </Typography>
+                        <TeamBuySell />
+                    </Grid>
                 </Grid>
                 <Grid item xs={12}>
                     <GameCardContainer />
