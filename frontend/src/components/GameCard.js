@@ -4,7 +4,7 @@ import * as NBAIcons from 'react-nba-logos';
 // Material-UI Components
 import { makeStyles } from '@material-ui/core/styles';
 import { 
-    Card, Typography, Grid, Box,
+    Typography, Box,
 } from '@material-ui/core';
 
 const useStyles = makeStyles((theme) => ({

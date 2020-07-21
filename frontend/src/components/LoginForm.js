@@ -10,10 +10,7 @@ import {
   Button, TextField, Grid,
   // FormControlLabel,
   // Checkbox,
-  Collapse, IconButton,
 } from '@material-ui/core';
-import Alert from '@material-ui/lab/Alert';
-import CloseIcon from '@material-ui/icons/Close';
 
 const useStyles = makeStyles((theme) => ({
   form: {

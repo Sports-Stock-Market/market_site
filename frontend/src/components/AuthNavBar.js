@@ -12,7 +12,6 @@ import {
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import SportsBasketballIcon from '@material-ui/icons/SportsBasketball';
 import SearchIcon from '@material-ui/icons/Search';
-import AccountCircle from '@material-ui/icons/AccountCircle';
 import MenuIcon from '@material-ui/icons/Menu';
 
 const useStyles = makeStyles((theme) => ({
@@ -125,7 +124,7 @@ const AuthNavBar = (props) => {
   const userLinks = (
     <>
     <Button component={Link} to={`/portfolio/${user.username}`} color="inherit">Portfolio</Button>
-    <Button component={Link} to="/team/nyk" color="inherit">Teams</Button>
+    <Button component={Link} to="/teams" color="inherit">Teams</Button>
     <Button component={Link} to="/leaderboard" color="inherit">Leaderboard</Button>
     <Button component={Link} onClick={onLogout} to="/" color="inherit" variant="outlined">Logout</Button>
     </>
@@ -145,7 +144,7 @@ const AuthNavBar = (props) => {
       <MenuItem onClick={handleMobileMenuClose} component={Link} to={`/portfolio/${user.username}`}>
         <p>Portfolio</p>
       </MenuItem>
-      <MenuItem onClick={handleMobileMenuClose} component={Link} to="/team">
+      <MenuItem onClick={handleMobileMenuClose} component={Link} to="/teams">
         <p>Teams</p>
       </MenuItem>
       <MenuItem onClick={handleMobileMenuClose} component={Link} to="/leaderboard">
