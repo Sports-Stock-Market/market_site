@@ -155,7 +155,7 @@ const EnhancedTableToolbar = (props) => {
           variant="subtitle1"
           component="div"
         >
-          {numSelected} selected
+          {numSelected} Selected
         </Typography>
       ) : (
         <Typography
@@ -164,7 +164,7 @@ const EnhancedTableToolbar = (props) => {
           id="tableTitle"
           component="div"
         >
-          Leaderboard
+          All Teams
         </Typography>
       )}
     </Toolbar>
