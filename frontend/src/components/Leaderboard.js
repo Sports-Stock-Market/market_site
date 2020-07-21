@@ -1,21 +1,13 @@
 import React, { useLayoutEffect, useEffect } from "react";
 import PropTypes from "prop-types";
 import clsx from "clsx";
+
 import { lighten, makeStyles } from "@material-ui/core/styles";
-import Container from "@material-ui/core/Container";
-import Table from "@material-ui/core/Table";
-import TableBody from "@material-ui/core/TableBody";
-import TableCell from "@material-ui/core/TableCell";
-import TableContainer from "@material-ui/core/TableContainer";
-import TableHead from "@material-ui/core/TableHead";
-import TablePagination from "@material-ui/core/TablePagination";
-import TableRow from "@material-ui/core/TableRow";
-import TableSortLabel from "@material-ui/core/TableSortLabel";
-import Toolbar from "@material-ui/core/Toolbar";
-import Typography from "@material-ui/core/Typography";
-import Paper from "@material-ui/core/Paper";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
-import Switch from "@material-ui/core/Switch";
+import { 
+  Container, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination,
+  TableRow, TableSortLabel, Toolbar, Typography, FormControlLabel, Switch
+ } from "@material-ui/core";
+
 import { refreshToken } from '../actions/authActions';
 import { connect } from 'react-redux';
 import Cookies from 'universal-cookie';
@@ -55,26 +47,26 @@ function stableSort(array, comparator) {
 
 const headCells = [
   {
-    id: "name",
+    id: "Username",
     numeric: false,
     disablePadding: true,
     label: "Rank",
   },
   {
-    id: "rank",
+    id: "Rank",
     numeric: true,
     disablePadding: false,
     label: "Name",
   },
   {
-    id: "fans",
+    id: "Fans",
     numeric: true,
     disablePadding: false,
     label: "Fans",
     format: (value) => value.toFixed(2),
   },
   {
-    id: "growth",
+    id: "Growth",
     numeric: true,
     disablePadding: false,
     label: "Growth %",
