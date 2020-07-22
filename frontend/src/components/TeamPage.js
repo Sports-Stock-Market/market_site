@@ -24,6 +24,7 @@ const useStyles = makeStyles((theme) => ({
 const TeamPage = (props) => {
     const classes = useStyles();    
     const sample = getSampleData(1500.0);
+    const [price, setPrice] = useState(1500.0);
     const [data, setData] = useState(sample);
     const [abr, setAbr] = useState("");
 
@@ -35,10 +36,10 @@ const TeamPage = (props) => {
         console.log(props.teams.teams);
         if (!isEmpty(props.teams.teams)) {
             setData(props.teams.teams[abr]['graph']);
+            setPrice(props.teams.teams[abr]['price']['price']);
         }
     }, [props.teams]);
 
-    console.log(data);
 
     const name = props.teams.names[abr];
 
@@ -49,7 +50,7 @@ const TeamPage = (props) => {
             </Typography>
             <Grid className={classes.main} container spacing={4}>
                 <Grid item xs={12}>
-                    <MainStockChart last={1600.06} delta={200.02} pctInc={20.34} chartData={data} />
+                    <MainStockChart last={price} delta={200.02} pctInc={20.34} chartData={data} />
                 </Grid>
                 <Divider />
                 <Grid item xs={12}>
