@@ -49,8 +49,8 @@ class Purchase(db.Model):
     purchased_at = db.Column(db.DateTime)
     sold_at = db.Column(db.DateTime, nullable=True)
     sold_for = db.Column(db.Float, nullable=True)
-    purchased_for = db.Column(Float)
-    amt_shares = db.Column(Integer)
+    purchased_for = db.Column(db.Float)
+    amt_shares = db.Column(db.Integer)
 
     def serialize(self):
         return dumps({'id': self.id, 'team_id': self.team_id,
@@ -106,7 +106,7 @@ class Listing(db.Model):
     __tablename__ = 'listing'
     id = db.Column(db.Integer, primary_key=True)
     team_id = db.Column(db.Integer, db.ForeignKey('team.id'))
-    user_id = db.Column(db.Integer, ForeignKey('user.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     price = db.Column(db.Float)
     posted_at = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     
