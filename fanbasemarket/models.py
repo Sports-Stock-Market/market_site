@@ -1,4 +1,3 @@
-from sqlalchemy import Column, Integer, String, Boolean, Float, ForeignKey, DateTime
 from werkzeug.security import generate_password_hash, check_password_hash
 from fanbasemarket import db
 from datetime import datetime
@@ -33,8 +32,9 @@ class User(db.Model):
 class Team(db.Model):
     __tablename__ = 'team'
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(String(140))
-    abr = db.Column(String(10))
+    name = db.Column(db.String(140))
+    abr = db.Column(db.String(10))
+    price = db.Column(db.Float, default=0.0)
 
     def serialize(self):
         return dumps({'id': self.id, 'name': self.name})
