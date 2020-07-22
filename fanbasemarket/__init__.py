@@ -114,11 +114,11 @@ def teardown_db(exc):
 
 from fanbasemarket.routes.auth import auth
 from fanbasemarket.routes.users import users
-# from fanbasemarket.routes.teams import teams
+from fanbasemarket.routes.teams import teams
 
 
 def create_app():
     app.register_blueprint(auth, url_prefix='/api/auth/')
     app.register_blueprint(users, url_prefix='/api/users/')
-    # app.register_blueprint(teams, url_prefix='/api/teams/')
+    app.register_blueprint(teams, url_prefix='/api/teams/')
     return app

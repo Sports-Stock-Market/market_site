@@ -1,14 +1,26 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   BrowserRouter as Router, Switch, Route
 } from 'react-router-dom';
 import {
   AuthNavBar, LoginForm, SignUpForm, Portfolio, FormContainer, Leaderboard, TeamPage, AllTeamsPage,
 } from './components';
+import { connect } from 'react-redux';
+import { initAllTeams, setAllNames } from './actions/teamActions'; 
+import { refreshToken } from './actions/authActions';
+import Cookies from 'universal-cookie';
 
 import './App.css';
 
-function App() {
+function App(props) {
+
+  const cookies = new Cookies();
+
+  useEffect(() => {
+    props.refreshToken(cookies.get('csrf_refresh_token'));
+    props.setAllNames();
+    props.initAllTeams();
+  }, []);
 
   return (
     <Router>
@@ -42,4 +54,4 @@ function App() {
   );
 }
 
-export default App;
+export default connect(null, { initAllTeams, setAllNames, refreshToken })(App);

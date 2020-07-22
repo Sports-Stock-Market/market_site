@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useHistory } from 'react-router-dom';
 
 import { connect } from 'react-redux';
@@ -82,21 +82,24 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const teams = [
-  { name: "New York Knicks", abr: "NYK"},
-  { name: "Chicago Bulls", abr: "CHI"},
-  { name: "Los Angeles Lakers", abr: "LAL"},
-]
-
 const AuthNavBar = (props) => {
+
+  const teams = Object.entries(props.names).map(p => {
+    const obj = {};
+    obj['name'] = p[1];
+    obj['abr'] = p[0];
+    return obj;
+  });
+
   const classes = useStyles();
   const history = useHistory();
   const { isAuthenticated, user } = props.auth;
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = useState(null);
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
+  const cookies = new Cookies();
 
   const onLogout = () => {
-    props.logout(user['access_token']).then(
+    props.logout(cookies.get('csrf_refresh_token')).then(
       (res) => history.push('/'),
       (err) => console.log(err)
     );
@@ -184,7 +187,7 @@ const AuthNavBar = (props) => {
                   <SearchIcon />
                   </div>
                   <InputBase
-                  placeholder="Search"
+                  placeholder="Search Team"
                   classes={{
                     root: classes.inputRoot,
                     input: classes.inputInput,
@@ -229,7 +232,8 @@ const AuthNavBar = (props) => {
 
 const mapStateToProps = (state) => {
   return {
-    auth: state.auth
+    auth: state.auth,
+    names: state.teams.names
   };
 }
 
