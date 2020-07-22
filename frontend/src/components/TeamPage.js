@@ -3,6 +3,7 @@ import MainStockChart from './MainStockChart.js';
 import GameCardContainer from './GameCardContainer.js';
 import TeamBuySell from './TeamBuySell.js';
 import { connect } from 'react-redux';
+import { isEmpty, getSampleData } from '../utils/jsUtils';
 
 // Material-UI Components
 import { makeStyles } from '@material-ui/core/styles';
@@ -19,15 +20,10 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const sample = Array.from({length: 80}, (v, i) => {
-    return {
-        "date": `7/${i}/20`,
-        "price": Math.round(Math.random() * 8000 + 10)/100,
-    }
-});
 
 const TeamPage = (props) => {
-    const classes = useStyles();
+    const classes = useStyles();    
+    const sample = getSampleData(1500.0);
     const [data, setData] = useState(sample);
     const [abr, setAbr] = useState("");
 
@@ -35,9 +31,18 @@ const TeamPage = (props) => {
         setAbr(props.match.params.abr.toUpperCase());
     }, [props.match])
 
+    useEffect(() => {
+        console.log(props.teams.teams);
+        if (!isEmpty(props.teams.teams)) {
+            setData(props.teams.teams[abr]['graph']);
+        }
+    }, [props.teams]);
+
+    console.log(data);
+
     const name = props.teams.names[abr];
 
-    return (
+   return (
         <Container component="main" maxWidth="md">
             <Typography className={classes.title} variant="h3">
                 {name}
