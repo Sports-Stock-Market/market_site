@@ -1,24 +1,68 @@
 from sqlalchemy_utils import database_exists, create_database
 from fanbasemarket.pricing.utils import get_schedule_range
-from fanbasemarket.pricing.elo import home_rating_change
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import scoped_session, sessionmaker
+from fanbasemarket.pricing.elo import Player, home_rating_change
+from fanbasemarket.pricing.elo import Team as NoDBTeam
+from fanbasemarket.pricing.nba_data import get_schedule_range_df
 from flask_jwt_extended import JWTManager
 from nba_api.stats.static import teams
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import create_engine
 from flask_executor import Executor
 from dotenv import load_dotenv
-from datetime import datetime
+from datetime import datetime, timedelta
 from flask_cors import CORS
 from string import capwords
 from flask import Flask, g
 from os import getenv
 
+import pandas as pd
+import string
+import time
+import csv
+import math
+
 
 STRPTIME_FORMAT = '%m/%d/%Y'
 K = 40
 H = 100
+
+INJURIES = {'2019-11-01':[['Paul George', 'Clippers', 'Month']],
+    '2019-10-25': [['Deandre Ayton', 'Suns', 'Month']],
+    '2019-11-02':[['Stephen Curry', 'Warriors', 'Season']], 
+    '2019-12-18':[['Karl-Anthony Towns', 'Timberwolves', 'Month']], 
+    '2020-02-12':[['Karl-Anthony Towns', 'Timberwolves', 'Year']], 
+    '2020-02-05':[['Tyler Herro', 'Heat', 'Month']], 
+    '2019-11-16':[['Kyrie Irving', 'Nets', 'Month']],
+    '2019-12-20':[['Norman Powell', 'Raptors', 'Month']], 
+    '2019-10-23':[['Marvin Bagley III', 'Kings', 'Month']],
+    '2020-01-22':[['Marvin Bagley III', 'Kings', 'Season']],
+    '2020-01-24':[['Lauri Markkanen', 'Bulls', 'Month']], 
+    '2020-01-31':[['Clint Capela', 'Hawks', 'Season'], ['Marc Gasol', 'Raptors', 'Season']], 
+    '2019-11-15':[['Jonathan Isaac', 'Magic', 'Month']], 
+    '2020-01-01':[['Jonathan Isaac', 'Magic', 'Season']], 
+    '2020-03-05':[['Bradley Beal', 'Wizards', 'Season'], ['DeAndre Jordan', 'Nets', 'Season']],
+    '2019-12-08':[['Rodney Hood', 'Trail Blazers', 'Season']],
+    '2020-03-06':[['Pascal Siakam', 'Raptors', 'Season']],
+    '2019-11-16':[['Nikola Jokic', 'Nuggets', 'Season']]
+}
+
+STARTING_ELOS = {
+    '76ers': 1525, 'Bucks': 1575, 'Bulls': 1200, 'Cavaliers': 1000, 
+    'Celtics': 1455, 'Clippers': 1600, 'Grizzlies': 1100, 'Hawks': 1200, 
+    'Heat': 1325, 'Hornets': 1050, 'Jazz': 1475, 'Kings': 1250, 
+    'Knicks': 1200, 'Lakers': 1580, 'Magic': 1200, 'Mavericks': 1300, 
+    'Nets': 1350, 'Nuggets': 1450, 'Pacers': 1300, 'Pelicans': 1250,
+    'Pistons': 1100, 'Raptors': 1345, 'Rockets': 1525, 'Spurs': 1300, 'Suns' : 1250,
+    'Thunder': 1250, 'Timberwolves': 1200, 'Trail Blazers': 1415, 'Warriors': 1400,
+    'Wizards': 1200
+}
+
+def get_starting_elo(tname):
+    for k in STARTING_ELOS.keys():
+        if k in tname:
+            return STARTING_ELOS[k]
 
 load_dotenv()
 db_usr = getenv('DB_USR')
@@ -49,6 +93,79 @@ try:
 except:
     pass
 
+def find(sorted_list, team_name):
+    low = 0
+    high = len(sorted_list) - 1
+    while low <= high:
+        middle = (low + high)//2
+        if sorted_list[middle].name == team_name:
+            return sorted_list[middle]
+        elif sorted_list[middle].name > team_name:
+            high = middle - 1
+        else:
+            low = middle + 1
+    return -1
+
+def findteam(sorted_list, team_name):
+    for team in sorted_list:
+        if team.name in team_name:
+            return team
+    return -1
+
+def full_strength_teams():
+    teams_dict = {}
+    players = []
+    df = pd.read_csv("./player_data/new_2k_ratings.csv").fillna('').astype(str)
+    for _, row in df.iterrows():
+        team_name = row['Team']
+        if team_name not in teams_dict:
+            teams_dict[team_name] = NoDBTeam(team_name, elo_rating=STARTING_ELOS[team_name])
+        players.append(Player(row['Name'], float(row['Rating']) - 60.0, float(row['MPG']), team_name, row['Primary'], row['Secondary']))
+    teams = list(teams_dict.values())
+    for team in teams:
+        team.players = sorted(list(filter(lambda p: p.team == team.name, players)))
+        team.setup()
+    return(sorted(teams))
+
+def team_ratings_df(teams, date, db):
+    ratings = {}
+    ratings['Date'] = date
+    for team in teams:
+        t_obj = Team.query.filter(Team.name.contains(team.name)).first()
+        new_rating = team.elo_rating
+        t_obj.price = new_rating
+        db.session.add(t_obj)
+        db.session.commit()
+        newp = Teamprice(date=date, team_id=t_obj.id, elo=new_rating)
+        db.session.add(newp)
+        db.session.commit()
+
+def simulate(start_yr, end_yr, k, h, use_mov, db):
+    teams = full_strength_teams()
+    prices = pd.DataFrame(columns=['Date'])
+    for games in get_schedule_range_df(start_yr, end_yr):
+        for team in teams:
+            team.season_elo_reset()
+        prev_date = datetime.strptime(games.iat[0, 0][:10], '%Y-%m-%d') - timedelta(days=1)
+        for _, row in games.iterrows():
+            if math.isnan(row['home_team_score']):
+                break
+            date_obj = datetime.strptime(row['start_time'][:10], '%Y-%m-%d')
+            date = row['start_time'][:10]
+            if date != prev_date:
+                if date in INJURIES.keys():
+                    for injury in INJURIES[date]:
+                        inj_team = findteam(teams, injury[1])
+                        inj_team.injury([*injury, date_obj])
+                team_ratings_df(teams, prev_date, db)
+            home_team = findteam(teams, string.capwords(row['home_team']))
+            away_team = findteam(teams, string.capwords(row['away_team']))
+            score_diff = int(row['home_team_score']) - int(row['away_team_score'])
+            elo_diff = home_team.elo_rating - away_team.elo_rating
+            elo_change = home_rating_change(k, h, score_diff, elo_diff, use_mov)
+            home_team.update_elo(elo_change)
+            away_team.update_elo(-elo_change)
+            prev_date = date
 
 # Populate DB with NBA Teams
 teams_all = teams.get_teams()
@@ -56,47 +173,16 @@ team_names = [(team['full_name'], team['abbreviation']) for team in teams_all]
 for t_name, t_abr in team_names:
     q = Team.query.filter_by(name=t_name).all()
     if len(q) == 0:
-        t_obj = Team(name=t_name, abr=t_abr)
+        t_obj = Team(name=t_name, abr=t_abr, price=get_starting_elo(t_name))
         db.session.add(t_obj)
         db.session.commit()
-        t_price = Teamprice(date=load_start, team_id=t_obj.id, elo=1500.00)
+        t_price = Teamprice(date=load_start, team_id=t_obj.id, elo=get_starting_elo(t_name))
         db.session.add(t_price)
         db.session.commit()
 
 prices = Teamprice.query.all()
 if len(prices) == len(team_names):
-    # Populate DB with historic results and prices
-    schedules = get_schedule_range(load_start.year, datetime.today().year)
-    for schedule in schedules:
-        for game in schedule:
-            home_name = capwords(game['home_team'].value)
-            away_name = capwords(game['away_team'].value)
-            start_time = game['start_time']
-            home_score = game['home_team_score']
-            away_score = game['away_team_score']
-            if home_score is None:
-                home_score = 0
-            if away_score is None:
-                away_score = 0
-            home_team = Team.query.filter_by(name=home_name).first()
-            away_team = Team.query.filter_by(name=away_name).first()
-            game = Game(home=home_team.id, away=away_team.id, home_score=home_score,
-                        away_score=away_score, start=start_time)
-            db.session.add(game)
-            db.session.commit()
-            home_elo = Teamprice.query.filter_by(team_id=home_team.id).all()[-1].elo
-            away_elo = Teamprice.query.filter_by(team_id=away_team.id).all()[-1].elo
-            mov = home_score - away_score
-            elo_delta = home_rating_change(home_elo - away_elo, K, int(mov > 0), mov, h=H,
-                                           use_mov=True)
-            new_home_price = Teamprice(date=start_time, team_id=home_team.id,
-                                       elo=home_elo + elo_delta)
-            db.session.add(new_home_price)
-            db.session.commit()
-            new_away_price = Teamprice(date=start_time, team_id=away_team.id,
-                                       elo=away_elo - elo_delta)
-            db.session.add(new_away_price)
-            db.session.commit()
+    simulate(2019, 2020, 45, 100, True, db) 
 db.session.remove()
 
 executor = Executor(app)
