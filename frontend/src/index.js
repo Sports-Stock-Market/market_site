@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import io from 'socket.io-client'
 import App from './App';
 import './index.css';
 import theme from './theme.js'
@@ -12,6 +13,8 @@ import thunk from 'redux-thunk';
 import { composeWithDevTools } from 'redux-devtools-extension';
 import rootReducer from './rootReducer';
 
+const socket = io('http://localhost:5000')
+
 const store = createStore(
   rootReducer,
   composeWithDevTools(applyMiddleware(thunk))
@@ -22,7 +25,7 @@ ReactDOM.render(
     <Provider store={store}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <App />
+        <App socket={socket}/>
     </ThemeProvider>
     </Provider>
   </React.StrictMode>,

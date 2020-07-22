@@ -14,6 +14,7 @@ from flask_cors import CORS
 from string import capwords
 from flask import Flask, g
 from os import getenv
+from flask_socketio import SocketIO, emit
 
 
 STRPTIME_FORMAT = '%m/%d/%Y'
@@ -41,6 +42,7 @@ app.config['JWT_SESSION_COOKIE'] = False
 
 db = SQLAlchemy(app)
 jwt = JWTManager(app)
+socketio = SocketIO(app, cors_allowed_origins="*")
 
 from fanbasemarket.models import *
 
@@ -122,3 +124,6 @@ def create_app():
     app.register_blueprint(users, url_prefix='/api/users/')
     # app.register_blueprint(teams, url_prefix='/api/teams/')
     return app
+
+def send_new_prices():
+    emit('prices', {'Chicago Bulls': 1500}, broadcast=True)

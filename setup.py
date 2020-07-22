@@ -15,6 +15,7 @@ setup(
         'nba-api',
         'basketball_reference_web_scraper',
         'flask-cors',
-        'flask-executor'
+        'flask-executor',
+        'flask-socketio'
     ],
 )

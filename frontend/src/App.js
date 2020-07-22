@@ -1,21 +1,35 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import io from 'socket.io-client'
 import {
   BrowserRouter as Router, Switch, Route
 } from 'react-router-dom';
 import {
   AuthNavBar, LoginForm, SignUpForm, Portfolio, FormContainer, Leaderboard, TeamPage, AllTeamsPage,
 } from './components';
-
 import './App.css';
 
-function App() {
+const socket = io('http://localhost:5000')
+
+const App = (props) => {
+  const [prices, setPrices] = useState({'Chicago Bulls': 1000});
+
+  useEffect(() => {
+    getPrices();
+  }, []);
+
+  const getPrices = () => {
+    socket.on('prices', data => {
+      console.log('recieved');
+      setPrices(data);
+    });
+  };
 
   return (
     <Router>
       <AuthNavBar />
         <Switch>
           <Route path="/" exact>
-            <h1> Fanbase Market </h1>
+            <h1> {prices['Chicago Bulls']} </h1>
           </Route>
           <Route path="/login" exact>
             <FormContainer title="Welcome to Fanbase">
