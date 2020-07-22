@@ -47,19 +47,13 @@ function stableSort(array, comparator) {
 
 const headCells = [
   {
-    id: "Username",
+    id: "Name",
     numeric: false,
     disablePadding: true,
     label: "Rank",
   },
   {
-    id: "Rank",
-    numeric: true,
-    disablePadding: false,
-    label: "Name",
-  },
-  {
-    id: "Fans",
+    id: "Price",
     numeric: true,
     disablePadding: false,
     label: "Fans",
@@ -170,7 +164,7 @@ const EnhancedTableToolbar = (props) => {
           id="tableTitle"
           component="div"
         >
-          Leaderboard
+          All Teams
         </Typography>
       )}
     </Toolbar>
@@ -205,7 +199,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const Leaderboard = (props) => {
+const AllTeamsPage = (props) => {
   const classes = useStyles();
   const [rows, setRows] = React.useState([]);
   const [order, setOrder] = React.useState("desc");
@@ -359,4 +353,4 @@ const mapStateToProps = (state) => {
   };
 }
 
-export default connect(mapStateToProps, { refreshToken })(Leaderboard);
+export default connect(mapStateToProps, { refreshToken })(AllTeamsPage);

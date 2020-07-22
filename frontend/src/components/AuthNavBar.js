@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
 import { Link, useHistory } from 'react-router-dom';
+
 import { connect } from 'react-redux';
+import { logout } from '../actions/authActions';
+import Cookies from 'universal-cookie'
+
 import { fade, makeStyles } from '@material-ui/core/styles';
 import {
     AppBar, Toolbar, IconButton, Typography, InputBase, MenuItem, Menu, Button
@@ -8,7 +12,6 @@ import {
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import SportsBasketballIcon from '@material-ui/icons/SportsBasketball';
 import SearchIcon from '@material-ui/icons/Search';
-import AccountCircle from '@material-ui/icons/AccountCircle';
 import MenuIcon from '@material-ui/icons/Menu';
 
 const useStyles = makeStyles((theme) => ({
@@ -80,10 +83,10 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const teams = [
-    { name: "New York Knicks", abr: "NYK"},
-    { name: "Chicago Bulls", abr: "CHI"},
-    { name: "Los Angeles Lakers", abr: "LAL"},
-  ]
+  { name: "New York Knicks", abr: "NYK"},
+  { name: "Chicago Bulls", abr: "CHI"},
+  { name: "Los Angeles Lakers", abr: "LAL"},
+]
 
 const AuthNavBar = (props) => {
 
@@ -96,47 +99,43 @@ const AuthNavBar = (props) => {
 
   const classes = useStyles();
   const history = useHistory();
-  const [anchorEl, setAnchorEl] = useState(null);
+  const { isAuthenticated, user } = props.auth;
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = useState(null);
-
-  const isMenuOpen = Boolean(anchorEl);
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
+
+  const onLogout = () => {
+    props.logout(user['access_token']).then(
+      (res) => history.push('/'),
+      (err) => console.log(err)
+    );
+  };
 
   const onSearch = (value) => {
     history.push(`/team/${value}`)
-  };
-
-  const handleProfileMenuOpen = (event) => {
-    setAnchorEl(event.currentTarget);
   };
 
   const handleMobileMenuClose = () => {
     setMobileMoreAnchorEl(null);
   };
 
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-    handleMobileMenuClose();
-  };
-
   const handleMobileMenuOpen = (event) => {
     setMobileMoreAnchorEl(event.currentTarget);
   };
 
-  const menuId = 'primary-search-account-menu';
-  const renderMenu = (
-    <Menu
-      anchorEl={anchorEl}
-      anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-      id={menuId}
-      keepMounted
-      transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-      open={isMenuOpen}
-      onClose={handleMenuClose}
-    >
-      <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
-      <MenuItem onClick={handleMenuClose}>Logout</MenuItem>
-    </Menu>
+  const guestLinks = (
+    <>
+    <Button component={Link} to="/signup" color="inherit">Sign Up</Button>
+    <Button component={Link} to="/login" color="primary" variant="outlined">Login</Button>
+    </>
+  );
+
+  const userLinks = (
+    <>
+    <Button component={Link} to={`/portfolio/${user.username}`} color="inherit">Portfolio</Button>
+    <Button component={Link} to="/teams" color="inherit">Teams</Button>
+    <Button component={Link} to="/leaderboard" color="inherit">Leaderboard</Button>
+    <Button component={Link} onClick={onLogout} to="/" color="inherit" variant="outlined">Logout</Button>
+    </>
   );
 
   const mobileMenuId = 'primary-search-account-menu-mobile';
@@ -150,16 +149,21 @@ const AuthNavBar = (props) => {
       open={isMobileMenuOpen}
       onClose={handleMobileMenuClose}
     >
-      <MenuItem onClick={handleMobileMenuClose} component={Link} to="/portfolio">
+      <MenuItem onClick={handleMobileMenuClose} component={Link} to={`/portfolio/${user.username}`}>
         <p>Portfolio</p>
       </MenuItem>
-      <MenuItem onClick={handleMobileMenuClose} component={Link} to="/team">
+      <MenuItem onClick={handleMobileMenuClose} component={Link} to="/teams">
         <p>Teams</p>
       </MenuItem>
       <MenuItem onClick={handleMobileMenuClose} component={Link} to="/leaderboard">
         <p>Leaderboard</p>
       </MenuItem>
-      <MenuItem onClick={handleMobileMenuClose} component={Link} to="/portfolio">
+      <MenuItem 
+        onClick={() => {
+          onLogout();
+          handleMobileMenuClose();
+        } }
+        component={Link} to="/">
         <p>Logout</p>
       </MenuItem>
     </Menu>
@@ -170,9 +174,10 @@ const AuthNavBar = (props) => {
       <AppBar className={classes.bar} color="inherit" position="fixed">
         <Toolbar>
         <SportsBasketballIcon edge="start" className={classes.logo} color="inherit" />
-          <Typography className={classes.title} variant="h6" noWrap>
+          <Typography className={isAuthenticated ? classes.title : null} variant="h6" noWrap>
             Fanbase
           </Typography>
+          { isAuthenticated &&
           <Autocomplete
             value={""}
             id="search"
@@ -203,20 +208,12 @@ const AuthNavBar = (props) => {
               }
             }}
           />
+          }
           <div className={classes.grow} />
+          { isAuthenticated ? 
+          <>
           <div className={classes.sectionDesktop}>
-            <Button component={Link} to="/team/nyk" color="inherit">Teams</Button>
-            <Button component={Link} to="/leaderboard" color="inherit">Leaderboard</Button>
-            <IconButton
-              edge="end"
-              aria-label="account of current user"
-              aria-controls={menuId}
-              aria-haspopup="true"
-              onClick={handleProfileMenuOpen}
-              color="inherit"
-            >
-              <AccountCircle />
-            </IconButton>
+            {userLinks}
           </div>
           <div className={classes.sectionMobile}>
             <IconButton
@@ -229,20 +226,19 @@ const AuthNavBar = (props) => {
               <MenuIcon />
             </IconButton>
           </div>
+          </> : guestLinks }
         </Toolbar>
       </AppBar>
       <Toolbar />
       {renderMobileMenu}
-      {renderMenu}
     </div>
   );
 }
 
 const mapStateToProps = (state) => {
   return {
-    auth: state.auth,
-    names: state.teams.names
+    auth: state.auth
   };
 }
 
-export default connect(mapStateToProps, {})(AuthNavBar);
+export default connect(mapStateToProps, { logout })(AuthNavBar);

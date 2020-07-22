@@ -3,7 +3,7 @@ import {
   BrowserRouter as Router, Switch, Route
 } from 'react-router-dom';
 import {
-  BaseNavBar, AuthNavBar, LoginForm, SignUpForm, Portfolio, FormContainer, Leaderboard, TeamPage,
+  AuthNavBar, LoginForm, SignUpForm, Portfolio, FormContainer, Leaderboard, TeamPage, AllTeamsPage,
 } from './components';
 import { connect } from 'react-redux';
 import { initAllTeams, setAllNames } from './actions/teamActions'; 
@@ -43,6 +43,9 @@ function App(props) {
             <Portfolio />
           </Route>
           <Route path="/team/:abr" render={props => <TeamPage {...props} />} />
+          <Route path="/teams" exact>
+            <AllTeamsPage />
+          </Route>
           <Route path="/leaderboard" exact>
             <Leaderboard />
           </Route>
