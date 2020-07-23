@@ -35,10 +35,24 @@ class Team(db.Model):
     name = db.Column(db.String(140))
     abr = db.Column(db.String(10))
     price = db.Column(db.Float, default=0.0)
+    prev_price = db.Column(db.Float, default=0.0)
+    fs_rating = db.Column(db.Float, default=0.0)
+    rating = db.Column(db.Float, default=0.0)
 
     def serialize(self):
         return dumps({'id': self.id, 'name': self.name})
 
+class Player(db.Model):
+    __tablename__ = 'player'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(140))
+    rating = db.Column(db.Integer)
+    initial_mpg = db.Column(db.Float)
+    mpg = db.Column(db.Float)
+    pos1 = db.Column(db.String(5))
+    pos2 = db.Column(db.String(5))
+    team_id = db.Column(db.Integer, db.ForeignKey('team.id'))
+    is_injured = db.Column(db.Boolean, default=False)
 
 class Purchase(db.Model):
     __tablename__ = 'purchase'
