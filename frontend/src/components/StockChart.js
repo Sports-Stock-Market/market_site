@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-    LineChart, Line, Tooltip, ResponsiveContainer, ReferenceLine, XAxis 
+    LineChart, Line, Tooltip, ResponsiveContainer, ReferenceLine, XAxis, YAxis, 
 } from 'recharts';
 
 // Material-UI Components
@@ -9,10 +9,17 @@ import {
 } from '@material-ui/core';
 
 const StockTooltip = (props) => {
+    let timeStamp;
+    if (props.range == "1D") {
+        timeStamp = String(props.label).slice(11);
+    } else {
+        timeStamp = String(props.label).slice(0, 10);
+    }
+
     if (props.active) {
         return (
             <Typography color="secondary" variant={props.big ? "body1" : "body2"}>
-                {props.big && props.label} ${props.payload[0].value}
+                {props.big && timeStamp} ${props.payload[0].value}
             </Typography>
         );
     }
@@ -24,13 +31,14 @@ const StockChart = (props) => {
     <ResponsiveContainer width={props.width} height={props.height}>
         <LineChart data={props.data}>
             <XAxis dataKey="date" hide />
+            <YAxis type="number" domain={[1000, 2000]} hide />
             <Tooltip 
                 position={props.big ? { y: -20 } : { y: -15 }}
                 offset={props.big ? -45 : -20}
                 animationDuration={200}
-                content={<StockTooltip big={props.big} />}
+                content={<StockTooltip range={props.range} big={props.big} />}
             />
-            {props.referenceLine && <ReferenceLine y={50} stroke="#000" strokeDasharray="3 3" />}
+            {props.referenceLine && <ReferenceLine y={1500} stroke="#000" strokeDasharray="3 3" />}
             <Line
                 
                 dataKey="price"
