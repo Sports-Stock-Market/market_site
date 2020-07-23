@@ -50,10 +50,6 @@ def getPbpCSV(gameid):
 
 def winprobCSV(game_id):
     return winprobabilitypbp.WinProbabilityPBP(game_id).get_data_frames()[0].to_csv('./game_data/winprob.csv')
-    #winprob = pd.read_csv("winprob.csv")
-    #winprob['HOME_PCT'] = winprob['HOME_PCT'].astype(float)
-    #winprob['VISITOR_PCT'] = winprob['VISITOR_PCT'].astype(float)
-    #return winprob['HOME_PCT'], winprob['VISITOR_PCT']
 
 #Minute model functions
 def get_player_mpg(name):
@@ -117,7 +113,6 @@ def playbyplay_scores(game_id):
     scores_list = []
     pbp = pbp[['SCORE', 'PCTIMESTRING', "PERIOD", "SCOREMARGIN"]]
     pbp = pbp[pbp["SCOREMARGIN"].notna()]
-    #pbp["SCOREMARGIN"] = pbp["SCOREMARGIN"].map(lambda s: int(s[0])-int(s[-1]))
     for i, game in pbp.iterrows():
         minutes = float(game["PCTIMESTRING"][:game["PCTIMESTRING"].index(":")])
         seconds = float(game["PCTIMESTRING"][game["PCTIMESTRING"].index(":")+1:])
@@ -143,7 +138,6 @@ def removeGLeague(d):
     return d
 
 def liveGame(time_elapsed, score_margin, initial_prob):
-    #initial_prob = 40
     time_left = 48 - time_elapsed
     score_margin_noabs = round(score_margin,2)
     score_margin_nocap = score_margin
@@ -159,7 +153,6 @@ def liveGame(time_elapsed, score_margin, initial_prob):
         y_int = ( ( ( (initial_prob - 50) /47) * (time_left - 48) ) + initial_prob)*10
     else:
         y_int = ( ( ( (initial_prob - 50) /47) * (time_left - 48) ) + initial_prob)*10
-
 
     if time_left >= 41:
         live_w = (12.466 * score_margin) + y_int
@@ -204,7 +197,6 @@ def fullGame(date, gameonday, k):
     initial_prob = alldata[2]*100
     getPbpCSV(alldata[-1])
     scores = playbyplay_scores(alldata[-1])
-    print(scores)
     pct = [{"Time Remaining": 48.0, "Odds to win": initial_prob}]
     elos = [{"Time Remaining": 48.0, "Home Team": alldata[0], "Away Team": alldata[1]}]
     for pair in scores:
@@ -226,12 +218,3 @@ def fullGame(date, gameonday, k):
     elo_df = pd.DataFrame(full_elo)
     ax = elo_df.plot(x = "Time Remaining", y = "Home Team", kind = "line")
     plt.show()
-
-
-#fullGame("0021900925")
-#getDateInfo("2020-02-29", 1)
-#h_elo_prob = 1/(1+10**((away_elo - home_elo)/400))
-#celtics = 1/(1+10**((1669 - 1558)/400))
-#heat = 1/(1+10**((1377 - 1542)/400))
-#print(heat)
-#a_elo_prob = 1/(1+10**((home_elo - away_elo)/400))
