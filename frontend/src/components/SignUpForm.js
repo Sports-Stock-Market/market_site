@@ -7,8 +7,10 @@ import { authReq } from '../actions/authActions';
 // Material-UI Components
 import { makeStyles } from '@material-ui/core/styles';
 import { 
-  Button, TextField, Grid, 
+  Button, TextField, Grid, Snackbar, IconButton,
 } from '@material-ui/core';
+import Alert from '@material-ui/lab/Alert';
+import CloseIcon from '@material-ui/icons/Close';
 
 const useStyles = makeStyles((theme) => ({
   form: {
@@ -32,18 +34,16 @@ const SignUpForm = (props) => {
   const classes = useStyles();
   const { register, handleSubmit, setValue, getValues } = useForm();
   const [ formError, setFormError ] = useState(false);
-  const [ errorMessage, setErrorMessage ] = useState()
+  const [ errorMessage, setErrorMessage ] = useState("");
+  const [ open, setOpen ] = useState(false);
   const history = useHistory();
 
   const values = getValues(["userName", "email", "password", "confirm-password"])
 
   const handleError = err => {
+    setOpen(true);
     setFormError(true);
     setErrorMessage(err['message']);
-  }
-
-  const isFieldError = (field) => {
-    return formError && values[field] !== ""
   }
 
   const onSubmit = data => {
@@ -75,8 +75,7 @@ const SignUpForm = (props) => {
       <Grid container spacing={2}>
         <Grid item xs={12}>
           <TextField
-            error={isFieldError("userName") ? true : false}
-            helperText={isFieldError("userName") ? errorMessage : ""}
+            error={formError ? true : false}
             autoComplete="uname"
             name="userName"
             variant="outlined"
@@ -91,8 +90,7 @@ const SignUpForm = (props) => {
         </Grid>
         <Grid item xs={12}>
           <TextField
-            error={isFieldError("email") ? true : false}
-            helperText={isFieldError("email") ? errorMessage : ""}          
+            error={formError ? true : false}         
             variant="outlined"
             required
             fullWidth
@@ -106,8 +104,7 @@ const SignUpForm = (props) => {
         </Grid>
         <Grid item xs={12}>
           <TextField
-            error={isFieldError("password") ? true : false}
-            helperText={isFieldError("password") ? errorMessage : ""}
+            error={formError ? true : false}
             variant="outlined"
             required
             fullWidth
@@ -122,8 +119,7 @@ const SignUpForm = (props) => {
         </Grid>
         <Grid item xs={12}>
           <TextField
-            error={isFieldError("confirm-password") ? true : false}
-            helperText={isFieldError("confirm-password") ? errorMessage : ""}
+            error={formError ? true : false}
             variant="outlined"
             required
             fullWidth
@@ -146,6 +142,24 @@ const SignUpForm = (props) => {
       >
         Sign Up
       </Button>
+      <Snackbar open={open}>
+        <Alert 
+          action={
+            <IconButton
+              aria-label="close"
+              color="inherit"
+              size="small"
+              onClick={() => {
+                setOpen(false);
+              }}
+            >
+              <CloseIcon fontSize="inherit" />
+            </IconButton>
+          } 
+          severity="error">
+          {errorMessage}
+        </Alert>
+      </Snackbar>
       <Link className={classes.link} to="/login" variant="body2">
         Already have an account? Login
       </Link>

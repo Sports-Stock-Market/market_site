@@ -39,7 +39,7 @@ const TeamPage = (props) => {
             setData(props.teams.teams[abr]['graph']);
             setPrice(props.teams.teams[abr]['price']['price']);
         }
-    }, [props.teams]);
+    });
 
 
     const name = props.teams.names[abr];

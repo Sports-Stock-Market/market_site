@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import * as NBAIcons from 'react-nba-logos';
 import { withStyles, makeStyles } from '@material-ui/core/styles';
 import { 
@@ -59,12 +59,6 @@ const TradeTab = withStyles((theme) => ({
   }))((props) => <Tab disableRipple {...props} />);
 
 // sample data
-const sample = {
-    price: 1600,
-    avFunds: 16000,
-    totalPrice: 3200,
-    remFunds: 16000,
-}
 
 const labels = {
     price: "Share Price",
@@ -74,6 +68,13 @@ const labels = {
 }
 
 const TeamBuySell = (props) => {
+    const sample = {
+        price: 1500,
+        avFunds: 16000,
+        totalPrice: 1500,
+        remFunds: 16000,
+    }
+
     const classes = useStyles();
     const [value, setValue] = useState(0);
     const [data, setData] = useState(sample);
@@ -83,6 +84,10 @@ const TeamBuySell = (props) => {
     const handleChange = (event, newValue) => {
       setValue(newValue);
     };
+
+    useEffect(() => {
+        setData({...data, price: props.price});
+    }, [props.price])
 
     const InfoItem = ({ label, info }) => {
         return (

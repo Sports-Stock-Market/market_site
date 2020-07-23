@@ -7,10 +7,12 @@ import { authReq } from '../actions/authActions';
 // Material-UI Components
 import { makeStyles } from '@material-ui/core/styles';
 import { 
-  Button, TextField, Grid,
+  Button, TextField, Grid, Snackbar, IconButton
   // FormControlLabel,
   // Checkbox,
 } from '@material-ui/core';
+import Alert from '@material-ui/lab/Alert';
+import CloseIcon from '@material-ui/icons/Close';
 
 const useStyles = makeStyles((theme) => ({
   form: {
@@ -35,10 +37,12 @@ const LoginForm = (props) => {
   const classes = useStyles();
   const { register, handleSubmit } = useForm();
   const [ formError, setFormError ] = useState(false);
-  const [ errorMessage, setErrorMessage ] = useState();
+  const [ errorMessage, setErrorMessage ] = useState("");
+  const [ open, setOpen ] = useState(false);
   const history = useHistory();
 
   const handleError = err => {
+    setOpen(true);
     setFormError(true);
     setErrorMessage(err['message']);
   }
@@ -73,7 +77,6 @@ const LoginForm = (props) => {
         <Grid item xs={12}>
           <TextField
             error={formError ? true : false}
-            helperText={formError ? errorMessage : ""}
             variant="outlined"
             required
             fullWidth
@@ -88,7 +91,6 @@ const LoginForm = (props) => {
         <Grid item xs={12}>
           <TextField
             error={formError ? true : false}
-            helperText={formError ? errorMessage : ""}
             variant="outlined"
             required
             fullWidth
@@ -114,6 +116,24 @@ const LoginForm = (props) => {
       >
         Login
       </Button>
+      <Snackbar open={open}>
+        <Alert 
+          action={
+            <IconButton
+              aria-label="close"
+              color="inherit"
+              size="small"
+              onClick={() => {
+                setOpen(false);
+              }}
+            >
+              <CloseIcon fontSize="inherit" />
+            </IconButton>
+          } 
+          severity="error">
+          {errorMessage}
+        </Alert>
+      </Snackbar>
       <Link className={classes.link} to="/signup">
         Don't have an account? Register
       </Link>
