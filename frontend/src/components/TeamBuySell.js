@@ -74,7 +74,7 @@ const labels = {
 const TeamBuySell = (props) => {
     const sample = {
         price: 1500,
-        avFunds: 160000,
+        avFunds: 16000,
         totalPrice: 1500,
         remFunds: 16000,
     }
