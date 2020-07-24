@@ -5,6 +5,7 @@ import GameCardContainer from './GameCardContainer.js';
 import Cookies from 'universal-cookie';
 import { refreshToken } from '../actions/authActions';
 import { connect } from 'react-redux';
+import { getSampleData } from '../utils/jsUtils';
 
 // Material-UI Components
 import { makeStyles } from '@material-ui/core/styles';
@@ -23,13 +24,15 @@ const useStyles = makeStyles((theme) => ({
 
 
 const Portfolio = (props) => {
+
+    const sample = getSampleData(15000.0);
+
     const classes = useStyles();
     const [avFunds, setAvFunds] = useState(0.0);
     const [holdings, setHoldings] = useState([]);
-    const [data, setData] = useState([]);
+    const [data, setData] = useState(sample);
 
     const username = window.location.pathname.slice(11);
-    const cookies = new Cookies();
     const requestOpts = {
         method: 'GET',
         headers: {'Content-type': 'application/JSON',
@@ -45,20 +48,11 @@ const Portfolio = (props) => {
             })
         );
     }
-    var last = 0;
-    var sndLast = 0;
-    var delta = 0;
-    var pctInc = 0;
-    if (data.length !== 0) {
-        last = data['1D'][data['1D'].length - 1]['price'];
-        sndLast = data['1D'][data['1D'].length - 2]['price'];
-        delta = last - sndLast;
-        pctInc = (last / sndLast) - 1;
-    }
 
-    useEffect(() => {
-        props.refreshToken(cookies.get('csrf_refresh_token'));
-    }, []);
+    var last = data['1D'][data['1D'].length - 1]['price'];
+    var sndLast = data['1D'][data['1D'].length - 2]['price'];
+    var delta = last - sndLast;
+    var pctInc = (last / sndLast) - 1;
 
     useEffect(() => {
         getUsrData();
@@ -92,4 +86,4 @@ const mapStateToProps = (state) => {
     };
 }
 
-export default connect(mapStateToProps, { refreshToken })(Portfolio);
+export default connect(mapStateToProps, {})(Portfolio);

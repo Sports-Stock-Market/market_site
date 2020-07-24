@@ -6,3 +6,4 @@ export { default as Portfolio } from './Portfolio.js';
 export { default as Leaderboard } from './Leaderboard.js';
 export { default as TeamPage } from './TeamPage.js';
 export { default as AllTeamsPage } from './AllTeamsPage.js';
+export { default as BaseNavBar } from './BaseNavBar.js';

@@ -1,28 +1,27 @@
-import React, { useState, useEffect } from 'react';
 import io from 'socket.io-client'
+import React, { useEffect } from 'react';
 import {
   BrowserRouter as Router, Switch, Route
 } from 'react-router-dom';
 import {
   AuthNavBar, LoginForm, SignUpForm, Portfolio, FormContainer, Leaderboard, TeamPage, AllTeamsPage,
 } from './components';
+import { connect } from 'react-redux';
+import { initAllTeams, setAllNames } from './actions/teamActions'; 
+import { refreshToken } from './actions/authActions';
+import Cookies from 'universal-cookie';
+
 import './App.css';
+const socket = io('http://localhost:5000');
+function App(props) {
 
-const socket = io('http://localhost:5000')
-
-const App = (props) => {
-  const [prices, setPrices] = useState({'Chicago Bulls': 1000});
+  const cookies = new Cookies();
 
   useEffect(() => {
-    getPrices();
+    props.refreshToken(cookies.get('csrf_refresh_token'));
+    props.setAllNames();
+    props.initAllTeams();
   }, []);
-
-  const getPrices = () => {
-    socket.on('prices', data => {
-      console.log('recieved');
-      setPrices(data);
-    });
-  };
 
   return (
     <Router>
@@ -56,4 +55,4 @@ const App = (props) => {
   );
 }
 
-export default App;
+export default connect(null, { initAllTeams, setAllNames, refreshToken })(App);

@@ -1,4 +1,3 @@
-from sqlalchemy import Column, Integer, String, Boolean, Float, ForeignKey, DateTime
 from werkzeug.security import generate_password_hash, check_password_hash
 from fanbasemarket import db
 from datetime import datetime
@@ -33,12 +32,27 @@ class User(db.Model):
 class Team(db.Model):
     __tablename__ = 'team'
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(String(140))
-    abr = db.Column(String(10))
+    name = db.Column(db.String(140))
+    abr = db.Column(db.String(10))
+    price = db.Column(db.Float, default=0.0)
+    prev_price = db.Column(db.Float, default=0.0)
+    fs_rating = db.Column(db.Float, default=0.0)
+    rating = db.Column(db.Float, default=0.0)
 
     def serialize(self):
         return dumps({'id': self.id, 'name': self.name})
 
+class Player(db.Model):
+    __tablename__ = 'player'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(140))
+    rating = db.Column(db.Integer)
+    initial_mpg = db.Column(db.Float)
+    mpg = db.Column(db.Float)
+    pos1 = db.Column(db.String(5))
+    pos2 = db.Column(db.String(5))
+    team_id = db.Column(db.Integer, db.ForeignKey('team.id'))
+    is_injured = db.Column(db.Boolean, default=False)
 
 class Purchase(db.Model):
     __tablename__ = 'purchase'
@@ -49,8 +63,8 @@ class Purchase(db.Model):
     purchased_at = db.Column(db.DateTime)
     sold_at = db.Column(db.DateTime, nullable=True)
     sold_for = db.Column(db.Float, nullable=True)
-    purchased_for = db.Column(Float)
-    amt_shares = db.Column(Integer)
+    purchased_for = db.Column(db.Float)
+    amt_shares = db.Column(db.Integer)
 
     def serialize(self):
         return dumps({'id': self.id, 'team_id': self.team_id,
@@ -106,7 +120,7 @@ class Listing(db.Model):
     __tablename__ = 'listing'
     id = db.Column(db.Integer, primary_key=True)
     team_id = db.Column(db.Integer, db.ForeignKey('team.id'))
-    user_id = db.Column(db.Integer, ForeignKey('user.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     price = db.Column(db.Float)
     posted_at = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     

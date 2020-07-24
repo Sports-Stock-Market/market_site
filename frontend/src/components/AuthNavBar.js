@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useHistory } from 'react-router-dom';
+
+import * as NBAIcons from 'react-nba-logos';
 
 import { connect } from 'react-redux';
 import { logout } from '../actions/authActions';
@@ -32,6 +34,7 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   search: {
+    padding: 0,
     position: 'relative',
     borderRadius: theme.shape.borderRadius,
     backgroundColor: fade(theme.palette.secondary.main, 0.15),
@@ -59,13 +62,13 @@ const useStyles = makeStyles((theme) => ({
     color: "inherit",
   },
   inputInput: {
-    padding: theme.spacing(1, 1, 1, 0),
+    padding: theme.spacing(1, 1, 1, 2),
     // vertical padding + font size from searchIcon
     paddingLeft: `calc(1em + ${theme.spacing(4)}px)`,
     transition: theme.transitions.create('width'),
-    width: '100%',
+    width: 250,
     [theme.breakpoints.up('md')]: {
-      width: '100%',
+      width: 255,
     },
   },
   sectionDesktop: {
@@ -82,18 +85,21 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const teams = [
-  { name: "New York Knicks", abr: "NYK"},
-  { name: "Chicago Bulls", abr: "CHI"},
-  { name: "Los Angeles Lakers", abr: "LAL"},
-]
-
 const AuthNavBar = (props) => {
+
+  const teams = Object.entries(props.names).map(p => {
+    const obj = {};
+    obj['name'] = p[1];
+    obj['abr'] = p[0];
+    return obj;
+  });
+
   const classes = useStyles();
   const history = useHistory();
   const { isAuthenticated, user } = props.auth;
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = useState(null);
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
+  const cookies = new Cookies();
 
   const onLogout = () => {
     props.logout(user['access_token']).then(
@@ -113,6 +119,11 @@ const AuthNavBar = (props) => {
   const handleMobileMenuOpen = (event) => {
     setMobileMoreAnchorEl(event.currentTarget);
   };
+
+  const logoFromAbr = (abr) => {
+    const Logo = NBAIcons[abr];
+    return <Logo size={50} />
+  }
 
   const guestLinks = (
     <>
@@ -172,19 +183,29 @@ const AuthNavBar = (props) => {
           { isAuthenticated &&
           <Autocomplete
             value={""}
+            clearOnEscape
+            disableListWrap
+            size="medium"
             id="search"
-            fullWidth
             clearOnEscape
             options={teams}
             getOptionLabel={(option) => option.name}
-            style={{ width: 300 }}
+            renderOption={(option) => (
+              <>
+                <span style={{marginTop: 5, marginRight: 7}}>{logoFromAbr(option.abr)}</span>
+                <Typography variant="subtitle1">
+                  {option.name}
+                </Typography>
+              </>
+            )}
+            style={{ width: 350 }}
             renderInput={(params) => 
               <div className={classes.search}>
                   <div className={classes.searchIcon}>
                   <SearchIcon />
                   </div>
                   <InputBase
-                  placeholder="Search"
+                  placeholder="Search Team"
                   classes={{
                     root: classes.inputRoot,
                     input: classes.inputInput,
@@ -229,7 +250,8 @@ const AuthNavBar = (props) => {
 
 const mapStateToProps = (state) => {
   return {
-    auth: state.auth
+    auth: state.auth,
+    names: state.teams.names
   };
 }
 

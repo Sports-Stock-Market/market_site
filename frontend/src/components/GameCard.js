@@ -65,7 +65,9 @@ const GameCard = (props) => {
             </Box>
             <Box className={classes.teamContainer} display="flex">
                 <Box flexGrow={1}>
-                    {/* <HomeLogo size={50}/> */}
+                    {/* <span style={{ marginRight: 5}}>
+                        <HomeLogo size={40}/>
+                    </span> */}
                     <Typography className={classes.team} variant="h6">
                         {props.data.home_team.name}
                     </Typography>

@@ -25,6 +25,7 @@ const MainStockChart = (props) => {
             </Grid>
             <Grid item xs={12}>
                 <StockChart
+                    range={range}
                     big
                     referenceLine 
                     data={props.chartData[range]}
