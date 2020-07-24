@@ -11,9 +11,9 @@ const useStyles = makeStyles((theme) => ({
         padding: theme.spacing(1.5),
         width: "100%",
     },
-    field: {
-        color: theme.palette.primary,
-        backgroundColor: theme.palette.secondary.light,
+    label: {
+        fontSize: "0.8rem",
+        fontWeight: 500,
     },
     value: {
         fontWeight: 700,
@@ -50,7 +50,7 @@ const PositionCard = (props) => {
     const InfoItem = ({ label, info }) => {
         return (
             <Grid item xs={6}>
-                <Typography display="inline" variant="subtitle1">
+                <Typography display="inline" className={classes.label}>
                     {label}
                 </Typography>
                 <Typography display="inline" className={classes.value} variant="subtitle1">

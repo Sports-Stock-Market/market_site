@@ -31,11 +31,11 @@ const StockChart = (props) => {
     <ResponsiveContainer width={props.width} height={props.height}>
         <LineChart data={props.data}>
             <XAxis dataKey="date" hide />
-            <YAxis type="number" domain={[1000, 2000]} hide />
+            <YAxis type="number" domain={[1200, 1800]} hide />
             <Tooltip 
                 position={props.big ? { y: -20 } : { y: -15 }}
                 offset={props.big ? -45 : -20}
-                animationDuration={200}
+                animationDuration={50}
                 content={<StockTooltip range={props.range} big={props.big} />}
             />
             {props.referenceLine && <ReferenceLine y={1500} stroke="#000" strokeDasharray="3 3" />}

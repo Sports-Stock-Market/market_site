@@ -39,12 +39,12 @@ const TeamPage = (props) => {
             setData(props.teams.teams[abr]['graph']);
             setPrice(props.teams.teams[abr]['price']['price']);
         }
-    }, [props.teams]);
+    });
 
 
     const name = props.teams.names[abr];
 
-   return (
+    return (
         <Container component="main" maxWidth="md">
             <Typography className={classes.title} variant="h3">
                 {name}
@@ -65,7 +65,7 @@ const TeamPage = (props) => {
                         <Typography className={classes.title} variant="h4">
                             Trade {abr}
                         </Typography>
-                        <TeamBuySell />
+                        <TeamBuySell price={price}/>
                     </Grid>
                 </Grid>
                 <Grid item xs={12}>
