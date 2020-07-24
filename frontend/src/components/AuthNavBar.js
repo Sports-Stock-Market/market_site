@@ -102,7 +102,7 @@ const AuthNavBar = (props) => {
   const cookies = new Cookies();
 
   const onLogout = () => {
-    props.logout(cookies.get('csrf_refresh_token')).then(
+    props.logout(user['access_token']).then(
       (res) => history.push('/'),
       (err) => console.log(err)
     );

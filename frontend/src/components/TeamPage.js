@@ -31,16 +31,13 @@ const TeamPage = (props) => {
 
     useEffect(() => {
         setAbr(props.match.params.abr.toUpperCase());
-    }, [props.match])
-
-    useEffect(() => {
-        console.log(props.teams.teams);
-        if (!isEmpty(props.teams.teams)) {
+        if (!isEmpty(props.teams.teams) && abr !== '') {
+            console.log(abr);
+            console.log(props.teams.teams[abr]);
             setData(props.teams.teams[abr]['graph']);
             setPrice(props.teams.teams[abr]['price']['price']);
         }
     });
-
 
     const name = props.teams.names[abr];
 

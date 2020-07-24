@@ -9,10 +9,11 @@ export function setUsr(user) {
 export function authReq(name, opts) {
   return async function(dispatch) {
     const res = await fetch('http://localhost:5000/api/auth/' + name, opts);
-    const user = res.json();
+    const user = await res.json();
     if (user.hasOwnProperty('message')) {
       dispatch(setUsr({}));
     } else {
+      console.log(user);
       dispatch(setUsr(user));
     }
     return user;
