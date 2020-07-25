@@ -24,8 +24,8 @@ const useStyles = makeStyles((theme) => ({
 
 const TeamPage = (props) => {
     const classes = useStyles();    
-    const sample = getSampleData(1500.0);
-    const [price, setPrice] = useState(1500.0);
+    const sample = getSampleData(0);
+    const [price, setPrice] = useState(0);
     const [data, setData] = useState(sample);
     const [abr, setAbr] = useState("");
 
@@ -64,7 +64,7 @@ const TeamPage = (props) => {
                     </Grid>
                 </Grid>
                 <Grid item xs={12}>
-                    <GameCardContainer />
+                    <GameCardContainer message={"This team has no games!"}/>
                 </Grid>
             </Grid>
         </Container>

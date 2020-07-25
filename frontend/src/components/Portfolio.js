@@ -49,10 +49,10 @@ const Portfolio = (props) => {
         );
     }
 
-    var last = data['1D'][data['1D'].length - 1]['price'];
-    var sndLast = data['1D'][data['1D'].length - 2]['price'];
-    var delta = last - sndLast;
-    var pctInc = (last / sndLast) - 1;
+    let last = data['1D'][data['1D'].length - 1]['price'];
+    let sndLast = data['1D'][data['1D'].length - 2]['price'];
+    let delta = last - sndLast;
+    let pctInc = (last / sndLast) - 1;
 
     useEffect(() => {
         getUsrData();
@@ -73,7 +73,7 @@ const Portfolio = (props) => {
                 </Grid>
                 <Divider />
                 <Grid item xs={12}>
-                    <GameCardContainer />
+                    <GameCardContainer message={"Once you purchase some teams, their games will show up here!"}/>
                 </Grid>
             </Grid>
         </Container>
