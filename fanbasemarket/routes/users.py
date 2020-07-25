@@ -9,6 +9,7 @@ from fanbasemarket.queries.team import get_price
 from fanbasemarket.queries.user import get_active_holdings, get_user_graph_points, \
                                        get_leaderboard
 from fanbasemarket.routes.utils import bad_request, ok
+from fanbasemarket.queries.user import buy_shares
 
 users = Blueprint('users', __name__)
 CORS(users)
@@ -59,3 +60,18 @@ def gen_usrPg():
             payload['holdings'].append(holding)
         payload['graphData'] = get_user_graph_points(uid, db)
         return ok(payload)
+
+@users.route('buyShares', methods=['POST'])
+@cross_origin('http://localhost:3000/')
+@jwt_required
+def make_purchase():
+    with app.app_context():
+        db = get_db()
+        uname = get_current_user()
+        usr = User.query.filter(User.username == uname).first()
+        js = request.get_json()
+        try:
+            buy_shares(usr, js['abr'], js['num_shares'])
+            return ok({})
+        except:
+            return bad_request('not enough funds')

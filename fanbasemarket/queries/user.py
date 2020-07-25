@@ -72,3 +72,20 @@ def get_user_graph_points(uid, db):
             date_s = str(date)
             data_points[k].append({'date': date_s, 'price': val})
     return data_points
+
+def buy_shares(usr, abr, num_shares, db):
+    team = Team.query.filter(Team.abr == abr).first()
+    price = num_shares * team.price * 1.01
+    if usr.available_funds < price:
+        raise ValueError('not enough funds')
+    usr.available_funds -= price
+    db.session.add(usr)
+    db.session.commit()
+    now = datetime.utcnow()
+    purchase = Purchase(team_id=team.id, user_id=user.id, purchased_at=now,
+                        purchased_for=team.price, amt_shares=num_shares)
+    db.session.add(purchase)
+    db.session.commit()
+    team.price *= 1.01
+    db.session.add(team)
+    db.session.commit()
