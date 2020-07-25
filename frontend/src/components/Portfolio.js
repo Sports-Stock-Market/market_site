@@ -73,7 +73,7 @@ const Portfolio = (props) => {
                 </Grid>
                 <Divider />
                 <Grid item xs={12}>
-                    <GameCardContainer message={"Once you purchase some teams, their games will show up here!"}/>
+                    <GameCardContainer message={"Once you purchase some teams, their games will show up here"}/>
                 </Grid>
             </Grid>
         </Container>

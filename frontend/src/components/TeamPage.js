@@ -64,7 +64,7 @@ const TeamPage = (props) => {
                     </Grid>
                 </Grid>
                 <Grid item xs={12}>
-                    <GameCardContainer message={"This team has no games!"}/>
+                    <GameCardContainer message={"This team has no games"}/>
                 </Grid>
             </Grid>
         </Container>
