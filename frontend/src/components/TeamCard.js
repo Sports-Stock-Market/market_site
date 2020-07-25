@@ -29,7 +29,7 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const data = Array.from({length: 40}, (v, i) => {
+const data = Array.from({length: 40}, (_, i) => {
     return {
         "date": `7/${i}/20`,
         "price": Math.round(Math.random() * 8000 + 10)/100,

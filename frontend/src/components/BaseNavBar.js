@@ -1,16 +1,14 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link, useHistory } from 'react-router-dom';
 
 // Material-UI Components
 import { makeStyles } from '@material-ui/core/styles';
 import {
-  AppBar, Toolbar, Typography, Button, TextField, Box, 
+  AppBar, Toolbar, Typography, Button,
 } from '@material-ui/core';
 import SportsBasketballIcon from '@material-ui/icons/SportsBasketball';
-import Autocomplete from '@material-ui/lab/Autocomplete';
 import { connect } from 'react-redux';
 import { logout } from '../actions/authActions';
-import Cookies from 'universal-cookie'
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -28,12 +26,6 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const teams = [
-  { name: "New York Knicks", abr: "NYK"},
-  { name: "Chicago Bulls", abr: "CHI"},
-  { name: "Los Angeles Lakers", abr: "LAL"},
-]
-
 const BaseNavBar = (props) => {
     const classes = useStyles();
     const { isAuthenticated, user } = props.auth;
@@ -44,10 +36,6 @@ const BaseNavBar = (props) => {
         (res) => history.push('/'),
         (err) => console.log(err)
       );
-    };
-
-    const onSearch = (value) => {
-      history.push(`/team/${value}`)
     };
 
     const userLinks = (

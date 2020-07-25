@@ -1,11 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link, useHistory } from 'react-router-dom';
 
 import * as NBAIcons from 'react-nba-logos';
 
 import { connect } from 'react-redux';
 import { logout } from '../actions/authActions';
-import Cookies from 'universal-cookie'
 
 import { fade, makeStyles } from '@material-ui/core/styles';
 import {
@@ -99,7 +98,6 @@ const AuthNavBar = (props) => {
   const { isAuthenticated, user } = props.auth;
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = useState(null);
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
-  const cookies = new Cookies();
 
   const onLogout = () => {
     props.logout(user['access_token']).then(
@@ -182,12 +180,10 @@ const AuthNavBar = (props) => {
           </Typography>
           { isAuthenticated &&
           <Autocomplete
-            value={""}
             clearOnEscape
             disableListWrap
             size="medium"
             id="search"
-            clearOnEscape
             options={teams}
             getOptionLabel={(option) => option.name}
             renderOption={(option) => (

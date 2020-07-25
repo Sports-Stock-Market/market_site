@@ -10,7 +10,7 @@ import {
 
 const StockTooltip = (props) => {
     let timeStamp;
-    if (props.range == "1D") {
+    if (props.range === "1D") {
         timeStamp = String(props.label).slice(11);
     } else {
         timeStamp = String(props.label).slice(0, 10);

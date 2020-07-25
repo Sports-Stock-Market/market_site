@@ -34,7 +34,7 @@ export function setAllNames() {
             headers: {'Content-Type': 'application/JSON'},
             credentials: 'include'
         }
-        const res = await fetch('http://localhost:3000/api/teams/teamNames');
+        const res = await fetch('http://localhost:3000/api/teams/teamNames', opts);
         const data = await res.json();
         dispatch(setNames(data));
     }
