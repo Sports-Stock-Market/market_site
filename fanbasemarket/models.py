@@ -38,6 +38,7 @@ class Team(db.Model):
     prev_price = db.Column(db.Float, default=0.0)
     fs_rating = db.Column(db.Float, default=0.0)
     rating = db.Column(db.Float, default=0.0)
+    delta = db.Column(db.Float, default=0.0)
 
     def serialize(self):
         return dumps({'id': self.id, 'name': self.name})

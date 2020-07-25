@@ -23,7 +23,7 @@ const MainStockChart = (props) => {
     const classes = useStyles();
 
     const [range, setRange] = useState('1D');
-    const labels = ["1D", "1W", "1M", "YTD"];
+    const labels = ["1D", "1W", "1M", "SZN"];
 
     return (
         <Grid container spacing={3}>

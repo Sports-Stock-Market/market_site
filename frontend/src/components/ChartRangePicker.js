@@ -41,7 +41,7 @@ const StockTab = withStyles((theme) => ({
 const ChartRangePicker = (props) => {
     const [value, setValue] = useState(0);
 
-    const labels = ["1D", "1W", "1M", "YTD"];
+    const labels = ["1D", "1W", "1M", "SZN"];
 
     const handleChange = (e, newValue) => {
         setValue(newValue);

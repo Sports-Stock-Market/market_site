@@ -10,7 +10,10 @@ from datetime import datetime, timedelta
 from flask_cors import CORS
 from string import capwords
 from flask import Flask, g
+from flask_socketio import SocketIO, emit
+from flask_apscheduler import APScheduler
 from os import getenv
+from warnings import filterwarnings
 
 import pandas as pd
 import string
@@ -18,10 +21,12 @@ import time
 import csv
 import math
 
+# filterwarnings('ignore')
 
 STRPTIME_FORMAT = '%m/%d/%Y'
 K = 40
 H = 100
+
 
 INJURIES = {'2019-11-01':[['Paul George', 'Clippers', 'Month']],
     '2019-10-25': [['Deandre Ayton', 'Suns', 'Month']],
@@ -77,9 +82,12 @@ app.config['JWT_BLACKLIST_ENABLED'] = True
 app.config['JWT_BLACKLIST_TOKEN_CHECKS'] = ['access', 'refresh']
 app.config['JWT_COOKIE_CSRF_PROTECT'] = True
 app.config['JWT_SESSION_COOKIE'] = False
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
 
 db = SQLAlchemy(app)
 jwt = JWTManager(app)
+io = SocketIO(app, cors_allowed_origins='http://localhost:3000')
 
 from fanbasemarket.models import *
 from fanbasemarket.pricing.elo import simulate
@@ -145,9 +153,22 @@ from fanbasemarket.routes.auth import auth
 from fanbasemarket.routes.users import users
 from fanbasemarket.routes.teams import teams
 
+app.register_blueprint(auth, url_prefix='/api/auth/')
+app.register_blueprint(users, url_prefix='/api/users/')
+app.register_blueprint(teams, url_prefix='/api/teams/')
+
+scheduler = APScheduler()
+
+from fanbasemarket.pricing.live import bigboy_pulls_only
+
+@scheduler.task('interval', seconds=5)
+def pull_and_emit():
+    with app.app_context():
+        db = get_db()
+        results = bigboy_pulls_only(db)
+        emit('prices', results, broadcast=True, namespace='/')
 
 def create_app():
-    app.register_blueprint(auth, url_prefix='/api/auth/')
-    app.register_blueprint(users, url_prefix='/api/users/')
-    app.register_blueprint(teams, url_prefix='/api/teams/')
+    scheduler.init_app(app)
+    scheduler.start()
     return app

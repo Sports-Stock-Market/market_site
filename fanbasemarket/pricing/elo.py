@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 from string import capwords
 from fanbasemarket.pricing.utils import get_schedule_range
-from fanbasemarket.queries.team import update_teamPrice
+from fanbasemarket.queries.team import update_teamPrice, active_player_rating
 from fanbasemarket.queries.player import new_injury_mins
 from fanbasemarket.models import Player, Team
 
@@ -57,6 +57,16 @@ def apply_injury(team, player_name, duration, date, db):
                 player.mpg = 35.5
             db.session.add(player)
             db.session.commit()
+    team.rating = active_player_rating(team, db)
+    db.session.add(team)
+    db.session.commit()
+    ps = Player.query.filter(Player.team_id == team.id).filter(Player.is_injured == False).all()
+    print(f'WHEN {player_name} GOT INJURED for a {duration}:')
+    for p in ps:
+        print(f'{p.name}: {p.mpg}')
+    print('')
+    print(f'Full Strength Rating: {team.fs_rating}')
+    print(f'Rating: {team.rating}')
     sev = 100 * (team.fs_rating - team.rating) / team.fs_rating
     if duration == 'Day':
             sev = sev * .1
@@ -76,7 +86,9 @@ def apply_injury(team, player_name, duration, date, db):
     if days_left < 63 and duration == 'Day':
         print("Initial Sev: " + str(sev))
         sev = sev + ((63 - days_left) * .2)
-    update_teamPrice(team, (1 - (sev / 100)) - team.price, date, db)
+    print(f'severity: {sev}')
+    print('======================')
+    update_teamPrice(team, (-sev / 100) * team.price, date, db)
 
 def recover_from_injury(team, player_name, db):
     inj_player = Player.query.filter(Player.name==player_name).first()
@@ -96,6 +108,7 @@ def simulate(start_yr, end_yr, k, h, use_mov, injuries, db):
     for season in get_schedule_range(start_yr, end_yr):
         teams = Team.query.all()
         season_start = season[0]['start_time']
+        season_end = season[-1]['start_time'].replace(tzinfo=None)
         for team in teams:
             season_elo_reset(team, season_start, db)
         prev_date = season_start - timedelta(days=1)
@@ -111,18 +124,20 @@ def simulate(start_yr, end_yr, k, h, use_mov, injuries, db):
                         new.append((d, active_inj))
                     else:
                         inj_team = Team.query.filter(Team.name.contains(injury[1])).first()
-                        recover_from_injury(team, injury[0], db)
+                        recover_from_injury(inj_team, injury[0], db)
                 active_injuries = new
                 if date in injuries.keys():
                     for injury in injuries[date]:
                         inj_team = Team.query.filter(Team.name.contains(injury[1])).first()
-                        apply_injury(team, injury[0], injury[2], date_obj, db)
+                        apply_injury(inj_team, injury[0], injury[2], date_obj, db)
                         if injury[2] == 'Day':
                             ret_d = date_obj + timedelta(days=1)
                         elif injury[2] == 'Week':
                             ret_d = date_obj + timedelta(weeks=1)
+                        elif injury[2] == 'Month':
+                            ret_d = date_obj + timedelta(weeks=4)
                         else:
-                            ret_d = date_obj + timedelta(weeks=4) 
+                            ret_d = season_end
                         active_injuries.append((ret_d, injury))
             home_tname = capwords(game['home_team'].name.replace('_', ' '))
             away_tname = capwords(game['away_team'].name.replace('_', ' '))

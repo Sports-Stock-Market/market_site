@@ -137,8 +137,11 @@ def removeGLeague(d):
             break
     return d
 
-def liveGame(time_elapsed, score_margin, initial_prob):
-    time_left = 48 - time_elapsed
+def liveGame(time_elapsed, score_margin, initial_prob, period):
+    if period <= 4:
+        time_left = 48 - time_elapsed
+    else:
+        time_left = (48 + ((period - 4) * 5)) - time_elapsed
     score_margin_noabs = round(score_margin,2)
     score_margin_nocap = score_margin
     if score_margin < 0:

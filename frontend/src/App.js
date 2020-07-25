@@ -9,6 +9,7 @@ import { connect } from 'react-redux';
 import { initAllTeams, setAllNames } from './actions/teamActions'; 
 import { refreshToken } from './actions/authActions';
 import Cookies from 'universal-cookie';
+import socketIOClient from "socket.io-client";
 
 import './App.css';
 
@@ -21,6 +22,12 @@ function App(props) {
     props.setAllNames();
     props.initAllTeams();
   }, []);
+
+  const socket = socketIOClient('http://localhost:5000');
+
+  socket.on('prices', data => {
+    console.log(data);
+  });
 
   return (
     <Router>

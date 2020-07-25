@@ -6,7 +6,6 @@ from sqlalchemy.ext.declarative import declarative_base
 from fanbasemarket.models import Teamprice, Player
 from fanbasemarket.queries.utils import get_graph_x_values
 
-
 def get_price(tid, db, date=None):
     if not date:
         date = datetime.utcnow().strftime('%Y-%m-%d')
@@ -28,10 +27,13 @@ def get_team_graph_points(tid, db):
     return data_points
 
 def update_teamPrice(team, delta, dt, db):
+    # delta_prime = delta - team.delta
     newprice = team.price + delta
     team.prev_price = team.price
     team.price = newprice
-    db.session.add(team)
+    team.delta = delta
+    loc = db.session.merge(team)
+    db.session.add(loc)
     db.session.commit()
     price_obj = Teamprice(date=dt, team_id=team.id, elo=newprice)
     db.session.add(price_obj)
@@ -40,3 +42,9 @@ def update_teamPrice(team, delta, dt, db):
 def set_player_rating(team, db):
     players = Player.query.filter(Player.team_id==team.id).all()
     return sum([player.rating * player.mpg for player in players])
+
+def active_player_rating(team, db):
+    active_ps = Player.query.filter(Player.team_id == team.id).\
+        filter(Player.is_injured == False).\
+            all()
+    return sum([player.rating * player.mpg for player in active_ps])
