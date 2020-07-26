@@ -39,6 +39,17 @@ def update_teamPrice(team, delta, dt, db):
     db.session.add(price_obj)
     db.session.commit()
 
+def set_teamPrice(team, p, dt, db):
+    team.prev_price = team.price
+    team.price = p
+    team.delta = p - team.prev_price
+    loc = db.session.merge(team)
+    db.session.add(loc)
+    db.session.commit()
+    price_obj = Teamprice(date=dt, team_id=team.id, elo=p)
+    db.session.add(price_obj)
+    db.session.commit()
+
 def set_player_rating(team, db):
     players = Player.query.filter(Player.team_id==team.id).all()
     return sum([player.rating * player.mpg for player in players])

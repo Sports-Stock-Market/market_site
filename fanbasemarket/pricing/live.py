@@ -1,7 +1,7 @@
 from requests import get
 from nba_api.stats.static import teams
 from fanbasemarket.pricing.nba_data import liveGame, mov_multiplier
-from fanbasemarket.queries.team import update_teamPrice
+from fanbasemarket.queries.team import update_teamPrice, set_teamPrice
 from fanbasemarket.models import Team, Teamprice
 from datetime import datetime
 
@@ -71,10 +71,10 @@ def bigboy_pulls_only(db):
                 proj_mov = -score_margin * (1-live_prob/100)
             marginofv = mov_multiplier(home_elo, away_elo, proj_mov)
             elo_change = k * marginofv * ((live_prob - (i_home_win_prob*100))/100)
-            new_home_elo = home_elo + elo_change
-            new_away_elo = away_elo - elo_change
-            update_teamPrice(home_tObj, new_home_elo - home_elo, today, db)
+            set_teamPrice(home_tObj, home_elo + elo_change, today, db)
             results.append({home_abv: {'date': str(today), 'price': new_home_elo}})
-            update_teamPrice(away_tObj, new_away_elo - away_elo, today, db)
+            set_teamPrice(away_tObj, away_elo - elo_change, today, db)
             results.append({away_abv: {'date': str(today), 'price': new_away_elo}})
+        else:
+            print(clock)
     return results

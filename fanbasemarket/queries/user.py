@@ -4,6 +4,7 @@ from json import dumps
 from sqlalchemy import and_, not_
 
 from fanbasemarket.queries.utils import get_graph_x_values
+from fanbasemarket.queries.team import update_teamPrice
 from fanbasemarket.models import Purchase, User, Team
 
 
@@ -98,7 +99,4 @@ def buy_shares(usr, abr, num_shares, db):
                         purchased_for=team.price, amt_shares=num_shares)
     db.session.add(purchase)
     db.session.commit()
-    team.price *= 1.01
-    l_tm = db.session.merge(team)
-    db.session.add(l_tm)
-    db.session.commit()
+    update_teamPrice(team, (team.price * .01), datetime.utcnow() , db)
