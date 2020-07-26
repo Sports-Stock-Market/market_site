@@ -76,5 +76,5 @@ def bigboy_pulls_only(db):
             set_teamPrice(away_tObj, away_elo - elo_change, today, db)
             results.append({away_abv: {'date': str(today), 'price': away_elo - elo_change}})
         else:
-            print(clock)
+            print(i)
     return results
