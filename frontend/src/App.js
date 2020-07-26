@@ -6,7 +6,7 @@ import {
   AuthNavBar, LoginForm, SignUpForm, Portfolio, FormContainer, Leaderboard, TeamPage, AllTeamsPage,
 } from './components';
 import { connect } from 'react-redux';
-import { initAllTeams, setAllNames } from './actions/teamActions'; 
+import { initAllTeams, setAllNames, updatePrices } from './actions/teamActions'; 
 import { refreshToken } from './actions/authActions';
 import Cookies from 'universal-cookie';
 import socketIOClient from "socket.io-client";
@@ -26,7 +26,7 @@ function App(props) {
   const socket = socketIOClient('http://localhost:5000');
 
   socket.on('prices', data => {
-    console.log(data);
+    props.updatePrices(data);
   });
 
   return (
@@ -61,4 +61,4 @@ function App(props) {
   );
 }
 
-export default connect(null, { initAllTeams, setAllNames, refreshToken })(App);
+export default connect(null, { initAllTeams, setAllNames, refreshToken, updatePrices })(App);

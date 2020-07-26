@@ -24,7 +24,7 @@ def all_team_data():
         for team in teams_all:
             d = {}
             d['graph'] = get_team_graph_points(team.id, db)
-            d['price'] = d['graph']['1D'][-1]
+            d['price'] = {'price': team.price}
             d['name'] = team.name
             payload[team.abr] = d
         return ok(payload)

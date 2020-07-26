@@ -1,4 +1,4 @@
-import { INIT_TEAMS, SET_NAMES } from './types';
+import { INIT_TEAMS, SET_NAMES, UPDATE_PRICES } from './types';
 
 export function initTeamData(data) {
     return {
@@ -37,5 +37,11 @@ export function setAllNames() {
         const res = await fetch('http://localhost:3000/api/teams/teamNames', opts);
         const data = await res.json();
         dispatch(setNames(data));
+    }
+}
+
+export function updatePrices(updates) {
+    return dispatch => {
+        dispatch({type: UPDATE_PRICES, updates: updates});
     }
 }

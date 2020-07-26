@@ -1,5 +1,8 @@
 import { INIT_TEAMS } from '../actions/types';
 import { SET_NAMES } from '../actions/types';
+import { UPDATE_PRICES } from '../actions/types';
+
+import { isEmpty } from '../utils/jsUtils';
 
 const initialState = {
   teams: {},
@@ -18,6 +21,23 @@ export default (state = initialState, action = {}) => {
         names: action.names,
         teams: state.teams
       };
+    case UPDATE_PRICES:
+      if (isEmpty(state.teams)) {
+        return {
+          names: state.names,
+          teams: state.teams
+        };
+      } else {
+        action.updates.forEach(update => {
+          let abr = Object.keys(update)[0];
+          state.teams[abr]['price'] = update[abr];
+          state.teams[abr]['graph']['1D'].push(update[abr]);
+        });
+        return {
+          names: state.names,
+          teams: state.teams
+        };
+      }
     default: return state;
   }
 }
