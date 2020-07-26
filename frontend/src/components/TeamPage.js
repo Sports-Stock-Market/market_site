@@ -38,6 +38,13 @@ const TeamPage = (props) => {
         }
     });
 
+    useEffect(() => {
+        if (!isEmpty(props.teams.teams) && abr !== '') {
+            setData(props.teams.teams[abr]['graph']);
+            setPrice(props.teams.teams[abr]['price']['price']);
+        }
+    }, [props.teams.teams]);
+
     const name = props.teams.names[abr];
 
     return (

@@ -11,7 +11,7 @@ import {
 const StockTooltip = (props) => {
     let timeStamp;
     if (props.range === "1D") {
-        timeStamp = String(props.label).slice(11);
+        timeStamp = String(props.label).slice(11, 19);
     } else {
         timeStamp = String(props.label).slice(0, 10);
     }
@@ -19,7 +19,7 @@ const StockTooltip = (props) => {
     if (props.active) {
         return (
             <Typography color="secondary" variant={props.big ? "body1" : "body2"}>
-                {props.big && timeStamp} ${props.payload[0].value}
+                {props.big && timeStamp} ${props.payload[0].value.toFixed(2)}
             </Typography>
         );
     }
@@ -31,7 +31,7 @@ const StockChart = (props) => {
     <ResponsiveContainer width={props.width} height={props.height}>
         <LineChart data={props.data}>
             <XAxis dataKey="date" hide />
-            <YAxis type="number" domain={[1200, 1800]} hide />
+            <YAxis type="number" domain={[0.8 * 'datamin', 1.2 * 'datamax']} hide />
             <Tooltip 
                 position={props.big ? { y: -20 } : { y: -15 }}
                 offset={props.big ? -45 : -20}
