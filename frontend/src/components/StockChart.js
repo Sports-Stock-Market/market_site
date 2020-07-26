@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     LineChart, Line, Tooltip, ResponsiveContainer, ReferenceLine, XAxis, YAxis, 
 } from 'recharts';
@@ -27,6 +27,9 @@ const StockTooltip = (props) => {
 }
 
 const StockChart = (props) => {
+
+    console.log(props.data);
+
     return (
     <ResponsiveContainer width={props.width} height={props.height}>
         <LineChart data={props.data}>

@@ -31,7 +31,7 @@ export default (state = initialState, action = {}) => {
         action.updates.forEach(update => {
           let abr = Object.keys(update)[0];
           state.teams[abr]['price'] = update[abr];
-          state.teams[abr]['graph']['1D'].push(update[abr]);
+          state.teams[abr]['graph']['1D'] = [...state.teams[abr]['graph']['1D'], update[abr]];
         });
         return {
           names: state.names,
