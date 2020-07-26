@@ -72,9 +72,9 @@ def bigboy_pulls_only(db):
             marginofv = mov_multiplier(home_elo, away_elo, proj_mov)
             elo_change = k * marginofv * ((live_prob - (i_home_win_prob*100))/100)
             set_teamPrice(home_tObj, home_elo + elo_change, today, db)
-            results.append({home_abv: {'date': str(today), 'price': new_home_elo}})
+            results.append({home_abv: {'date': str(today), 'price': home_elo + elo_change}})
             set_teamPrice(away_tObj, away_elo - elo_change, today, db)
-            results.append({away_abv: {'date': str(today), 'price': new_away_elo}})
+            results.append({away_abv: {'date': str(today), 'price': away_elo - elo_change}})
         else:
             print(clock)
     return results
