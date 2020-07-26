@@ -29,18 +29,9 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const data = Array.from({length: 40}, (_, i) => {
-    return {
-        "date": `7/${i}/20`,
-        "price": Math.round(Math.random() * 8000 + 10)/100,
-    }
-});
-
 const TeamCard = (props) => {
     const classes = useStyles();
     const Logo = NBAIcons[props.abr];
-
-    console.log(props.chartData);
 
     const shares = props.data.reduce((total, current) => total + current.num_shares, 0);
     const equity = props.data.reduce((total, current) => total + (current.num_shares * current.bought_for), 0);

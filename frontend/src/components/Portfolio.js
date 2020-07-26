@@ -25,7 +25,7 @@ const useStyles = makeStyles((theme) => ({
 
 const Portfolio = (props) => {
 
-    const sample = getSampleData(15000.0);
+    const sample = getSampleData(0.0);
 
     const classes = useStyles();
     const [avFunds, setAvFunds] = useState(0.0);
@@ -42,7 +42,6 @@ const Portfolio = (props) => {
     const getUsrData = () => {
         fetch('http://localhost:5000/api/users/usrPg', requestOpts).then(
             res => res.json().then(data_ => {
-                console.log(data_['holdings']);
                 setAvFunds(data_['available_funds']);
                 setHoldings(data_['holdings']);
                 setData(data_['graphData']);

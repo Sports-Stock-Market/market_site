@@ -3,8 +3,10 @@ import { connect } from 'react-redux';
 import * as NBAIcons from 'react-nba-logos';
 import { withStyles, makeStyles } from '@material-ui/core/styles';
 import { 
-    Typography, Grid, Card, TextField, Tabs, Tab, Box, Button
+    Typography, Grid, Card, TextField, Tabs, Tab, Button, Snackbar, IconButton
 } from '@material-ui/core';
+import Alert from '@material-ui/lab/Alert';
+import CloseIcon from '@material-ui/icons/Close';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -82,15 +84,16 @@ const TeamBuySell = (props) => {
 
     const classes = useStyles();
     const [value, setValue] = useState(0);
-    const [shares, setShares] = useState(0);
+    const [shares, setShares] = useState(1);
     const [data, setData] = useState(defaultData);
     const [labels, setLabels] = useState(buyLabels);
+    const [open, setOpen] = useState(false);
     const spreadPCT = 0.005;
 
     const Logo = NBAIcons[props.abr];
 
     useEffect(() => {
-        setShares(0);
+        setShares(1);
         setValue(0);
         const multiplier = (1 + spreadPCT);
         setData({...data, 
@@ -101,7 +104,7 @@ const TeamBuySell = (props) => {
     }, [props.price]);
 
     useEffect(() => {
-        setShares(0);
+        setShares(1);
         if (value == 0) {
             setLabels(buyLabels);
         } else if (value == 1) {
@@ -119,7 +122,7 @@ const TeamBuySell = (props) => {
         const change = value == 1 ? props.price * multiplier * shares : -props.price * multiplier * shares;
         setData({...data, 
             price: props.price * multiplier,
-            total: change,
+            total: Math.abs(change),
             remFunds: data.avFunds + (change),
         });
     }, [value]);
@@ -129,7 +132,7 @@ const TeamBuySell = (props) => {
         const change = value == 1 ? props.price * multiplier * shares : -props.price * multiplier * shares;
         setData({...data, 
             price: props.price * multiplier,
-            total: change,
+            total: Math.abs(change),
             remFunds: data.avFunds + (change),
         });
     }, [shares]);
@@ -156,7 +159,7 @@ const TeamBuySell = (props) => {
         };
         fetch(`http://localhost:5000/api/users/${type}`, requestOpts).then(res => {
             res.json().then(response => {
-                console.log(response);
+                setOpen(true);
             }); 
         });
     };
@@ -166,7 +169,7 @@ const TeamBuySell = (props) => {
     };
 
     const handleFieldChange = e => {
-        if (!(e.target.value < 0 || 
+        if (!(e.target.value <= 0 || 
             (value != 1 && e.target.value * data.price >= data.avFunds))) {
             setShares(e.target.value);
         }
@@ -226,6 +229,24 @@ const TeamBuySell = (props) => {
                 >
                     Submit
                 </Button>
+                <Snackbar open={open}>
+                    <Alert 
+                    action={
+                        <IconButton
+                        aria-label="close"
+                        color="inherit"
+                        size="small"
+                        onClick={() => {
+                            setOpen(false);
+                        }}
+                        >
+                        <CloseIcon fontSize="inherit" />
+                        </IconButton>
+                    } 
+                    severity="success">
+                    You successfully purchased {shares} {shares == 1 ? "share": "shares"} of {props.abr}
+                    </Alert>
+                </Snackbar>
             </Grid>
         </Card>
     )
