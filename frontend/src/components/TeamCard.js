@@ -38,23 +38,26 @@ const data = Array.from({length: 40}, (_, i) => {
 
 const TeamCard = (props) => {
     const classes = useStyles();
+    const Logo = NBAIcons[props.abr];
 
-    console.log(props.data);
+    console.log(props.chartData);
 
-    const Logo = NBAIcons[props.key];
-    const change = Math.round((props.data.price-props.data.position.bought) * 100) / 100;
-    const pct_change = Math.round((change / props.data.position.bought) * 100) / 100;
+    const shares = props.data.reduce((total, current) => total + current.num_shares, 0);
+    const equity = props.data.reduce((total, current) => total + (current.num_shares * current.bought_for), 0);
+    const currValue = props.price * shares;
+    const change = currValue - equity;
+    const pct_change = (change / equity) * 100;
 
     return (
-        <Link to={`/team/${props.data.abr.toLowerCase()}`} style={{ textDecoration: 'none' }}>
+        <Link to={`/team/${props.abr.toLowerCase()}`} style={{ textDecoration: 'none' }}>
             <Card variant="outlined" className={classes.root}>
                 <Grid container spacing={2}>
                     <Grid item md={9} xs={10}>
                         <Typography variant="h5">
-                            {props.data.name}
+                            {props.name}
                         </Typography>
                         <Typography variant="subtitle2">
-                            {props.data.position.shares} Shares ({props.data.position.diversity*100}% Portfolio) 
+                            {shares} Shares Owned
                         </Typography>
                     </Grid>
                     <Grid style={{ marginTop: -9}} item xs={2}>
@@ -62,7 +65,8 @@ const TeamCard = (props) => {
                     </Grid>
                     <Grid item xs={12}>
                         <StockChart 
-                            data={data} 
+                            range="SZN"
+                            data={props.chartData['SZN']} 
                             width={"90%"} 
                             height={80} 
                             strokeWidth={2}
@@ -71,7 +75,7 @@ const TeamCard = (props) => {
                     </Grid>
                     <Grid item xs={12}>
                         <StockPrice 
-                            price={props.data.price}
+                            price={props.price}
                             change={change}
                             pct_change={pct_change}
                         />
@@ -81,5 +85,6 @@ const TeamCard = (props) => {
         </Link>
     );
 }
+
 
 export default TeamCard;

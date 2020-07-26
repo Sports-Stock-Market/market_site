@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import TeamCard from './TeamCard.js';
+import { connect } from 'react-redux';
 import { isEmpty } from '../utils/jsUtils';
 
 // Material-UI Components
@@ -8,6 +9,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import { 
     Grid, Typography, Button
 } from '@material-ui/core';
+import Skeleton from '@material-ui/lab/Skeleton';
 
 const useStyles = makeStyles((theme) => ({
     title: {
@@ -17,6 +19,13 @@ const useStyles = makeStyles((theme) => ({
 
 const TeamCardContainer = (props) => {
     const classes = useStyles();
+    const [teamData, setTeamData] = useState({});
+
+    useEffect(() => {
+        if (!isEmpty(props.teams.teams)) {
+            setTeamData(props.teams.teams)
+        }
+    });
 
     const Contents = () => {
         if (isEmpty(props.holdings)) {
@@ -38,7 +47,17 @@ const TeamCardContainer = (props) => {
             return (
                 Object.entries(props.holdings).map(holding => 
                     <Grid item sm={6} md={3}>
-                        <TeamCard key={holding[0]} data={holding[1]} />
+                        { isEmpty(teamData) ? 
+                            <Skeleton variant="rect" height={216} /> :
+                            <TeamCard 
+                                key={holding[0]} 
+                                name={props.teams.names[holding[0]]} 
+                                price={teamData[holding[0]]['price']['price']} 
+                                abr={holding[0]} 
+                                data={holding[1]} 
+                                chartData={teamData[holding[0]]['graph']}
+                            />
+                        }
                     </Grid>
                 )
             );
@@ -61,4 +80,11 @@ const TeamCardContainer = (props) => {
     );
 }
 
-export default TeamCardContainer;
+const mapStateToProps = (state) => {
+    return {
+      auth: state.auth,
+      teams: state.teams
+    };
+}
+
+export default connect(mapStateToProps, {})(TeamCardContainer);
