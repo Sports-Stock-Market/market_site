@@ -87,12 +87,21 @@ const TeamBuySell = (props) => {
     const Logo = NBAIcons[props.abr];
 
     useEffect(() => {
+        setShares(0);
+        setValue(0);
         setData({...data, 
             price: props.price, 
             totalPrice: props.price * shares,
             remFunds: data.avFunds - (props.price * shares),
         });
-    }, [props.price, shares])
+    }, [props.price])
+
+    useEffect(() => {
+        setData({...data, 
+            totalPrice: props.price * shares,
+            remFunds: data.avFunds - (props.price * shares),
+        });
+    }, [shares])
 
     const handleTabChange = (e, newValue) => {
         setValue(newValue);
