@@ -23,5 +23,5 @@ def get_graph_x_values():
         week_ago += timedelta(days=1)
     while beginning_of_day <= now:
         x_values['1D'].append(beginning_of_day)
-        beginning_of_day += timedelta(hours=0.5)
+        beginning_of_day += timedelta(seconds=30)
     return x_values
