@@ -42,9 +42,10 @@ const Portfolio = (props) => {
     const getUsrData = () => {
         fetch('http://localhost:5000/api/users/usrPg', requestOpts).then(
             res => res.json().then(data_ => {
-            setAvFunds(data_['available_funds']);
-            setHoldings(data_['holdings']);
-            setData(data_['graphData']);
+                console.log(data_['holdings']);
+                setAvFunds(data_['available_funds']);
+                setHoldings(data_['holdings']);
+                setData(data_['graphData']);
             })
         );
     }

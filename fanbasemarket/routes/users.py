@@ -1,6 +1,6 @@
 from flask import Blueprint, request
 from flask_cors import CORS, cross_origin
-from flask_jwt_extended import jwt_required, get_current_user
+from flask_jwt_extended import jwt_required, get_current_user, get_jwt_identity
 from datetime import datetime
 
 from fanbasemarket import app, get_db
@@ -44,20 +44,8 @@ def gen_usrPg():
         user_obj = matches[0]
         uid = user_obj.id
         all_purchases = get_active_holdings(uid, db, date=date)
-        payload = {'available_funds': user_obj.available_funds, 'holdings': []}
-        for purchase in all_purchases:
-            holding = {}
-            tid = purchase.team_id
-            team = Team.query.filter_by(id=tid).first()
-            holding['name'] = team.name
-            holding['abr'] = team.abr
-            price = get_price(tid, date)
-            holding['price'] = price
-            holding['position'] = {
-                'bought': purchase.purchased_for,
-                'shares': purchase.amt_shares
-            }
-            payload['holdings'].append(holding)
+        payload = {'available_funds': user_obj.available_funds}
+        payload['holdings'] = all_purchases
         payload['graphData'] = get_user_graph_points(uid, db)
         return ok(payload)
 
@@ -65,13 +53,10 @@ def gen_usrPg():
 @cross_origin('http://localhost:3000/')
 @jwt_required
 def make_purchase():
+    uname = get_jwt_identity()
     with app.app_context():
         db = get_db()
-        uname = get_current_user()
         usr = User.query.filter(User.username == uname).first()
         js = request.get_json()
-        try:
-            buy_shares(usr, js['abr'], js['num_shares'])
-            return ok({})
-        except:
-            return bad_request('not enough funds')
+        buy_shares(usr, js['abr'], int(js['num_shares']), db)
+        return ok({})

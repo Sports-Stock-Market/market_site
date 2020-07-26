@@ -4,7 +4,7 @@ from json import dumps
 from sqlalchemy import and_, not_
 
 from fanbasemarket.queries.utils import get_graph_x_values
-from fanbasemarket.models import Purchase, User
+from fanbasemarket.models import Purchase, User, Team
 
 
 def get_active_holdings(uid, db, date=None):
@@ -15,7 +15,18 @@ def get_active_holdings(uid, db, date=None):
         filter(Purchase.exists).\
         filter(Purchase.purchased_at <= date).\
         all()
-    return results
+    holdings = {}
+    for result in results:
+        tm = Team.query.filter(Team.id == result.team_id).first()
+        bt_at = str(result.purchased_at)
+        bt_f = result.purchased_for
+        amt_shares = result.amt_shares
+        res = {'bought_at': bt_at, 'bought_for': bt_f, 'num_shares': amt_shares}
+        if tm.abr not in holdings:
+            holdings[tm.abr] = [res]
+        else:
+            holdings[tm.abr].append(res)
+    return holdings
 
 
 def get_assets_in_date_range(uid, previous_balance, end, db, start=None):
@@ -79,13 +90,15 @@ def buy_shares(usr, abr, num_shares, db):
     if usr.available_funds < price:
         raise ValueError('not enough funds')
     usr.available_funds -= price
-    db.session.add(usr)
+    loc = db.session.merge(usr)
+    db.session.add(loc)
     db.session.commit()
     now = datetime.utcnow()
-    purchase = Purchase(team_id=team.id, user_id=user.id, purchased_at=now,
+    purchase = Purchase(team_id=team.id, user_id=usr.id, purchased_at=now,
                         purchased_for=team.price, amt_shares=num_shares)
     db.session.add(purchase)
     db.session.commit()
     team.price *= 1.01
-    db.session.add(team)
+    l_tm = db.session.merge(team)
+    db.session.add(l_tm)
     db.session.commit()

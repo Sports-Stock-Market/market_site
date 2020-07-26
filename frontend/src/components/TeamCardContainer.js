@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import TeamCard from './TeamCard.js';
+import { isEmpty } from '../utils/jsUtils';
 
 // Material-UI Components
 import { makeStyles } from '@material-ui/core/styles';
@@ -18,7 +19,7 @@ const TeamCardContainer = (props) => {
     const classes = useStyles();
 
     const Contents = () => {
-        if (props.holdings.length == 0) {
+        if (isEmpty(props.holdings)) {
             return (
                 <>
                 <Grid item xs={12}>
@@ -35,9 +36,9 @@ const TeamCardContainer = (props) => {
             );
         } else {
             return (
-                props.holdings.map((holding) => 
+                Object.entries(props.holdings).map(holding => 
                     <Grid item sm={6} md={3}>
-                        <TeamCard key={holding.abr} data={holding} />
+                        <TeamCard key={holding[0]} data={holding[1]} />
                     </Grid>
                 )
             );

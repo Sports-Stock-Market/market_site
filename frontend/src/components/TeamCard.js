@@ -39,7 +39,9 @@ const data = Array.from({length: 40}, (_, i) => {
 const TeamCard = (props) => {
     const classes = useStyles();
 
-    const Logo = NBAIcons[props.data.abr];
+    console.log(props.data);
+
+    const Logo = NBAIcons[props.key];
     const change = Math.round((props.data.price-props.data.position.bought) * 100) / 100;
     const pct_change = Math.round((change / props.data.position.bought) * 100) / 100;
 
