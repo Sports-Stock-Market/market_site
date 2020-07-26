@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { connect } from 'react-redux';
 import * as NBAIcons from 'react-nba-logos';
 import { withStyles, makeStyles } from '@material-ui/core/styles';
 import { 
@@ -64,51 +65,111 @@ const TradeTab = withStyles((theme) => ({
 
 // sample data
 
-const labels = {
-    price: "Share Price",
-    totalPrice: "Total Price",
+const buyLabels = {
+    price: "Buy Price",
+    total: "Total Cost",
     avFunds: "Available Funds",
     remFunds: "Remaining Funds"
 }
 
 const TeamBuySell = (props) => {
-    const sample = {
+    const defaultData = {
         price: 1500,
-        avFunds: 16000,
-        totalPrice: 1500,
-        remFunds: 16000,
+        avFunds: 15000,
+        total: 1500,
+        remFunds: 15000,
     }
 
     const classes = useStyles();
     const [value, setValue] = useState(0);
     const [shares, setShares] = useState(0);
-    const [data, setData] = useState(sample);
+    const [data, setData] = useState(defaultData);
+    const [labels, setLabels] = useState(buyLabels);
+    const spreadPCT = 0.005;
 
     const Logo = NBAIcons[props.abr];
 
     useEffect(() => {
         setShares(0);
         setValue(0);
+        const multiplier = (1 + spreadPCT);
         setData({...data, 
-            price: props.price, 
-            totalPrice: props.price * shares,
-            remFunds: data.avFunds - (props.price * shares),
+            price: props.price * multiplier, 
+            total: props.price * multiplier * shares,
+            remFunds: data.avFunds - (props.price * multiplier * shares),
         });
-    }, [props.price])
+    }, [props.price]);
 
     useEffect(() => {
+        setShares(0);
+        if (value == 0) {
+            setLabels(buyLabels);
+        } else if (value == 1) {
+            setLabels({...labels,
+                price: "Sell Price",
+                total: "Total Credit",
+                remFunds: "New Funds"
+            });
+        } else {
+            setLabels({...labels,
+                price: "Short Price",
+            });
+        }
+        const multiplier = value == 0 ? (1 + spreadPCT) : (1 - spreadPCT);
+        const change = value == 1 ? props.price * multiplier * shares : -props.price * multiplier * shares;
         setData({...data, 
-            totalPrice: props.price * shares,
-            remFunds: data.avFunds - (props.price * shares),
+            price: props.price * multiplier,
+            total: change,
+            remFunds: data.avFunds + (change),
         });
-    }, [shares])
+    }, [value]);
+
+    useEffect(() => {
+        const multiplier = value == 0 ? (1 + spreadPCT) : (1 - spreadPCT);
+        const change = value == 1 ? props.price * multiplier * shares : -props.price * multiplier * shares;
+        setData({...data, 
+            price: props.price * multiplier,
+            total: change,
+            remFunds: data.avFunds + (change),
+        });
+    }, [shares]);
+
+    const handleTrade = () => {
+        let type;
+        if (value == 0) {
+            type = "buyShares";
+        } else if (value == 1) {
+            type = "sellShares";
+        } else {
+            type = "shortShares";
+        }
+        const token = props.auth.user.access_token;
+        const tradeInfo = {
+            abr: props.abr,
+            num_shares: shares,
+        };
+        const requestOpts = {
+            method: 'POST',
+            headers: {'Content-type': 'application/JSON', 'Authorization': 'Bearer ' + token},
+            body: JSON.stringify(tradeInfo),
+            credentials: 'include'
+        };
+        fetch(`http://localhost:5000/api/users/${type}`, requestOpts).then(res => {
+            res.json().then(response => {
+                console.log(response);
+            }); 
+        });
+    };
 
     const handleTabChange = (e, newValue) => {
         setValue(newValue);
     };
 
     const handleFieldChange = e => {
-        setShares(e.target.value);
+        if (!(e.target.value < 0 || 
+            (value != 1 && e.target.value * data.price >= data.avFunds))) {
+            setShares(e.target.value);
+        }
     };
 
     const InfoItem = ({ label, info }) => {
@@ -161,6 +222,7 @@ const TeamBuySell = (props) => {
                     variant="contained"
                     color="primary"
                     className={classes.submit}
+                    onClick={handleTrade}
                 >
                     Submit
                 </Button>
@@ -169,4 +231,10 @@ const TeamBuySell = (props) => {
     )
 }
 
-export default TeamBuySell;
+const mapStateToProps = (state) => {
+    return {
+      auth: state.auth
+    };
+}
+
+export default connect(mapStateToProps, {})(TeamBuySell);

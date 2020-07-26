@@ -11,6 +11,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import { 
     Grid, Typography, Container, Divider,
 } from '@material-ui/core';
+import Skeleton from '@material-ui/lab/Skeleton';
 
 const useStyles = makeStyles((theme) => ({
     title: {
@@ -46,21 +47,27 @@ const TeamPage = (props) => {
             </Typography>
             <Grid className={classes.main} container spacing={4}>
                 <Grid item xs={12}>
-                    <MainStockChart last={price} delta={200.02} pctInc={20.34} chartData={data} />
+                    <MainStockChart last={price} delta={200.02} pctInc={20.34} chartData={data} abr={abr}/>
                 </Grid>
                 <Divider />
                 <Grid container item xs={12} spacing={3}>
-                    <Grid item md={6} xs={12}>
+                    <Grid item md={6} sm={10}>
                         <Typography className={classes.title} variant="h4">
                             Position
                         </Typography>
+                        {price == 0 ? 
+                        <Skeleton variant="rect" height={154} /> :
                         <PositionCard />
+                        }
                     </Grid>
-                    <Grid item md={6} xs={12}>
+                    <Grid item md={6} sm={10}>
                         <Typography className={classes.title} variant="h4">
                             Trade {abr}
                         </Typography>
-                        <TeamBuySell price={price}/>
+                        {price == 0 ?
+                        <Skeleton variant="rect" height={304.09} /> :
+                        <TeamBuySell abr={abr} price={price}/>
+                        }
                     </Grid>
                 </Grid>
                 <Grid item xs={12}>

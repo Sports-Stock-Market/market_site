@@ -2,13 +2,14 @@ import React, { useState } from 'react';
 import { Link, useHistory } from 'react-router-dom';
 
 import * as NBAIcons from 'react-nba-logos';
+import { ReactComponent as LogoIcon } from '../assets/svgs/logo-04.svg';
 
 import { connect } from 'react-redux';
 import { logout } from '../actions/authActions';
 
 import { fade, makeStyles } from '@material-ui/core/styles';
 import {
-    AppBar, Toolbar, IconButton, Typography, InputBase, MenuItem, Menu, Button
+    AppBar, Toolbar, IconButton, Typography, InputBase, MenuItem, Menu, Button, SvgIcon
 } from '@material-ui/core';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import SportsBasketballIcon from '@material-ui/icons/SportsBasketball';
@@ -23,7 +24,8 @@ const useStyles = makeStyles((theme) => ({
     boxShadow: "0 1px 3px 1px rgba(0,0,0,0.1)",
   },
   logo: {
-    marginRight: theme.spacing(1.5),
+    marginRight: theme.spacing(1.2),
+    fontSize: "1.9rem",
   },
   title: {
     fontWeight: 700,
@@ -174,7 +176,7 @@ const AuthNavBar = (props) => {
     <div className={classes.grow}>
       <AppBar className={classes.bar} color="inherit" position="fixed">
         <Toolbar>
-        <SportsBasketballIcon edge="start" className={classes.logo} color="inherit" />
+        <SvgIcon component={LogoIcon} className={classes.logo} viewBox="0 0 1080 1080" />
           <Typography className={isAuthenticated ? classes.title : null} variant="h6" noWrap>
             Fanbase
           </Typography>

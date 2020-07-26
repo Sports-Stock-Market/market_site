@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 
 // Material-UI Components
 import { makeStyles, withStyles } from '@material-ui/core/styles';
@@ -42,6 +42,10 @@ const ChartRangePicker = (props) => {
     const [value, setValue] = useState(0);
 
     const labels = ["1D", "1W", "1M", "SZN"];
+
+    useEffect(() => {
+      setValue(0);
+    }, [props.abr])
 
     const handleChange = (e, newValue) => {
         setValue(newValue);

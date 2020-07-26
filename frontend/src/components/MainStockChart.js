@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import StockPrice from './StockPrice';
 import StockChart from './StockChart';
 import ChartRangePicker from './ChartRangePicker';
@@ -24,6 +24,10 @@ const MainStockChart = (props) => {
 
     const [range, setRange] = useState('1D');
     const labels = ["1D", "1W", "1M", "SZN"];
+
+    useEffect(() => {
+        setRange('1D');
+    }, [props.abr])
 
     return (
         <Grid container spacing={3}>
@@ -58,7 +62,7 @@ const MainStockChart = (props) => {
                 />}
             </Grid>
             <Grid  item xs={12}>
-                <ChartRangePicker pickRange={range => setRange(labels[range])} />
+                <ChartRangePicker abr={props.abr} pickRange={range => setRange(labels[range])} />
             </Grid>
         </Grid>
     );
