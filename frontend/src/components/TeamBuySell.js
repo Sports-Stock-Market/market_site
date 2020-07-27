@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { formatNumber } from '../utils/jsUtils';
 import { connect } from 'react-redux';
 import * as NBAIcons from 'react-nba-logos';
 import { withStyles, makeStyles } from '@material-ui/core/styles';
@@ -182,7 +183,7 @@ const TeamBuySell = (props) => {
                     {label}
                 </Typography>
                 <Typography display="inline" className={classes.value} variant="subtitle1">
-                    {info}
+                    {formatNumber(info)}
                 </Typography>
             </Grid>
         )

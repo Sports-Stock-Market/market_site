@@ -1,23 +1,33 @@
 import React, { useLayoutEffect, useEffect } from "react";
 import PropTypes from "prop-types";
-import clsx from "clsx";
 
-import { lighten, makeStyles } from "@material-ui/core/styles";
+import { makeStyles } from "@material-ui/core/styles";
 import { 
-  Container, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination,
-  TableRow, TableSortLabel, Toolbar, Typography, FormControlLabel, Switch
+  Container, Table, TableBody, TableCell, TableContainer, TableHead,
+  TableRow, TableSortLabel, Typography, LinearProgress, TablePagination, Avatar
  } from "@material-ui/core";
-
 
 import { refreshToken } from '../actions/authActions';
 import { connect } from 'react-redux';
 import Cookies from 'universal-cookie';
 
-// import "bootstrap/dist/css/bootstrap.css";
+function moneyFromRank(rank) {
+    if (rank == 1) {
+        return 100;
+    } else if (rank == 2) {
+        return 50;
+    } else if (rank == 3) {
+        return 20;
+    } else if (4 <= rank <= 10) {
+        return 5;
+    } else {
+        return 0;
+    }
+}
 
 function createData(name, fans) {
-  const growth = (((fans - 1500) / 1500) * 100).toFixed(2);
-  return { name, fans, growth };
+    const growth = (((fans - 1500) / 1500) * 100).toFixed(2);
+    return { name, fans, growth };
 }
 
 function descendingComparator(a, b, orderBy) {
@@ -51,13 +61,13 @@ const headCells = [
     id: "name",
     numeric: false,
     disablePadding: true,
-    label: "Rank",
+    label: "Name",
   },
   {
     id: "rank",
     numeric: true,
     disablePadding: false,
-    label: "Name",
+    label: "Rank",
   },
   {
     id: "fans",
@@ -77,11 +87,8 @@ const headCells = [
 function EnhancedTableHead(props) {
   const {
     classes,
-    onSelectAllClick,
     order,
     orderBy,
-    numSelected,
-    rowCount,
     onRequestSort,
   } = props;
   const createSortHandler = (property) => (event) => {
@@ -95,7 +102,7 @@ function EnhancedTableHead(props) {
         {headCells.map((headCell) => (
           <TableCell
             key={headCell.id}
-            align={headCell.numeric ? "center" : "center"}
+            align={headCell.id=="name" ? "" : "right"}
             padding={headCell.disablePadding ? "none" : "default"}
             sortDirection={orderBy === headCell.id ? order : false}
           >
@@ -120,69 +127,10 @@ function EnhancedTableHead(props) {
 
 EnhancedTableHead.propTypes = {
   classes: PropTypes.object.isRequired,
-  numSelected: PropTypes.number.isRequired,
   onRequestSort: PropTypes.func.isRequired,
-  onSelectAllClick: PropTypes.func.isRequired,
   order: PropTypes.oneOf(["asc", "desc"]).isRequired,
   orderBy: PropTypes.string.isRequired,
   rowCount: PropTypes.number.isRequired,
-};
-
-const useToolbarStyles = makeStyles((theme) => ({
-  root: {
-    paddingLeft: theme.spacing(0),
-    paddingRight: theme.spacing(13),
-  },
-  highlight:
-    theme.palette.type === "light"
-      ? {
-          color: theme.palette.secondary.main,
-          backgroundColor: lighten(theme.palette.secondary.light, 0.85),
-        }
-      : {
-          color: theme.palette.text.primary,
-          backgroundColor: theme.palette.secondary.dark,
-        },
-  title: {
-    margin: theme.spacing(2, 0)
-  },
-}));
-
-const EnhancedTableToolbar = (props) => {
-  const classes = useToolbarStyles();
-  const { numSelected } = props;
-
-  return (
-    <Toolbar
-      className={clsx(classes.root, {
-        [classes.highlight]: numSelected > 0,
-      })}
-    >
-      {numSelected > 0 ? (
-        <Typography
-          className={classes.title}
-          color="inherit"
-          variant="subtitle1"
-          component="div"
-        >
-          {numSelected} selected
-        </Typography>
-      ) : (
-        <Typography
-          className={classes.title}
-          variant="h3"
-          id="tableTitle"
-          component="div"
-        >
-          Leaderboard
-        </Typography>
-      )}
-    </Toolbar>
-  );
-};
-
-EnhancedTableToolbar.propTypes = {
-  numSelected: PropTypes.number.isRequired,
 };
 
 const useStyles = makeStyles((theme) => ({
@@ -195,6 +143,25 @@ const useStyles = makeStyles((theme) => ({
   },
   table: {
     minWidth: 750,
+  },
+  title: {
+    margin: theme.spacing(2, 0)
+  },
+  userRow: {
+    backgroundColor: theme.palette.secondary.light,
+  },
+  money: {
+    fontSize: "0.7rem",
+    fontWeight: 700,
+    width: theme.spacing(5),
+    height: theme.spacing(5),
+    backgroundColor: "#000",
+  },
+  good: {
+    color: theme.palette.green.main,
+  },
+  bad: {
+    color: theme.palette.red.main,
   },
   visuallyHidden: {
     border: 0,
@@ -209,15 +176,13 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const Leaderboard = (props) => {
+const NewLeaderboard = (props) => {
   const classes = useStyles();
   const [rows, setRows] = React.useState([]);
   const [order, setOrder] = React.useState("desc");
   const [orderBy, setOrderBy] = React.useState("fans");
-  const [selected, setSelected] = React.useState([]);
   const [page, setPage] = React.useState(0);
-  const [dense, setDense] = React.useState(false);
-  const [rowsPerPage, setRowsPerPage] = React.useState(100);
+  const [rowsPerPage, setRowsPerPage] = React.useState(25);
 
   const cookies = new Cookies();
   useLayoutEffect(() => {
@@ -249,15 +214,6 @@ const Leaderboard = (props) => {
     setOrderBy(property);
   };
 
-  const handleSelectAllClick = (event) => {
-    if (event.target.checked) {
-      const newSelecteds = rows.map((n) => n.name);
-      setSelected(newSelecteds);
-      return;
-    }
-    setSelected([]);
-  };
-
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
@@ -267,80 +223,81 @@ const Leaderboard = (props) => {
     setPage(0);
   };
 
-  const handleChangeDense = (event) => {
-    setDense(event.target.checked);
-  };
-
-  const isSelected = (name) => selected.indexOf(name) !== -1;
-
   const emptyRows =
     rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage);
 
   return (
     <Container component="main" maxWidth="md">
       <div className={classes.root}>
-        <EnhancedTableToolbar numSelected={selected.length} />
+        <Typography
+          className={classes.title}
+          variant="h3"
+          id="tableTitle"
+          component="div"
+        >
+          Leaderboard
+        </Typography>
+        { rows.length == 0 ? 
+          <LinearProgress /> :
+        <>
         <TableContainer>
           <Table
             className={classes.table}
             aria-labelledby="tableTitle"
-            size={dense ? "small" : "medium"}
+            size={"medium"}
             aria-label="enhanced table"
           >
             <EnhancedTableHead
               classes={classes}
-              numSelected={selected.length}
               order={order}
               orderBy={orderBy}
-              onSelectAllClick={handleSelectAllClick}
               onRequestSort={handleRequestSort}
               rowCount={rows.length}
             />
             <TableBody>
               {stableSort(rows, getComparator(order, orderBy))
-                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((row, index) => {
-                  const isItemSelected = isSelected(row.name);
-                  const labelId = `enhanced-table-checkbox-${index}`;
-
-                  let rowColor = "";
-                  rowColor +=
-                    row.growth < 0.0
-                      ? "bg-danger"
-                      : row.growth < 0.0000001
-                      ? "table-active"
-                      : "bg-success";
-
                   return (
-                    <TableRow className={rowColor}>
-                      <TableCell></TableCell>
+                    <TableRow 
+                    hover
+                    className={row.name == props.auth.user.username ? classes.userRow : null}>
+                      <TableCell>
+                      <span>
+                        <Avatar className={classes.money}>
+                            ${moneyFromRank(index + 1)}
+                        </Avatar>
+                      </span>
+                      </TableCell>
                       <TableCell
                         component="th"
-                        id={labelId}
                         scope="row"
                         padding="none"
-                        align="center"
                       >
+                        {row.name}
+                      </TableCell>
+                      <TableCell align="right">
                         {index + 1}
                       </TableCell>
-                      <TableCell align="center">{row.name}</TableCell>
-                      <TableCell align="center">
-                        {row.fans.toFixed(2)}
+                      <TableCell align="right">${row.fans.toFixed(2)}</TableCell>
+                      <TableCell 
+                        className={row.growth >= 0 ? classes.good : classes.bad} 
+                        align="right"
+                      >
+                        {row.growth}%
                       </TableCell>
-                      <TableCell align="center">{row.growth}</TableCell>
                     </TableRow>
                   );
                 })}
-              {emptyRows > 0 && (
-                <TableRow style={{ height: (dense ? 33 : 53) * emptyRows }}>
+                {emptyRows > 0 && (
+                <TableRow style={{ height: 33 * emptyRows }}>
                   <TableCell colSpan={6} />
                 </TableRow>
-              )}
+                )}
             </TableBody>
           </Table>
         </TableContainer>
         <TablePagination
-          rowsPerPageOptions={[10000, 20000]}
+          rowsPerPageOptions={[50, 100]}
           component="div"
           count={rows.length}
           rowsPerPage={rowsPerPage}
@@ -348,10 +305,8 @@ const Leaderboard = (props) => {
           onChangePage={handleChangePage}
           onChangeRowsPerPage={handleChangeRowsPerPage}
         />
-        <FormControlLabel
-          control={<Switch checked={dense} onChange={handleChangeDense} />}
-          label="Dense padding"
-        />
+        </>
+        }
       </div>
     </Container>
   );
@@ -359,8 +314,9 @@ const Leaderboard = (props) => {
 
 const mapStateToProps = (state) => {
   return {
-    auth: state.auth
+    auth: state.auth,
+    teams: state.teams
   };
 }
 
-export default connect(mapStateToProps, { refreshToken })(Leaderboard);
+export default connect(mapStateToProps, { refreshToken })(NewLeaderboard);

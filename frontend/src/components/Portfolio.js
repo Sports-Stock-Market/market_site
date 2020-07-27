@@ -29,7 +29,7 @@ const Portfolio = (props) => {
 
     const classes = useStyles();
     const [avFunds, setAvFunds] = useState(0.0);
-    const [holdings, setHoldings] = useState([]);
+    const [holdings, setHoldings] = useState(null);
     const [data, setData] = useState(sample);
 
     const username = window.location.pathname.slice(11);

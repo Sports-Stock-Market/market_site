@@ -1,4 +1,5 @@
 import React from 'react';
+import { formatNumber } from '../utils/jsUtils';
 
 // Material-UI Components
 import { makeStyles } from '@material-ui/core/styles';
@@ -23,10 +24,10 @@ const StockPrice = (props) => {
     return (
         <>
         <Typography className={props.big ? classes.bigHeader : null} variant="h5">
-            ${props.price.toFixed(2)}
+            ${formatNumber(props.price.toFixed(2))}
         </Typography>
         <Typography className={props.big ? classes.bigSubtitle : null} variant="subtitle2">
-            {sign}${Math.abs(props.change).toFixed(2)} ({sign}{Math.abs(props.pct_change).toFixed(2)}%) 
+            {sign}${formatNumber(Math.abs(props.change).toFixed(2))} ({sign}{Math.abs(props.pct_change).toFixed(2)}%) 
         </Typography>
         </>
     );
