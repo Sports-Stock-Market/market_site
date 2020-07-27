@@ -2,7 +2,7 @@ from requests import get
 from nba_api.stats.static import teams
 from fanbasemarket.pricing.nba_data import liveGame, mov_multiplier
 from fanbasemarket.queries.team import update_teamPrice, set_teamPrice
-from fanbasemarket.models import Team, Teamprice
+from fanbasemarket.models import Team, Teamprice, Purchase
 from datetime import datetime
 from pytz import timezone
 
