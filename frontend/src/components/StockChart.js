@@ -28,13 +28,11 @@ const StockTooltip = (props) => {
 
 const StockChart = (props) => {
 
-    console.log(props.data);
-
     return (
     <ResponsiveContainer width={props.width} height={props.height}>
         <LineChart data={props.data}>
             <XAxis dataKey="date" hide />
-            <YAxis type="number" domain={[0.8 * 'datamin', 1.2 * 'datamax']} hide />
+            <YAxis type="number" domain={['dataMin - 100', 'dataMax + 100']} hide />
             <Tooltip 
                 position={props.big ? { y: -20 } : { y: -15 }}
                 offset={props.big ? -45 : -20}
@@ -47,7 +45,7 @@ const StockChart = (props) => {
                 dataKey="price"
                 label={(entry) => entry.date}
                 isAnimationActive={false}
-                animationDuration={800} 
+                animationDuration={600} 
                 unit="$"
                 stroke={props.color}
                 strokeWidth={props.strokeWidth}

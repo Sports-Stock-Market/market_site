@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { formatNumber } from '../utils/jsUtils';
 import * as NBAIcons from 'react-nba-logos';
 import { makeStyles } from '@material-ui/core/styles';
 import { 
@@ -54,7 +55,7 @@ const PositionCard = (props) => {
                     {label}
                 </Typography>
                 <Typography display="inline" className={classes.value} variant="subtitle1">
-                    {info}
+                    {formatNumber(info)}
                 </Typography>
             </Grid>
         )

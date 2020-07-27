@@ -28,7 +28,9 @@ const TeamCardContainer = (props) => {
     });
 
     const Contents = () => {
-        if (isEmpty(props.holdings)) {
+        if (props.holdings === null) {
+            return null;
+        } else if (isEmpty(props.holdings)) {
             return (
                 <>
                 <Grid item xs={12}>
