@@ -46,6 +46,12 @@ def gen_usrPg():
         all_purchases = get_active_holdings(uid, db, date=date)
         payload = {'available_funds': user_obj.available_funds}
         payload['holdings'] = all_purchases
+        total = user_obj.available_funds
+        for abr, item in all_purchases.items():
+            for p in item:
+                t = Team.query.filter(Team.abr == abr).first()
+                total += p['num_shares'] * t.price
+        payload['total_assets'] = total
         payload['graphData'] = get_user_graph_points(uid, db)
         return ok(payload)
 

@@ -31,6 +31,7 @@ const Portfolio = (props) => {
     const [avFunds, setAvFunds] = useState(0.0);
     const [holdings, setHoldings] = useState(null);
     const [data, setData] = useState(sample);
+    const [totalAssets, setTotalAssets] = useState(0.0);
 
     const username = window.location.pathname.slice(11);
     const requestOpts = {
@@ -45,14 +46,14 @@ const Portfolio = (props) => {
                 setAvFunds(data_['available_funds']);
                 setHoldings(data_['holdings']);
                 setData(data_['graphData']);
+                setTotalAssets(data_['total_assets']);
             })
         );
     }
 
-    let last = data['1D'][data['1D'].length - 1]['price'];
     let sndLast = data['1D'][data['1D'].length - 2]['price'];
-    let delta = last - sndLast;
-    let pctInc = (last / sndLast) - 1;
+    let delta = totalAssets - sndLast;
+    let pctInc = (totalAssets / sndLast) - 1;
 
     useEffect(() => {
         getUsrData();
@@ -65,7 +66,7 @@ const Portfolio = (props) => {
             </Typography>
             <Grid className={classes.main} container spacing={4}>
                 <Grid item xs={12}>
-                    <MainStockChart last={last} delta={delta} pctInc={pctInc} chartData={data} />
+                    <MainStockChart last={totalAssets} delta={delta} pctInc={pctInc} chartData={data} />
                 </Grid>
                 <Divider />
                 <Grid item xs={12}>
