@@ -1,12 +1,14 @@
 from datetime import datetime, timedelta
 from json import dumps
-
+from functools import reduce
 from sqlalchemy import and_, not_
+from pytz import timezone
 
 from fanbasemarket.queries.utils import get_graph_x_values
 from fanbasemarket.queries.team import update_teamPrice
 from fanbasemarket.models import Purchase, User, Team
 
+EST = timezone('US/Eastern')
 
 def get_active_holdings(uid, db, date=None):
     if not date:
@@ -90,7 +92,7 @@ def buy_shares(usr, abr, num_shares, db):
     price = num_shares * team.price * 1.005
     if usr.available_funds < price:
         raise ValueError('not enough funds')
-    now = datetime.utcnow()
+    now = EST.localize(datetime.utcnow())
     purchase = Purchase(team_id=team.id, user_id=usr.id, purchased_at=now,
                         purchased_for=team.price * 1.005, amt_shares=num_shares)
     db.session.add(purchase)
@@ -99,4 +101,32 @@ def buy_shares(usr, abr, num_shares, db):
     usr.available_funds -= price
     loc = db.session.merge(usr)
     db.session.add(loc)
+    db.session.commit()
+
+def sell_shares(usr, abr, num_shares, db):
+    team = Team.query.filter(Team.abr == abr).first()
+    price = num_shares * team.price * 0.995
+    all_holdings = Purchase.query.filter(Purchase.user_id == usr.id).filter(Purchase.team_id == team.id).all()
+    total_shares = reduce(lambda x, p: x + p.amt_shares, all_holdings, 0)
+    if num_shares > total_shares:
+        raise ValueError('not enough shares owned')
+    now = EST.localize(datetime.utcnow())
+    all_holdings.sort(key=lambda p: p.amt_shares, reverse=True)
+    left_to_delete = num_shares
+    ix = 0
+    while left_to_delete > 0:
+        p = all_holdings[ix]
+        to_del = min(p.amt_shares, left_to_delete)
+        if to_del == p.amt_shares:
+            p.exists = False
+            p.sold_at = now
+            p.sold_for = team.price * .995
+        else:
+            p.amt_shares -= to_del
+        loc = db.session.merge(p)
+        db.session.add(loc)
+        db.session.commit()
+    usr.available_funds += price
+    loc_u = db.session.merge(usr)
+    db.session.add(loc_u)
     db.session.commit()
