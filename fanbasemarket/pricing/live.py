@@ -4,6 +4,7 @@ from fanbasemarket.pricing.nba_data import liveGame, mov_multiplier
 from fanbasemarket.queries.team import update_teamPrice, set_teamPrice
 from fanbasemarket.models import Team, Teamprice, Purchase
 from datetime import datetime
+from dateutil import parser
 from pytz import timezone
 
 EST = timezone('US/Eastern')
@@ -21,7 +22,7 @@ def bigboy_pulls_only(db):
     ret = []
     for game in games:
         l = {}
-        l['start'] = EST.localize(game['startTimeUTC'])
+        l['start'] = str(parser.parse(game['startTimeUTC']).astimezone(EST))
         l['is_on'] = game['isGameActivated']
         l['arena'] = game['arena']['name']
         ht, vt = game['hTeam'], game['vTeam']
@@ -89,11 +90,12 @@ def bigboy_pulls_only(db):
         ss_during_game = Purchase.query.\
             filter(Purchase.exists == False).\
             filter(Purchase.sold_at <= today).\
-            filter(Purchase.sold_at >= i['start']).\
+            filter(Purchase.sold_at >= i['start'])
         home_ss = len(ss_during_game.filter(Purchase.team_id == home_tObj.id).all())
         away_ss = len(ss_during_game.filter(Purchase.team_id == away_tObj.id).all())
-        new_homeElo *= (1.005 * (home_ps - home_ss))
-        new_awayElo *= (1.005 * (away_ps - away_ss))
+        print(home_ps, home_ss)
+        new_homeElo *= (1.005 ** (home_ps - home_ss))
+        new_awayElo *= (1.005 ** (away_ps - away_ss))
         set_teamPrice(home_tObj, new_homeElo, today, db)
         results.append({home_abv: {'date': str(today), 'price': new_homeElo}})
         set_teamPrice(away_tObj, new_awayElo, today, db)

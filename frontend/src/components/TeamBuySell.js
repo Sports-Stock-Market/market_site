@@ -89,6 +89,7 @@ const TeamBuySell = (props) => {
     const [data, setData] = useState(defaultData);
     const [labels, setLabels] = useState(buyLabels);
     const [open, setOpen] = useState(false);
+    const [msg, setMsg] = useState("");
     const spreadPCT = 0.005;
 
     const Logo = NBAIcons[props.abr];
@@ -139,13 +140,16 @@ const TeamBuySell = (props) => {
     }, [shares]);
 
     const handleTrade = () => {
-        let type;
+        let type, forSnack;
         if (value == 0) {
             type = "buyShares";
+            forSnack = "purchased";
         } else if (value == 1) {
             type = "sellShares";
+            forSnack = "sold";
         } else {
             type = "shortShares";
+            forSnack = "shorted";
         }
         const token = props.auth.user.access_token;
         const tradeInfo = {
@@ -160,6 +164,7 @@ const TeamBuySell = (props) => {
         };
         fetch(`http://localhost:5000/api/users/${type}`, requestOpts).then(res => {
             res.json().then(response => {
+                setMsg(forSnack);
                 setOpen(true);
             }); 
         });
@@ -245,7 +250,7 @@ const TeamBuySell = (props) => {
                         </IconButton>
                     } 
                     severity="success">
-                    You successfully purchased {shares} {shares == 1 ? "share": "shares"} of {props.abr}
+                    You successfully {msg} {shares} {shares == 1 ? "share": "shares"} of {props.abr}
                     </Alert>
                 </Snackbar>
             </Grid>

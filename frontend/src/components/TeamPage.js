@@ -28,10 +28,28 @@ const TeamPage = (props) => {
     const sample = getSampleData(0);
     const [price, setPrice] = useState(0);
     const [data, setData] = useState(sample);
+    const [position, setPosition] = useState({});
     const [abr, setAbr] = useState("");
+
+    // useEffect(() => {
+    //     if (abr) {
+    //         const token = props.auth.user.access_token;
+    //         const requestOpts = {
+    //             method: 'GET',
+    //             headers: {'Content-type': 'application/JSON', 'Authorization': 'Bearer ' + token, 'Abr': abr},
+    //             credentials: 'include'
+    //         };
+    //         fetch(`http://localhost:5000/api/teams/position`, requestOpts).then(res => {
+    //             res.json().then(response => {
+    //                 setPosition(response);
+    //             }); 
+    //         });
+    //     }
+    // }, [abr])
 
     useEffect(() => {
         setAbr(props.match.params.abr.toUpperCase());
+
         if (!isEmpty(props.teams.teams) && abr !== '') {
             setData(props.teams.teams[abr]['graph']);
             setPrice(props.teams.teams[abr]['price']['price']);
@@ -64,7 +82,7 @@ const TeamPage = (props) => {
                         </Typography>
                         {price == 0 ? 
                         <Skeleton variant="rect" height={154} /> :
-                        <PositionCard />
+                        <PositionCard data={position}/>
                         }
                     </Grid>
                     <Grid item md={6} sm={10}>
