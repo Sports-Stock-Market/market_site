@@ -135,3 +135,11 @@ class BlacklistedToken(db.Model):
     __tablename__ = 'blacklistedtoken'
     id = db.Column(db.Integer, primary_key=True)
     jwt = db.Column(db.String(100))
+
+class Sale(db.Model):
+    __tablename__ = 'sale'
+    id = db.Column(db.Integer, primary_key=True)
+    team_id = db.Column(db.Integer, db.ForeignKey('team.id'))
+    date = db.Column(db.DateTime)
+    amt_sold = db.Column(db.Integer)
+

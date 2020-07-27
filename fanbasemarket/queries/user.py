@@ -6,7 +6,7 @@ from pytz import timezone
 
 from fanbasemarket.queries.utils import get_graph_x_values
 from fanbasemarket.queries.team import update_teamPrice
-from fanbasemarket.models import Purchase, User, Team
+from fanbasemarket.models import Purchase, User, Team, Sale
 
 EST = timezone('US/Eastern')
 
@@ -105,7 +105,7 @@ def buy_shares(usr, abr, num_shares, db):
 
 def sell_shares(usr, abr, num_shares, db):
     team = Team.query.filter(Team.abr == abr).first()
-    price = num_shares * team.price * 0.995
+    price = num_shares * team.price * 0.9999
     all_holdings = Purchase.query.filter(Purchase.user_id == usr.id).filter(Purchase.team_id == team.id).filter(Purchase.exists == True).all()
     total_shares = reduce(lambda x, p: x + p.amt_shares, all_holdings, 0)
     if num_shares > total_shares:
@@ -120,7 +120,7 @@ def sell_shares(usr, abr, num_shares, db):
         if to_del == p.amt_shares:
             p.exists = False
             p.sold_at = now
-            p.sold_for = team.price * .995
+            p.sold_for = team.price * .9999
         else:
             p.amt_shares -= to_del
         loc = db.session.merge(p)
@@ -131,4 +131,7 @@ def sell_shares(usr, abr, num_shares, db):
     usr.available_funds += price
     loc_u = db.session.merge(usr)
     db.session.add(loc_u)
+    db.session.commit()
+    new_sale = Sale(team_id=team.id, date=now, amt_sold=num_shares)
+    db.session.add(new_sale)
     db.session.commit()

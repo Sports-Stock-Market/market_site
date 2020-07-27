@@ -2,7 +2,7 @@ from requests import get
 from nba_api.stats.static import teams
 from fanbasemarket.pricing.nba_data import liveGame, mov_multiplier
 from fanbasemarket.queries.team import update_teamPrice, set_teamPrice
-from fanbasemarket.models import Team, Teamprice, Purchase
+from fanbasemarket.models import Team, Teamprice, Purchase, Sale
 from datetime import datetime
 from dateutil import parser
 from pytz import timezone
@@ -87,12 +87,11 @@ def bigboy_pulls_only(db):
         ps_during_game = Purchase.query.filter(Purchase.purchased_at <= today).filter(Purchase.purchased_at >= i['start'])
         home_ps = len(ps_during_game.filter(Purchase.team_id == home_tObj.id).all())
         away_ps = len(ps_during_game.filter(Purchase.team_id == away_tObj.id).all())
-        ss_during_game = Purchase.query.\
-            filter(Purchase.exists == False).\
-            filter(Purchase.sold_at <= today).\
-            filter(Purchase.sold_at >= i['start'])
-        home_ss = len(ss_during_game.filter(Purchase.team_id == home_tObj.id).all())
-        away_ss = len(ss_during_game.filter(Purchase.team_id == away_tObj.id).all())
+        ss_during_game = Sale.query.\
+            filter(Sale.date <= today).\
+            filter(Sale.date >= i['start'])
+        home_ss = len(ss_during_game.filter(Sale.team_id == home_tObj.id).all())
+        away_ss = len(ss_during_game.filter(Sale.team_id == away_tObj.id).all())
         print(home_ps, home_ss)
         new_homeElo *= (1.005 ** (home_ps - home_ss))
         new_awayElo *= (1.005 ** (away_ps - away_ss))
