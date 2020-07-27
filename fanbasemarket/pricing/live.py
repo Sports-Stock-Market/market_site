@@ -10,7 +10,7 @@ generate_url = lambda s: f'http://data.nba.net/10s/prod/v1/{s}/scoreboard.json'
 def bigboy_pulls_only(db):
     k = 45
     h = 80
-    today = datetime.utcnow()
+    today = datetime.now()
     url = generate_url(today.strftime('%Y%m%d'))
     games = get(url).json()['games']
     nba_teams = teams.get_teams()
