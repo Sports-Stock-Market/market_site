@@ -1,7 +1,7 @@
 from flask import Blueprint, request
 from flask_cors import CORS, cross_origin
 from fanbasemarket import app, get_db
-from fanbasemarket.models import Team
+from fanbasemarket.models import Team, User
 from fanbasemarket.routes.utils import ok, bad_request
 from fanbasemarket.queries.team import get_team_graph_points, get_user_position
 from flask_jwt_extended import jwt_required, get_jwt_identity
@@ -46,9 +46,9 @@ def names():
 @jwt_required
 def get_pos():
     uname = get_jwt_identity()
-    js = request.get_json()
+    js = request.headers
     with app.app_context():
         db = get_db()
-        usr = User.query.filter(User.username == uname)
-        tm = Team.query.filter(Team.abr == js['abr'])
+        usr = User.query.filter(User.username == uname).first()
+        tm = Team.query.filter(Team.abr == js['Abr']).first()
         return ok(get_user_position(tm, usr, db))

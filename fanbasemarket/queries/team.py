@@ -5,7 +5,6 @@ from sqlalchemy import desc
 from sqlalchemy.ext.declarative import declarative_base
 from fanbasemarket.models import Teamprice, Player, Purchase
 from fanbasemarket.queries.utils import get_graph_x_values
-from fanbasemarket.queries.user import get_active_holdings
 
 def get_price(tid, db, date=None):
     if not date:
@@ -60,6 +59,8 @@ def active_player_rating(team, db):
         filter(Player.is_injured == False).\
             all()
     return sum([player.rating * player.mpg for player in active_ps])
+
+from fanbasemarket.queries.user import get_active_holdings
 
 def get_user_position(team, user, db):
     holdings = Purchase.query.\

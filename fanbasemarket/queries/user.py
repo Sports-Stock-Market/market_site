@@ -106,7 +106,7 @@ def buy_shares(usr, abr, num_shares, db):
 def sell_shares(usr, abr, num_shares, db):
     team = Team.query.filter(Team.abr == abr).first()
     price = num_shares * team.price * 0.995
-    all_holdings = Purchase.query.filter(Purchase.user_id == usr.id).filter(Purchase.team_id == team.id).all()
+    all_holdings = Purchase.query.filter(Purchase.user_id == usr.id).filter(Purchase.team_id == team.id).filter(Purchase.exists == True).all()
     total_shares = reduce(lambda x, p: x + p.amt_shares, all_holdings, 0)
     if num_shares > total_shares:
         raise ValueError('not enough shares owned')
@@ -126,6 +126,8 @@ def sell_shares(usr, abr, num_shares, db):
         loc = db.session.merge(p)
         db.session.add(loc)
         db.session.commit()
+        left_to_delete -= to_del
+        ix += 1
     usr.available_funds += price
     loc_u = db.session.merge(usr)
     db.session.add(loc_u)
