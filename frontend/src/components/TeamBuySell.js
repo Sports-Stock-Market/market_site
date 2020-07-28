@@ -3,6 +3,7 @@ import { formatNumber } from '../utils/jsUtils';
 import { connect } from 'react-redux';
 import * as NBAIcons from 'react-nba-logos';
 import { withStyles, makeStyles } from '@material-ui/core/styles';
+import { updatePrices } from '../actions/teamActions';
 import { 
     Typography, Grid, Card, TextField, Tabs, Tab, Button, Snackbar, IconButton
 } from '@material-ui/core';
@@ -176,8 +177,14 @@ const TeamBuySell = (props) => {
                         avFunds: props.funds,
                         remFunds: props.funds + (change),
                     });
+                    const newp = props.price * multiplier;
+                    const est = new Date().toLocaleString('en-US', {timeZone: 'America/New_York'});
+                    const to_upd = {}
+                    to_upd[props.abr] = {'date': new Date(est).toISOString(), 'price': newp};
+                    props.updatePrices([to_upd]);
                 }); 
             });
+            
         }
     };
 
@@ -276,4 +283,4 @@ const mapStateToProps = (state) => {
     };
 }
 
-export default connect(mapStateToProps, {})(TeamBuySell);
+export default connect(mapStateToProps, { updatePrices })(TeamBuySell);
