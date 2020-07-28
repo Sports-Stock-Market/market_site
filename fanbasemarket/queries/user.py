@@ -104,7 +104,7 @@ def buy_shares(usr, abr, num_shares, db):
 
 def sell_shares(usr, abr, num_shares, db):
     team = Team.query.filter(Team.abr == abr).first()
-    price = num_shares * team.price * 0.9999
+    price = num_shares * team.price * 0.995
     all_holdings = Purchase.query.filter(Purchase.user_id == usr.id).filter(Purchase.team_id == team.id).filter(Purchase.exists == True).all()
     total_shares = reduce(lambda x, p: x + p.amt_shares, all_holdings, 0)
     if num_shares > total_shares:
@@ -119,7 +119,7 @@ def sell_shares(usr, abr, num_shares, db):
         if to_del == p.amt_shares:
             p.exists = False
             p.sold_at = now
-            p.sold_for = team.price * .9999
+            p.sold_for = team.price * .995
         else:
             p.amt_shares -= to_del
         loc = db.session.merge(p)
