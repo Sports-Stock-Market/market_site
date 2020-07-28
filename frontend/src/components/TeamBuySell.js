@@ -72,7 +72,7 @@ const buyLabels = {
     price: "Buy Price",
     total: "Total Cost",
     avFunds: "Available Funds",
-    remFunds: "Remaining Funds"
+    remFunds: "After Trade"
 }
 
 const TeamBuySell = (props) => {
@@ -86,6 +86,7 @@ const TeamBuySell = (props) => {
     const classes = useStyles();
     const [value, setValue] = useState(0);
     const [shares, setShares] = useState(1);
+    const [lastShares, setLastShares] = useState(0);
     const [data, setData] = useState(defaultData);
     const [labels, setLabels] = useState(buyLabels);
     const [open, setOpen] = useState(false);
@@ -94,80 +95,90 @@ const TeamBuySell = (props) => {
 
     const Logo = NBAIcons[props.abr];
 
-    useEffect(() => {
-        setShares(1);
-        setValue(0);
-        const multiplier = (1 + spreadPCT);
+    const setAllData = () => {
+        const multiplier = value == 0 ? (1 + spreadPCT) : (1 - spreadPCT);
+        const change = value == 1 ? props.price * multiplier * shares : -props.price * multiplier * shares;
         setData({...data, 
-            price: props.price * multiplier, 
-            total: props.price * multiplier * shares,
-            remFunds: data.avFunds - (props.price * multiplier * shares),
+            price: props.price * multiplier,
+            total: Math.abs(change),
+            avFunds: props.funds,
+            remFunds: props.funds + (change),
         });
-    }, [props.price]);
+    }
 
     useEffect(() => {
-        setShares(1);
+        setValue(0);
+        setShares(0);
+        setOpen(false);
+    }, [props.abr])
+
+    useEffect(() => {
+        setAllData();
+    }, [props.funds])
+
+    useEffect(() => {
+        setAllData();
+    }, [props.price, shares]);
+
+    useEffect(() => {
+        setShares(0);
         if (value == 0) {
             setLabels(buyLabels);
         } else if (value == 1) {
             setLabels({...labels,
                 price: "Sell Price",
                 total: "Total Credit",
-                remFunds: "New Funds"
+                remFunds: "After Trade"
             });
         } else {
             setLabels({...labels,
                 price: "Short Price",
             });
         }
-        const multiplier = value == 0 ? (1 + spreadPCT) : (1 - spreadPCT);
-        const change = value == 1 ? props.price * multiplier * shares : -props.price * multiplier * shares;
-        setData({...data, 
-            price: props.price * multiplier,
-            total: Math.abs(change),
-            remFunds: data.avFunds + (change),
-        });
+        setAllData();
     }, [value]);
 
-    useEffect(() => {
-        const multiplier = value == 0 ? (1 + spreadPCT) : (1 - spreadPCT);
-        const change = value == 1 ? props.price * multiplier * shares : -props.price * multiplier * shares;
-        setData({...data, 
-            price: props.price * multiplier,
-            total: Math.abs(change),
-            remFunds: data.avFunds + (change),
-        });
-    }, [shares]);
-
     const handleTrade = () => {
-        let type, forSnack;
-        if (value == 0) {
-            type = "buyShares";
-            forSnack = "purchased";
-        } else if (value == 1) {
-            type = "sellShares";
-            forSnack = "sold";
-        } else {
-            type = "shortShares";
-            forSnack = "shorted";
+        if (shares > 0) {
+            let type, forSnack;
+            if (value == 0) {
+                type = "buyShares";
+                forSnack = "purchased";
+            } else if (value == 1) {
+                type = "sellShares";
+                forSnack = "sold";
+            } else {
+                type = "shortShares";
+                forSnack = "shorted";
+            }
+            const token = props.auth.user.access_token;
+            const tradeInfo = {
+                abr: props.abr,
+                num_shares: shares,
+            };
+            const requestOpts = {
+                method: 'POST',
+                headers: {'Content-type': 'application/JSON', 'Authorization': 'Bearer ' + token},
+                body: JSON.stringify(tradeInfo),
+                credentials: 'include'
+            };
+            fetch(`http://localhost:5000/api/users/${type}`, requestOpts).then(res => {
+                res.json().then(response => {
+                    setMsg(forSnack);
+                    setLastShares(shares)
+                    setOpen(true);
+                    setShares(0);
+                    props.updatePosition();
+                    props.updateFunds();
+                    const multiplier = value == 0 ? (1 + spreadPCT) : (1 - spreadPCT);
+                    const change = value == 1 ? props.price * multiplier * shares : -props.price * multiplier * shares;
+                    setData({...data, 
+                        avFunds: props.funds,
+                        remFunds: props.funds + (change),
+                    });
+                }); 
+            });
         }
-        const token = props.auth.user.access_token;
-        const tradeInfo = {
-            abr: props.abr,
-            num_shares: shares,
-        };
-        const requestOpts = {
-            method: 'POST',
-            headers: {'Content-type': 'application/JSON', 'Authorization': 'Bearer ' + token},
-            body: JSON.stringify(tradeInfo),
-            credentials: 'include'
-        };
-        fetch(`http://localhost:5000/api/users/${type}`, requestOpts).then(res => {
-            res.json().then(response => {
-                setMsg(forSnack);
-                setOpen(true);
-            }); 
-        });
     };
 
     const handleTabChange = (e, newValue) => {
@@ -175,8 +186,9 @@ const TeamBuySell = (props) => {
     };
 
     const handleFieldChange = e => {
-        if (!(e.target.value <= 0 || 
-            (value != 1 && e.target.value * data.price >= data.avFunds))) {
+        if (!(e.target.value < 0 || 
+            (value != 1 && e.target.value * data.price >= data.avFunds) ||
+            (value == 1 && e.target.value > props.avShares))) {
             setShares(e.target.value);
         }
     };
@@ -188,7 +200,7 @@ const TeamBuySell = (props) => {
                     {label}
                 </Typography>
                 <Typography display="inline" className={classes.value} variant="subtitle1">
-                    {formatNumber(info)}
+                    ${formatNumber(info)}
                 </Typography>
             </Grid>
         )
@@ -235,7 +247,7 @@ const TeamBuySell = (props) => {
                 >
                     Submit
                 </Button>
-                <Snackbar open={open}>
+                <Snackbar autoHideDuration={5000} onClose={() => setOpen(false)} open={open}>
                     <Alert 
                     action={
                         <IconButton
@@ -250,7 +262,7 @@ const TeamBuySell = (props) => {
                         </IconButton>
                     } 
                     severity="success">
-                    You successfully {msg} {shares} {shares == 1 ? "share": "shares"} of {props.abr}
+                    You successfully {msg} {lastShares} {lastShares == 1 ? "share": "shares"} of {props.abr}
                     </Alert>
                 </Snackbar>
             </Grid>

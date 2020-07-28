@@ -1,11 +1,14 @@
 from datetime import datetime, timedelta
+from pytz import timezone
+
+EST = timezone('US/Eastern')
 
 def get_graph_x_values():
-    now = datetime.utcnow()
-    beginning_of_day = datetime(now.year, now.month, now.day)
+    now = datetime.now(EST)
+    beginning_of_day = EST.localize(datetime(now.year, now.month, now.day))
     week_ago = beginning_of_day - timedelta(weeks=1)
     month_ago = beginning_of_day - timedelta(weeks=4)
-    beginning_of_szn = datetime(2019, 10, 23)
+    beginning_of_szn = EST.localize(datetime(2019, 10, 23))
     x_values = {
         '1D': [],
         '1W': [],

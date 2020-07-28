@@ -12,11 +12,10 @@ EST = timezone('US/Eastern')
 
 def get_active_holdings(uid, db, date=None):
     if not date:
-        date = datetime.utcnow().strftime('%Y-%m-%d')
-    results = db.session.query(Purchase).\
+        date = str(datetime.now(EST))
+    results = Purchase.query.\
         filter(Purchase.user_id == uid).\
-        filter(Purchase.exists).\
-        filter(Purchase.purchased_at <= date).\
+        filter(Purchase.exists == True).\
         all()
     holdings = {}
     for result in results:
@@ -64,7 +63,7 @@ def get_assets_in_date_range(uid, previous_balance, end, db, start=None):
     return last_date, total
 
 def get_current_usr_value(uid, db):
-    now = str(datetime.utcnow())
+    now = str(datetime.now(EST))
     _, t = get_assets_in_date_range(uid, 1500, now, db)
     return t
 
@@ -92,12 +91,12 @@ def buy_shares(usr, abr, num_shares, db):
     price = num_shares * team.price * 1.005
     if usr.available_funds < price:
         raise ValueError('not enough funds')
-    now = EST.localize(datetime.utcnow())
+    now = datetime.now(EST)
     purchase = Purchase(team_id=team.id, user_id=usr.id, purchased_at=now,
                         purchased_for=team.price * 1.005, amt_shares=num_shares)
     db.session.add(purchase)
     db.session.commit()
-    update_teamPrice(team, (team.price * .005), datetime.utcnow() , db)
+    update_teamPrice(team, (team.price * .005), now , db)
     usr.available_funds -= price
     loc = db.session.merge(usr)
     db.session.add(loc)
@@ -110,7 +109,7 @@ def sell_shares(usr, abr, num_shares, db):
     total_shares = reduce(lambda x, p: x + p.amt_shares, all_holdings, 0)
     if num_shares > total_shares:
         raise ValueError('not enough shares owned')
-    now = EST.localize(datetime.utcnow())
+    now = datetime.now(EST)
     all_holdings.sort(key=lambda p: p.amt_shares, reverse=True)
     left_to_delete = num_shares
     ix = 0
