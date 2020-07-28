@@ -12,6 +12,8 @@ import {
     Grid, Typography, Container, Divider,
 } from '@material-ui/core';
 import Skeleton from '@material-ui/lab/Skeleton';
+import Cookies from 'universal-cookie';
+import { refreshToken } from '../actions/authActions';
 
 const useStyles = makeStyles((theme) => ({
     title: {
@@ -48,6 +50,7 @@ const TeamPage = (props) => {
     }
 
     const getFunds = () => {
+        const cookies = new Cookies();
         const token = props.auth.user.access_token;
         const requestOpts = {
             method: 'GET',
@@ -55,12 +58,16 @@ const TeamPage = (props) => {
             credentials: 'include'
         };
         fetch("http://localhost:5000/api/users/availableFunds", requestOpts).then(res => {
-            if (res.status == '422') {
-                console.log("Rip");
+            if (res.status == '401') {
+                props.refreshToken(cookies.get('csrf_refresh_token'));
+                getFunds();
+            } else {
+                if (res.status != '422') {
+                    res.json().then(response => {
+                        setFunds(response.available_funds);
+                    });
+                }
             }
-            res.json().then(response => {
-                setFunds(response.available_funds);
-            }); 
         });
     };
 
@@ -143,4 +150,4 @@ const mapStateToProps = (state) => {
     };
 }
 
-export default connect(mapStateToProps, {})(TeamPage);
+export default connect(mapStateToProps, { refreshToken })(TeamPage);

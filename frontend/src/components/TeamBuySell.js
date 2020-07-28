@@ -151,24 +151,26 @@ const TeamBuySell = (props) => {
             credentials: 'include'
         };
         fetch(`http://localhost:5000/api/users/${type}`, requestOpts).then(res => {
-            if (res.status == 422) {
+            if (res.status == '401') {
                 props.refreshToken(cookies.get('csrf_refresh_token'));
                 do_setting(type, tradeInfo, forSnack);
             } else {
-                res.json().then(response => {
-                    setMsg(forSnack);
-                    setLastShares(shares)
-                    setOpen(true);
-                    setShares(0);
-                    props.updatePosition();
-                    props.updateFunds();
-                    const multiplier = value == 0 ? (1 + spreadPCT) : (1 - spreadPCT);
-                    const change = value == 1 ? props.price * multiplier * shares : -props.price * multiplier * shares;
-                    setData({...data, 
-                        avFunds: props.funds,
-                        remFunds: props.funds + (change),
+                if (res.status != '422') {
+                    res.json().then(response => {
+                        setMsg(forSnack);
+                        setLastShares(shares)
+                        setOpen(true);
+                        setShares(0);
+                        props.updatePosition();
+                        props.updateFunds();
+                        const multiplier = value == 0 ? (1 + spreadPCT) : (1 - spreadPCT);
+                        const change = value == 1 ? props.price * multiplier * shares : -props.price * multiplier * shares;
+                        setData({...data, 
+                            avFunds: props.funds,
+                            remFunds: props.funds + (change),
+                        });
                     });
-                });
+                }
             }
         });
     }
