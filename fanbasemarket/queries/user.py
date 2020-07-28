@@ -3,20 +3,20 @@ from json import dumps
 from functools import reduce
 from sqlalchemy import and_, not_
 from pytz import timezone
+from flask_socketio import emit
 
 from fanbasemarket.queries.utils import get_graph_x_values
 from fanbasemarket.queries.team import update_teamPrice
-from fanbasemarket.models import Purchase, User, Team, Sale
+from fanbasemarket.models import Purchase, User, Team, Sale, PurchaseTransaction
 
 EST = timezone('US/Eastern')
 
 def get_active_holdings(uid, db, date=None):
     if not date:
-        date = datetime.utcnow().strftime('%Y-%m-%d')
-    results = db.session.query(Purchase).\
+        date = str(datetime.now(EST))
+    results = Purchase.query.\
         filter(Purchase.user_id == uid).\
-        filter(Purchase.exists).\
-        filter(Purchase.purchased_at <= date).\
+        filter(Purchase.exists == True).\
         all()
     holdings = {}
     for result in results:
@@ -34,37 +34,37 @@ def get_active_holdings(uid, db, date=None):
 
 def get_assets_in_date_range(uid, previous_balance, end, db, start=None):
     if start is None:
-        previous_purchases = db.session.query(Purchase).\
-            filter(Purchase.user_id == uid).\
-            filter(Purchase.purchased_at <= end).all()
-        previous_sales = db.session.query(Purchase).\
-            filter(Purchase.user_id == uid).\
-            filter(not_(Purchase.sold_at == None)).\
-            filter(Purchase.sold_at <= end).all()
+        previous_purchases = PurchaseTransaction.query.\
+            filter(PurchaseTransaction.user_id == uid).\
+            filter(PurchaseTransaction.date <= end).all()
+        previous_sales = Sale.query.\
+            filter(Sale.user_id == uid).\
+            filter(Sale.date <= end).all()
     else:
-        previous_purchases = db.session.query(Purchase). \
-            filter(Purchase.user_id == uid).\
-            filter(and_(Purchase.purchased_at <= end, Purchase.purchased_at > start)).all()
-        previous_sales = db.session.query(Purchase).\
-            filter(Purchase.user_id == uid).\
-            filter(not_(Purchase.sold_at == None)).\
-            filter(and_(Purchase.sold_at <= end, Purchase.sold_at > start)).all()
+        previous_purchases = PurchaseTransaction.query.\
+            filter(PurchaseTransaction.user_id == uid).\
+            filter(PurchaseTransaction.date <= end).\
+            filter(PurchaseTransaction.date > start).all()
+        previous_sales = Sale.query.\
+            filter(Sale.user_id == uid).\
+            filter(Sale.date <= end).\
+            filter(Sale.date > start).all()
     total = previous_balance
     if not previous_purchases:
         return end, total
-    last_date = previous_purchases[0].purchased_at
+    last_date = previous_purchases[0].date
     for purchase in previous_purchases:
-        total -= purchase.purchased_for
+        total -= (purchase.purchased_for * purchase.amt_purchased)
         if purchase.purchased_at >= last_date:
             last_date = purchase.purchased_at
     for sale in previous_sales:
         if sale.sold_at >= last_date:
-            last_date = sale.sold_at
-            total += sale.sold_for
+            last_date = sale.date
+            total += (sale.sold_for * sale.amt_sold)
     return last_date, total
 
 def get_current_usr_value(uid, db):
-    now = str(datetime.utcnow())
+    now = str(datetime.now(EST))
     _, t = get_assets_in_date_range(uid, 1500, now, db)
     return t
 
@@ -92,12 +92,18 @@ def buy_shares(usr, abr, num_shares, db):
     price = num_shares * team.price * 1.005
     if usr.available_funds < price:
         raise ValueError('not enough funds')
-    now = EST.localize(datetime.utcnow())
+    now = datetime.now(EST)
     purchase = Purchase(team_id=team.id, user_id=usr.id, purchased_at=now,
                         purchased_for=team.price * 1.005, amt_shares=num_shares)
     db.session.add(purchase)
     db.session.commit()
-    update_teamPrice(team, (team.price * .005), datetime.utcnow() , db)
+    ptransac = PurchaseTransaction(team_id=team.id, user_id=usr.id, date=now,
+                                  purchased_for=team.price * 1.005, amt_purchased=num_shares)
+    db.session.add(ptransac)
+    db.session.commit()
+    res = [{team.abr: {'date': str(now), 'price': team.price * 1.005}}]
+    emit('prices', res, broadcast=True, namespace='/')
+    update_teamPrice(team, (team.price * .005), now , db)
     usr.available_funds -= price
     loc = db.session.merge(usr)
     db.session.add(loc)
@@ -105,12 +111,12 @@ def buy_shares(usr, abr, num_shares, db):
 
 def sell_shares(usr, abr, num_shares, db):
     team = Team.query.filter(Team.abr == abr).first()
-    price = num_shares * team.price * 0.9999
+    price = num_shares * team.price * 0.995
     all_holdings = Purchase.query.filter(Purchase.user_id == usr.id).filter(Purchase.team_id == team.id).filter(Purchase.exists == True).all()
     total_shares = reduce(lambda x, p: x + p.amt_shares, all_holdings, 0)
     if num_shares > total_shares:
         raise ValueError('not enough shares owned')
-    now = EST.localize(datetime.utcnow())
+    now = datetime.now(EST)
     all_holdings.sort(key=lambda p: p.amt_shares, reverse=True)
     left_to_delete = num_shares
     ix = 0
@@ -120,7 +126,7 @@ def sell_shares(usr, abr, num_shares, db):
         if to_del == p.amt_shares:
             p.exists = False
             p.sold_at = now
-            p.sold_for = team.price * .9999
+            p.sold_for = team.price * .995
         else:
             p.amt_shares -= to_del
         loc = db.session.merge(p)
@@ -132,6 +138,10 @@ def sell_shares(usr, abr, num_shares, db):
     loc_u = db.session.merge(usr)
     db.session.add(loc_u)
     db.session.commit()
-    new_sale = Sale(team_id=team.id, date=now, amt_sold=num_shares)
+    new_sale = Sale(team_id=team.id, date=now, amt_sold=num_shares, user_id=usr.id,
+                    sold_for=team.price * .995)
     db.session.add(new_sale)
     db.session.commit()
+    res = [{team.abr: {'date': str(now), 'price': team.price * .995}}]
+    emit('prices', res, broadcast=True, namespace='/')
+    update_teamPrice(team, -(team.price * .005), now, db)

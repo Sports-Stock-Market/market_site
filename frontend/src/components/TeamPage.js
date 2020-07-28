@@ -12,6 +12,8 @@ import {
     Grid, Typography, Container, Divider,
 } from '@material-ui/core';
 import Skeleton from '@material-ui/lab/Skeleton';
+import Cookies from 'universal-cookie';
+import { refreshToken } from '../actions/authActions';
 
 const useStyles = makeStyles((theme) => ({
     title: {
@@ -22,34 +24,65 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-
 const TeamPage = (props) => {
     const classes = useStyles();    
     const sample = getSampleData(0);
     const [price, setPrice] = useState(0);
-    const [data, setData] = useState(sample);
-    const [position, setPosition] = useState({});
+    const [data, setData] = useState({});
+    const [position, setPosition] = useState(null);
     const [abr, setAbr] = useState("");
+    const [funds, setFunds] = useState(15000);
 
-    // useEffect(() => {
-    //     if (abr) {
-    //         const token = props.auth.user.access_token;
-    //         const requestOpts = {
-    //             method: 'GET',
-    //             headers: {'Content-type': 'application/JSON', 'Authorization': 'Bearer ' + token, 'Abr': abr},
-    //             credentials: 'include'
-    //         };
-    //         fetch(`http://localhost:5000/api/teams/position`, requestOpts).then(res => {
-    //             res.json().then(response => {
-    //                 setPosition(response);
-    //             }); 
-    //         });
-    //     }
-    // }, [abr])
+    const getPosition = () => {
+        if (abr) {
+            const token = props.auth.user.access_token;
+            const requestOpts = {
+                method: 'GET',
+                headers: {'Content-type': 'application/JSON', 'Authorization': 'Bearer ' + token, 'Abr': abr},
+                credentials: 'include'
+            };
+            fetch(`http://localhost:5000/api/teams/position`, requestOpts).then(res => {
+                res.json().then(response => {
+                    setPosition(response);
+                }); 
+            });
+        }
+    }
+
+    const getFunds = () => {
+        const cookies = new Cookies();
+        const token = props.auth.user.access_token;
+        const requestOpts = {
+            method: 'GET',
+            headers: {'Content-type': 'application/JSON', 'Authorization': 'Bearer ' + token},
+            credentials: 'include'
+        };
+        fetch("http://localhost:5000/api/users/availableFunds", requestOpts).then(res => {
+            if (res.status == '401') {
+                props.refreshToken(cookies.get('csrf_refresh_token'));
+                getFunds();
+            } else {
+                if (res.status != '422') {
+                    res.json().then(response => {
+                        setFunds(response.available_funds);
+                    });
+                }
+            }
+        });
+    };
+
+    useEffect(() => {
+        getPosition();
+        getFunds();
+    }, []);
+
+    useEffect(() => {
+        getPosition();
+        getFunds();
+    }, [price]);
 
     useEffect(() => {
         setAbr(props.match.params.abr.toUpperCase());
-
         if (!isEmpty(props.teams.teams) && abr !== '') {
             setData(props.teams.teams[abr]['graph']);
             setPrice(props.teams.teams[abr]['price']['price']);
@@ -82,7 +115,7 @@ const TeamPage = (props) => {
                         </Typography>
                         {price == 0 ? 
                         <Skeleton variant="rect" height={154} /> :
-                        <PositionCard data={position}/>
+                        <PositionCard abr={abr} curr={price} teamData={data} data={position}/>
                         }
                     </Grid>
                     <Grid item md={6} sm={10}>
@@ -91,7 +124,14 @@ const TeamPage = (props) => {
                         </Typography>
                         {price == 0 ?
                         <Skeleton variant="rect" height={304.09} /> :
-                        <TeamBuySell abr={abr} price={price}/>
+                        <TeamBuySell 
+                            updatePosition={getPosition} 
+                            updateFunds={getFunds} 
+                            funds={funds} 
+                            avShares={position === null ? 100 : position.num_shares} 
+                            abr={abr} 
+                            price={price}   
+                        />
                         }
                     </Grid>
                 </Grid>
@@ -110,4 +150,4 @@ const mapStateToProps = (state) => {
     };
 }
 
-export default connect(mapStateToProps, {})(TeamPage);
+export default connect(mapStateToProps, { refreshToken })(TeamPage);
