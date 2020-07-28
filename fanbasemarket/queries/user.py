@@ -34,21 +34,23 @@ def get_active_holdings(uid, db, date=None):
 
 def get_assets_in_date_range(uid, previous_balance, end, db, start=None):
     if start is None:
-        previous_purchases = db.session.query(Purchase).\
+        previous_purchases = Purchase.query.\
             filter(Purchase.user_id == uid).\
             filter(Purchase.purchased_at <= end).all()
-        previous_sales = db.session.query(Purchase).\
+        previous_sales = Purchase.query.\
             filter(Purchase.user_id == uid).\
-            filter(not_(Purchase.sold_at == None)).\
+            filter(Purchase.exists == False).\
             filter(Purchase.sold_at <= end).all()
     else:
-        previous_purchases = db.session.query(Purchase). \
+        previous_purchases = Purchase.query.\
             filter(Purchase.user_id == uid).\
-            filter(and_(Purchase.purchased_at <= end, Purchase.purchased_at > start)).all()
-        previous_sales = db.session.query(Purchase).\
+            filter(Purchase.purchased_at <= end).\
+            filter(Purchase.purchased_at > start).all()
+        previous_sales = Purchase.query.\
             filter(Purchase.user_id == uid).\
-            filter(not_(Purchase.sold_at == None)).\
-            filter(and_(Purchase.sold_at <= end, Purchase.sold_at > start)).all()
+            filter(Purchase.exists == False).\
+            filter(Purchase.sold_at <= end).\
+            filter(Purchase.sold_at > start).all()
     total = previous_balance
     if not previous_purchases:
         return end, total
