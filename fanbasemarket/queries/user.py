@@ -3,6 +3,7 @@ from json import dumps
 from functools import reduce
 from sqlalchemy import and_, not_
 from pytz import timezone
+from flask_socketio import emit
 
 from fanbasemarket.queries.utils import get_graph_x_values
 from fanbasemarket.queries.team import update_teamPrice
@@ -96,6 +97,8 @@ def buy_shares(usr, abr, num_shares, db):
                         purchased_for=team.price * 1.005, amt_shares=num_shares)
     db.session.add(purchase)
     db.session.commit()
+    res = [{team.abr: {'date': str(now), 'price': team.price * 1.005}}]
+    emit('prices', res, broadcast=True, namespace='/')
     update_teamPrice(team, (team.price * .005), now , db)
     usr.available_funds -= price
     loc = db.session.merge(usr)
@@ -134,3 +137,6 @@ def sell_shares(usr, abr, num_shares, db):
     new_sale = Sale(team_id=team.id, date=now, amt_sold=num_shares)
     db.session.add(new_sale)
     db.session.commit()
+    res = [{team.abr: {'date': str(now), 'price': team.price * .995}}]
+    emit('prices', res, broadcast=True, namespace='/')
+    update_teamPrice(team, -(team.price * .005), now, db)

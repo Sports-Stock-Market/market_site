@@ -177,11 +177,6 @@ const TeamBuySell = (props) => {
                         avFunds: props.funds,
                         remFunds: props.funds + (change),
                     });
-                    const newp = props.price * multiplier;
-                    const est = new Date().toLocaleString('en-US', {timeZone: 'America/New_York'});
-                    const to_upd = {}
-                    to_upd[props.abr] = {'date': new Date(est).toISOString(), 'price': newp};
-                    props.updatePrices([to_upd]);
                 }); 
             });
             
