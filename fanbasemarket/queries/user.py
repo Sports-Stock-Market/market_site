@@ -7,7 +7,7 @@ from flask_socketio import emit
 
 from fanbasemarket.queries.utils import get_graph_x_values
 from fanbasemarket.queries.team import update_teamPrice
-from fanbasemarket.models import Purchase, User, Team, Sale
+from fanbasemarket.models import Purchase, User, Team, Sale, PurchaseTransaction
 
 EST = timezone('US/Eastern')
 
@@ -34,35 +34,33 @@ def get_active_holdings(uid, db, date=None):
 
 def get_assets_in_date_range(uid, previous_balance, end, db, start=None):
     if start is None:
-        previous_purchases = Purchase.query.\
-            filter(Purchase.user_id == uid).\
-            filter(Purchase.purchased_at <= end).all()
-        previous_sales = Purchase.query.\
-            filter(Purchase.user_id == uid).\
-            filter(Purchase.exists == False).\
-            filter(Purchase.sold_at <= end).all()
+        previous_purchases = PurchaseTransaction.query.\
+            filter(PurchaseTransaction.user_id == uid).\
+            filter(PurchaseTransaction.date <= end).all()
+        previous_sales = Sale.query.\
+            filter(Sale.user_id == uid).\
+            filter(Sale.date <= end).all()
     else:
-        previous_purchases = Purchase.query.\
-            filter(Purchase.user_id == uid).\
-            filter(Purchase.purchased_at <= end).\
-            filter(Purchase.purchased_at > start).all()
-        previous_sales = Purchase.query.\
-            filter(Purchase.user_id == uid).\
-            filter(Purchase.exists == False).\
-            filter(Purchase.sold_at <= end).\
-            filter(Purchase.sold_at > start).all()
+        previous_purchases = PurchaseTransaction.query.\
+            filter(PurchaseTransaction.user_id == uid).\
+            filter(PurchaseTransaction.date <= end).\
+            filter(PurchaseTransaction.date > start).all()
+        previous_sales = Sale.query.\
+            filter(Sale.user_id == uid).\
+            filter(Sale.date <= end).\
+            filter(Sale.date > start).all()
     total = previous_balance
     if not previous_purchases:
         return end, total
-    last_date = previous_purchases[0].purchased_at
+    last_date = previous_purchases[0].date
     for purchase in previous_purchases:
-        total -= purchase.purchased_for
+        total -= (purchase.purchased_for * purchase.amt_purchased)
         if purchase.purchased_at >= last_date:
             last_date = purchase.purchased_at
     for sale in previous_sales:
         if sale.sold_at >= last_date:
-            last_date = sale.sold_at
-            total += sale.sold_for
+            last_date = sale.date
+            total += (sale.sold_for * sale.amt_sold)
     return last_date, total
 
 def get_current_usr_value(uid, db):
@@ -98,6 +96,10 @@ def buy_shares(usr, abr, num_shares, db):
     purchase = Purchase(team_id=team.id, user_id=usr.id, purchased_at=now,
                         purchased_for=team.price * 1.005, amt_shares=num_shares)
     db.session.add(purchase)
+    db.session.commit()
+    ptransac = PurchaseTransaction(team_id=team.id, user_id=usr.id, date=now,
+                                  purchased_for=team.price * 1.005, amt_purchased=num_shares)
+    db.session.add(ptransac)
     db.session.commit()
     res = [{team.abr: {'date': str(now), 'price': team.price * 1.005}}]
     emit('prices', res, broadcast=True, namespace='/')
@@ -136,7 +138,8 @@ def sell_shares(usr, abr, num_shares, db):
     loc_u = db.session.merge(usr)
     db.session.add(loc_u)
     db.session.commit()
-    new_sale = Sale(team_id=team.id, date=now, amt_sold=num_shares)
+    new_sale = Sale(team_id=team.id, date=now, amt_sold=num_shares, user_id=usr.id,
+                    sold_for=team.price * .995)
     db.session.add(new_sale)
     db.session.commit()
     res = [{team.abr: {'date': str(now), 'price': team.price * .995}}]
