@@ -1,2 +1,4 @@
-heroku addons:create heroku-postgresql:hobby-dev
-web: gunicorn wsgi:app
+heroku addons:create cleardb:ignite
+server: gunicorn wsgi:app
+web: cd frontend && npm start
+initdb: python dbsetup.py
