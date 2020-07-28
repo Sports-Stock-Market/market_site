@@ -3,7 +3,7 @@ import {
   BrowserRouter as Router, Switch, Route
 } from 'react-router-dom';
 import {
-  AuthNavBar, LoginForm, SignUpForm, Portfolio, FormContainer, NewLeaderboard, TeamPage, AllTeamsPage,
+  AuthNavBar, LoginForm, SignUpForm, Portfolio, FormContainer, NewLeaderboard, TeamPage, AllTeamsPage, LandingPage
 } from './components';
 import { connect } from 'react-redux';
 import { initAllTeams, setAllNames, updatePrices } from './actions/teamActions'; 
@@ -34,7 +34,7 @@ function App(props) {
       <AuthNavBar />
         <Switch>
           <Route path="/" exact>
-            <h1> Fanbase Market </h1>
+            <LandingPage />
           </Route>
           <Route path="/login" exact>
             <FormContainer title="Welcome to Fanbase">

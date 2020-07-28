@@ -263,8 +263,8 @@ const NewLeaderboard = (props) => {
                     className={row.name == props.auth.user.username ? classes.userRow : null}>
                       <TableCell>
                       <span>
-                        <Avatar className={classes.money}>
-                            ${moneyFromRank(index + 1)}
+                        <Avatar style={{backgroundColor: "#FFF"}}>
+                            {"H"}
                         </Avatar>
                       </span>
                       </TableCell>
