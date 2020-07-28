@@ -14,7 +14,7 @@ generate_url = lambda s: f'http://data.nba.net/10s/prod/v1/{s}/scoreboard.json'
 def bigboy_pulls_only(db):
     k = 45
     h = 80
-    today = EST.localize(datetime.utcnow())
+    today = datetime.now(EST)
     url = generate_url(today.strftime('%Y%m%d'))
     games = get(url).json()['games']
     nba_teams = teams.get_teams()
@@ -92,7 +92,6 @@ def bigboy_pulls_only(db):
             filter(Sale.date >= i['start'])
         home_ss = len(ss_during_game.filter(Sale.team_id == home_tObj.id).all())
         away_ss = len(ss_during_game.filter(Sale.team_id == away_tObj.id).all())
-        print(home_ps, home_ss)
         new_homeElo *= (1.005 ** (home_ps - home_ss))
         new_awayElo *= (1.005 ** (away_ps - away_ss))
         set_teamPrice(home_tObj, new_homeElo, today, db)

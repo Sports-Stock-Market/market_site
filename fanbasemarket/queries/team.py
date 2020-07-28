@@ -3,12 +3,17 @@ from datetime import datetime
 from sqlalchemy import desc
 
 from sqlalchemy.ext.declarative import declarative_base
-from fanbasemarket.models import Teamprice, Player, Purchase
+from fanbasemarket.models import Teamprice, Player, Purchase, Team
 from fanbasemarket.queries.utils import get_graph_x_values
+
+from datetime import datetime
+from pytz import timezone
+
+EST = timezone('US/Eastern')
 
 def get_price(tid, db, date=None):
     if not date:
-        date = datetime.utcnow().strftime('%Y-%m-%d')
+        date = str(datetime.now(EST))
     return db.session.query(Teamprice). \
         filter(Teamprice.team_id == tid). \
         filter(Teamprice.date <= date). \
@@ -69,15 +74,22 @@ def get_user_position(team, user, db):
         filter(Purchase.exists == True).\
         all()
     values = [h.purchased_for for h in holdings]
-    bought_at = sum(values) / len(values)
+    if len(values) > 0:
+        bought_at = sum(values) / len(values)
+    else: 
+        bought_at = 0
     num_shares = sum([h.amt_shares for h in holdings])
-    all_holdings = get_active_holdings(user.id, db)
+    date = str(datetime.now(EST))
+    all_holdings = get_active_holdings(user.id, db, date=date)
     total_val = 0
-    for h in all_holdings:
-        for abr, item in h.items():
-            tm = Team.query.filter(Team.abr == abr).first()
-            total_val += tm.price
-    weight = team.price * num_shares / total_val
+    for abr, purchases in all_holdings.items():
+        tm = Team.query.filter(Team.abr == abr).first()
+        for purchase in purchases:
+            total_val += tm.price * purchase['num_shares']
+    if total_val != 0:
+        weight = team.price * num_shares / total_val
+    else:
+        weight = 0
     d = {}
     d['bought_at'] = bought_at
     d['num_shares'] = num_shares

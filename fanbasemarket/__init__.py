@@ -21,13 +21,6 @@ import time
 import csv
 import math
 
-# filterwarnings('ignore')
-
-STRPTIME_FORMAT = '%m/%d/%Y'
-K = 40
-H = 100
-
-
 INJURIES = {'2019-11-01':[['Paul George', 'Clippers', 'Month']],
     '2019-10-25': [['Deandre Ayton', 'Suns', 'Month']],
     '2019-11-02':[['Stephen Curry', 'Warriors', 'Season']], 
@@ -69,7 +62,6 @@ db_usr = getenv('DB_USR')
 db_pass = getenv('DB_PASS')
 db_host = getenv('DB_HOST')
 db_name = getenv('DB_NAME')
-load_start = datetime.strptime(getenv('LOAD_START'), STRPTIME_FORMAT)
 
 app = Flask(__name__)
 CORS(app)
@@ -88,53 +80,6 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 jwt = JWTManager(app)
 io = SocketIO(app, cors_allowed_origins='http://localhost:3000')
-
-from fanbasemarket.models import *
-from fanbasemarket.pricing.elo import simulate
-from fanbasemarket.queries.team import set_player_rating
-
-try:
-    db.create_all()
-except:
-    pass
-
-# Populate DB with NBA Teams
-teams_all = teams.get_teams()
-team_names = [(team['full_name'], team['abbreviation']) for team in teams_all]
-for t_name, t_abr in team_names:
-    q = Team.query.filter_by(name=t_name).all()
-    if len(q) == 0:
-        p = get_starting_elo(t_name)
-        t_obj = Team(name=t_name, abr=t_abr, price=p, prev_price=p)
-        db.session.add(t_obj)
-        db.session.commit()
-        t_price = Teamprice(date=load_start, team_id=t_obj.id, elo=p)
-        db.session.add(t_price)
-        db.session.commit()
-
-# load player data now
-players_all = Player.query.all()
-if len(players_all) == 0:
-    df = pd.read_csv('player_data/new_2k_ratings.csv')
-    for ix, row in df.iterrows():
-        name = row['Name']
-        pos1 = row['Primary']
-        pos2 = '' if pd.isna(row['Secondary']) else row['Secondary']
-        tid = Team.query.filter(Team.name.contains(row['Team'])).first().id
-        init_mpg = row['MPG']
-        rating = row['Rating']
-        new_p = Player(name=name, rating=rating, initial_mpg=init_mpg, mpg=init_mpg, \
-                       pos1=pos1, pos2=pos2, team_id=tid)
-        db.session.add(new_p)
-        db.session.commit()
-    for team in Team.query.all():
-        team.fs_rating = set_player_rating(team, db)
-        team.rating = set_player_rating(team, db)
-        db.session.add(team)
-        db.session.commit()
-    simulate(2019, 2020, 45, 100, True, INJURIES, db) 
-
-db.session.remove()
 
 executor = Executor(app)
 

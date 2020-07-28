@@ -2,6 +2,7 @@ from flask import Blueprint, request
 from flask_cors import CORS, cross_origin
 from flask_jwt_extended import jwt_required, get_current_user, get_jwt_identity
 from datetime import datetime
+from pytz import timezone
 
 from fanbasemarket import app, get_db
 from fanbasemarket.models import Purchase, User, Teamprice, Team
@@ -10,6 +11,8 @@ from fanbasemarket.queries.user import get_active_holdings, get_user_graph_point
                                        get_leaderboard
 from fanbasemarket.routes.utils import bad_request, ok
 from fanbasemarket.queries.user import buy_shares, sell_shares
+
+EST = timezone('US/Eastern')
 
 users = Blueprint('users', __name__)
 CORS(users)
@@ -34,7 +37,7 @@ def gen_usrPg():
         db = get_db()
         heads = request.headers
         if 'date' not in heads:
-            date = str(datetime.utcnow())
+            date = str(datetime.now(EST))
         else:
             date = heads['date']
         uname = heads['username']
@@ -84,3 +87,14 @@ def make_sale():
         except ValueError as e:
             return bad_request(str(e))
         return ok({})
+
+@users.route('availableFunds', methods=['GET'])
+@cross_origin('http://localhost:3000/')
+@jwt_required
+def get_avFunds():
+    uname = get_jwt_identity()
+    with app.app_context():
+        db = get_db()
+        usr = User.query.filter(User.username == uname).first()
+        return ok({'available_funds': usr.available_funds})
+        
