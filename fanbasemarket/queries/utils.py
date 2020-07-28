@@ -5,6 +5,7 @@ EST = timezone('US/Eastern')
 
 def get_graph_x_values():
     now = datetime.now(EST)
+    yesterday = now - timedelta(days=1)
     beginning_of_day = EST.localize(datetime(now.year, now.month, now.day))
     week_ago = beginning_of_day - timedelta(weeks=1)
     month_ago = beginning_of_day - timedelta(weeks=4)
@@ -24,7 +25,7 @@ def get_graph_x_values():
     while week_ago <= beginning_of_day:
         x_values['1W'].append(week_ago)
         week_ago += timedelta(days=1)
-    while beginning_of_day <= now:
+    while yesterday <= now:
         x_values['1D'].append(beginning_of_day)
-        beginning_of_day += timedelta(minutes=5)
+        yesterday += timedelta(minutes=5)
     return x_values

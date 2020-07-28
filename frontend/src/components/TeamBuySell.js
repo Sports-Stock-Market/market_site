@@ -3,11 +3,14 @@ import { formatNumber } from '../utils/jsUtils';
 import { connect } from 'react-redux';
 import * as NBAIcons from 'react-nba-logos';
 import { withStyles, makeStyles } from '@material-ui/core/styles';
+import { updatePrices } from '../actions/teamActions';
 import { 
     Typography, Grid, Card, TextField, Tabs, Tab, Button, Snackbar, IconButton
 } from '@material-ui/core';
 import Alert from '@material-ui/lab/Alert';
 import CloseIcon from '@material-ui/icons/Close';
+import { refreshToken } from '../actions/authActions';
+import Cookies from 'universal-cookie';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -138,6 +141,40 @@ const TeamBuySell = (props) => {
         setAllData();
     }, [value]);
 
+    const do_setting = (type, tradeInfo, forSnack) => {
+        const cookies = new Cookies();
+        const token = props.auth.user.access_token;
+        const requestOpts = {
+            method: 'POST',
+            headers: {'Content-type': 'application/JSON', 'Authorization': 'Bearer ' + token},
+            body: JSON.stringify(tradeInfo),
+            credentials: 'include'
+        };
+        fetch(`http://localhost:5000/api/users/${type}`, requestOpts).then(res => {
+            if (res.status == '401') {
+                props.refreshToken(cookies.get('csrf_refresh_token'));
+                do_setting(type, tradeInfo, forSnack);
+            } else {
+                if (res.status != '422') {
+                    res.json().then(response => {
+                        setMsg(forSnack);
+                        setLastShares(shares)
+                        setOpen(true);
+                        setShares(0);
+                        props.updatePosition();
+                        props.updateFunds();
+                        const multiplier = value == 0 ? (1 + spreadPCT) : (1 - spreadPCT);
+                        const change = value == 1 ? props.price * multiplier * shares : -props.price * multiplier * shares;
+                        setData({...data, 
+                            avFunds: props.funds,
+                            remFunds: props.funds + (change),
+                        });
+                    });
+                }
+            }
+        });
+    }
+
     const handleTrade = () => {
         if (shares > 0) {
             let type, forSnack;
@@ -151,33 +188,11 @@ const TeamBuySell = (props) => {
                 type = "shortShares";
                 forSnack = "shorted";
             }
-            const token = props.auth.user.access_token;
             const tradeInfo = {
                 abr: props.abr,
                 num_shares: shares,
             };
-            const requestOpts = {
-                method: 'POST',
-                headers: {'Content-type': 'application/JSON', 'Authorization': 'Bearer ' + token},
-                body: JSON.stringify(tradeInfo),
-                credentials: 'include'
-            };
-            fetch(`http://localhost:5000/api/users/${type}`, requestOpts).then(res => {
-                res.json().then(response => {
-                    setMsg(forSnack);
-                    setLastShares(shares)
-                    setOpen(true);
-                    setShares(0);
-                    props.updatePosition();
-                    props.updateFunds();
-                    const multiplier = value == 0 ? (1 + spreadPCT) : (1 - spreadPCT);
-                    const change = value == 1 ? props.price * multiplier * shares : -props.price * multiplier * shares;
-                    setData({...data, 
-                        avFunds: props.funds,
-                        remFunds: props.funds + (change),
-                    });
-                }); 
-            });
+            do_setting(type, tradeInfo, forSnack);
         }
     };
 
@@ -276,4 +291,4 @@ const mapStateToProps = (state) => {
     };
 }
 
-export default connect(mapStateToProps, {})(TeamBuySell);
+export default connect(mapStateToProps, { updatePrices, refreshToken })(TeamBuySell);

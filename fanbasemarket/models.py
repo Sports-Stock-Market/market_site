@@ -140,6 +140,16 @@ class Sale(db.Model):
     __tablename__ = 'sale'
     id = db.Column(db.Integer, primary_key=True)
     team_id = db.Column(db.Integer, db.ForeignKey('team.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    sold_for = db.Column(db.Float)
     date = db.Column(db.DateTime)
     amt_sold = db.Column(db.Integer)
 
+class PurchaseTransaction(db.Model):
+    __tablename__ = 'purchasetransaction'
+    id = db.Column(db.Integer, primary_key=True)
+    team_id = db.Column(db.Integer, db.ForeignKey('team.id'))
+    date = db.Column(db.DateTime)
+    purchased_for = db.Column(db.Float)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    amt_purchased = db.Column(db.Integer)
