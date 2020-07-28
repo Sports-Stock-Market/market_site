@@ -9,6 +9,8 @@ import {
 } from '@material-ui/core';
 import Alert from '@material-ui/lab/Alert';
 import CloseIcon from '@material-ui/icons/Close';
+import { refreshToken } from '../actions/authActions';
+import Cookies from 'universal-cookie';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -139,31 +141,20 @@ const TeamBuySell = (props) => {
         setAllData();
     }, [value]);
 
-    const handleTrade = () => {
-        if (shares > 0) {
-            let type, forSnack;
-            if (value == 0) {
-                type = "buyShares";
-                forSnack = "purchased";
-            } else if (value == 1) {
-                type = "sellShares";
-                forSnack = "sold";
+    const do_setting = (type, tradeInfo, forSnack) => {
+        const cookies = new Cookies();
+        const token = props.auth.user.access_token;
+        const requestOpts = {
+            method: 'POST',
+            headers: {'Content-type': 'application/JSON', 'Authorization': 'Bearer ' + token},
+            body: JSON.stringify(tradeInfo),
+            credentials: 'include'
+        };
+        fetch(`http://localhost:5000/api/users/${type}`, requestOpts).then(res => {
+            if (res.status == 422) {
+                props.refreshToken(cookies.get('csrf_refresh_token'));
+                do_setting(type, tradeInfo, forSnack);
             } else {
-                type = "shortShares";
-                forSnack = "shorted";
-            }
-            const token = props.auth.user.access_token;
-            const tradeInfo = {
-                abr: props.abr,
-                num_shares: shares,
-            };
-            const requestOpts = {
-                method: 'POST',
-                headers: {'Content-type': 'application/JSON', 'Authorization': 'Bearer ' + token},
-                body: JSON.stringify(tradeInfo),
-                credentials: 'include'
-            };
-            fetch(`http://localhost:5000/api/users/${type}`, requestOpts).then(res => {
                 res.json().then(response => {
                     setMsg(forSnack);
                     setLastShares(shares)
@@ -177,9 +168,29 @@ const TeamBuySell = (props) => {
                         avFunds: props.funds,
                         remFunds: props.funds + (change),
                     });
-                }); 
-            });
-            
+                });
+            }
+        });
+    }
+
+    const handleTrade = () => {
+        if (shares > 0) {
+            let type, forSnack;
+            if (value == 0) {
+                type = "buyShares";
+                forSnack = "purchased";
+            } else if (value == 1) {
+                type = "sellShares";
+                forSnack = "sold";
+            } else {
+                type = "shortShares";
+                forSnack = "shorted";
+            }
+            const tradeInfo = {
+                abr: props.abr,
+                num_shares: shares,
+            };
+            do_setting(type, tradeInfo, forSnack);
         }
     };
 
@@ -278,4 +289,4 @@ const mapStateToProps = (state) => {
     };
 }
 
-export default connect(mapStateToProps, { updatePrices })(TeamBuySell);
+export default connect(mapStateToProps, { updatePrices, refreshToken })(TeamBuySell);
